@@ -1,12 +1,10 @@
 ---
-title: 寻找 ReSharper 的开源替代品
+title: 寻找 ReSharper 开源替代
 abbrlink: 2913837123
+categories:
+  - 开发环境
 date: 2023-02-14 00:00:00
 ---
-
-
-
-# 使用一系列开源拓展部分替代ReSharper
 
 众所周知 JetBrains 家的IDE都十分的智能好用，Visual Studio 的代码提示和感知相比之下就略逊一筹。
 

@@ -1,6 +1,8 @@
 ---
 title: 初探 C# Script
 abbrlink: 3021583790
+categories:
+  - 刷题笔记
 date: 2023-04-11 00:00:00
 ---
 
