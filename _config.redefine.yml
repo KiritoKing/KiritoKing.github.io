@@ -38,7 +38,7 @@ navbar:
         归档: /archives/
     介绍:
       icon: fa-solid fa-address-card
-      path: /
+      path: /resume
     友链:
       icon: fa-solid fa-link
       path: /links/

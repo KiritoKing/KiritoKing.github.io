@@ -1,6 +1,7 @@
 ---
 title: 寻找 ReSharper 开源替代
 abbrlink: 2913837123
+excerpt: 不做被JetBrains宠坏的开发者（虽然IDEA真香）
 categories:
   - 开发环境
 date: 2023-02-14 00:00:00
