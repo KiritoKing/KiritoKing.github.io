@@ -1,5 +1,5 @@
 info:
-  title: ChlorineC's Blog
+  title: 南南地理
   author: ChlorineC
 
 default:
@@ -79,4 +79,7 @@ comment:
 footer:
   runtime: false
   start: 2023/04/17 14:44:44
+  icp:
+    enable: true
+    number: 蜀ICP备2022029268号
   
