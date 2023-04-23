@@ -36,7 +36,7 @@ navbar:
         分类: /categories/
         标签: /tags/
         归档: /archives/
-    介绍:
+    简历:
       icon: fa-solid fa-address-card
       path: /resume
     友链:
