@@ -158,3 +158,6 @@ auto_category:
  enable: true
  depth: 
 
+# Compress resources
+all_minifier: true
+
