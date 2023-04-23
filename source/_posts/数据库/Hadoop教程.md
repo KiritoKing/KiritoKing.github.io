@@ -1,12 +1,11 @@
 ---
-title: 从零开始 Hadoop 虚拟机伪集群环境教程
+title: 从零开始 Hadoop 虚拟机伪集群环境
+excerpt: 一个保姆级的 Hadoop 虚拟机伪集群环境搭建教程，面向零基础人群。
 abbrlink: 1679475366
+categories:
+  - 数据库
 date: 2022-01-25 00:00:00
 ---
-
-
-
-# 序言
 
 **本教程直接面向华中科技大学计算机专业大数据导论课程结业项目，是基础向教程，不涉及进阶应用**
 
@@ -18,14 +17,14 @@ date: 2022-01-25 00:00:00
 
 本博客同时也作为 [视频教程](待定) 的台本方便各位查阅，对Linux基础操作不熟悉的同学可以对着视频一步步操作，对应代码可以直接复制博客中代码。
 
-## 搭建环境
+### 搭建环境
 
 - CentOS v7.9.2009
 - jdk-8u202-linux-x64（1.8.202）
 - Hadoop-v3.3.1
 - VMWare Workstation Player 16
 
-## 推荐下载地址
+### 推荐下载地址
 
 - CentOS 下载地址：THU镜像站（亲测可以满速）
   - [下载列表 7.9.2009](https://mirrors.tuna.tsinghua.edu.cn/centos/7.9.2009/isos/x86_64/)
@@ -40,7 +39,7 @@ date: 2022-01-25 00:00:00
 - Hadoop 下载地址（THU镜像）：[hadoop-v3.3.1](https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz)
 - VMWare Player 下载地址（官方）：[VMware Workstation Player - VMware Customer Connect](https://customerconnect.vmware.com/en/downloads/info/slug/desktop_end_user_computing/vmware_workstation_player/16_0)
 
-## 搭建目标
+### 搭建目标
 
 搭建一个1主机+2从机的Hadoop伪分布式集群（因为并没有真正利用到分布式的特性，只是采用了分布式的形式所以叫伪分布式），并进行简单的wordcount示例计算
 
@@ -82,7 +81,7 @@ date: 2022-01-25 00:00:00
   9. 确定后通过如下方式重启虚拟机，等待进入安装界面![](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125152152847.png)
   10. 首先选择语言![image-20220125152349280](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125152349280.png)
   11. 继续后依次配置需要配置的三项![image-20220125152816041](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125152816041.png)
-      - 网络配置![image-20220125152456308](C:/Users/kirito/AppData/Roaming/Typora/typora-user-images/image-20220125152456308.png)
+      - 网络配置![image-20220125152456308](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304222209836.png)
       - 软件选择![image-20220125152837008](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125152837008.png)
       - 安装位置：点进去等一下会自己完成![image-20220125152856153](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125152856153.png)
   12. 安装过程中需要自己创建Root密码（双击进去自己设置）![image-20220125153010053](https://gitee.com/KiritoKing/blog-images/raw/master/image-20220125153010053.png)
