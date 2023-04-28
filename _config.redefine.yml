@@ -1,11 +1,11 @@
 info:
-  title: 南南地理
+  title: ChlorineC's Blog
   author: ChlorineC
 
-default:
-  favicon: images/favicon.ico
+defaults:
+  favicon: /images/favicon.ico
   logo: 
-  avator: 
+  avatar: /images/avatar.jpg
 
 global:
   chinese:
