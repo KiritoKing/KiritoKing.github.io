@@ -26,7 +26,13 @@ home_banner:
   title: Hello, World!
   subtitle:
     text: ["Stay Hungry, Stay Foolish.", "Keep Your Curiosity."]
-
+  social_links:
+    enable: true
+    links: 
+      github: https://github.com/KiritoKing
+      zhihu: https://www.zhihu.com/people/kirito-38
+      bilibili: https://space.bilibili.com/8408315
+  
 navbar:
   auto_hide: true
   links:
