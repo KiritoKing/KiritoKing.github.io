@@ -1,5 +1,7 @@
 ---
 title: 利用Table布局实现EDM设计
+thumbnail: https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80
+cover: https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80
 tags:
   - EDM
   - 表格控件
@@ -22,6 +24,8 @@ abbrlink: 3247330139
 
 因此，做国外的推广和宣发工作，EDM编写就是非常关键的一环。
 
+![](https://images.unsplash.com/photo-1522542550221-31fd19575a2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)
+
 ### EDM编写的特点
 
 由于EDM-HTML的宿主环境是各邮件客户端而不仅仅是浏览器（虽然也有网页邮箱这样的存在），因此EDM最突出的问题就是**兼容性问题**。如果你发的广告到客户的手机上无法正常显示，那别说推广产品了，对企业的印象分直接跌落谷底。
@@ -33,7 +37,7 @@ abbrlink: 3247330139
 - 不支持绝对定位（如`top`、`left`等属性）
 - 由于设计稿的需求比较细化，移动端和桌面端应使用独立的代码（使用**媒体查询**和`display: none`切换），而不是共用一套响应式代码
 
-## `<table>`标签
+## `<table>` 标签
 
 `<table>`表示表格数据, 即在一个由包含数据的行和列组成的二维表格中呈现的信息。最正统的用法肯定是展示一个数据表格，但由于`<td>`和`<th>`接收任何流式内容的特点，在EDM一般作为`flex`和`grid`的替代品存在。
 
@@ -77,11 +81,11 @@ abbrlink: 3247330139
 
 #### table-layout
 
-collecting...
+{% note info  %}此部分内容还在编辑中{% endnote %}
 
 #### 媒体查询（@media）
 
-collecting...
+{% note info  %}此部分内容还在编辑中{% endnote %}
 
 ## EDM编写过程中存在的问题
 
