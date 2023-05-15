@@ -7,9 +7,9 @@ tags:
 excerpt: >-
   在新机器和旧机器上重新配置统一的Python环境和管理方案，使用一个全局最新版Python +
   Conda管理项目中不同版本Python虚拟环境的方案，同时优化终端速度和体验。
-categories:
-  - 机器学习
 abbrlink: 768258525
+categories:
+  - 开发环境
 date: 2023-05-10 20:25:59
 ---
 
@@ -137,8 +137,8 @@ If (Test-Path "C:\Users\kirito\anaconda3\Scripts\conda.exe") {
 
 加载`profile.ps1`：**2309ms**
 
-![image-20230506233531366](C:/Users/kirito/AppData/Roaming/Typora/typora-user-images/image-20230506233531366.png)
+![image-20230506233531366](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202305160037378.png)
 
 不加载`profile.ps1`：**664ms**
 
-![image-20230506233558513](C:/Users/kirito/AppData/Roaming/Typora/typora-user-images/image-20230506233558513.png)
+![image-20230506233558513](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202305160037397.png)
