@@ -1,4 +1,10 @@
+- name: Elubrazione's Blog
+  link: https://elubrazione.github.io/
+  description: 华科的好兄弟1号
+  avatar: https://elubrazione.github.io/avatar/yunjin.jpg
+
 - name: EvanNotFound's Blog
   link: https://ohevan.com
-  description: 用香港记者的速度更新文章
+  description: 主题作者的博客
   avatar: https://evan.beee.top/avatar.png
+
