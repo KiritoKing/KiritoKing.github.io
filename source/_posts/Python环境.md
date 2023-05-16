@@ -1,15 +1,12 @@
 ---
 title: Python 编程环境重新构建
 tags:
-  - Python
-  - 编程环境
-  - 版本管理
+  - python
+  - 开发环境
 excerpt: >-
   在新机器和旧机器上重新配置统一的Python环境和管理方案，使用一个全局最新版Python +
   Conda管理项目中不同版本Python虚拟环境的方案，同时优化终端速度和体验。
 abbrlink: 768258525
-categories:
-  - 开发环境
 date: 2023-05-10 20:25:59
 ---
 

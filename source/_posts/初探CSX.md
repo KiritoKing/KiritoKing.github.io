@@ -3,9 +3,9 @@ title: 初探 C# Script
 excerpt: C# 脚本是一款用于测试 C# 和 .NET 代码段的工具，无需创建多个单元测试或控制台项目。它提供了轻型选项，可快速在命令行上对 LINQ 聚合方法进行编码、检查 .NET API 是否解压缩文件或调用 REST API，以了解返回的内容或工作原理。
 abbrlink: 3021583790
 tags:
-  - C#
-  - .NET
-  - 编程环境
+  - c#
+  - .net
+  - 开发环境
 categories:
   - 刷题笔记
 date: 2023-04-11 00:00:00
