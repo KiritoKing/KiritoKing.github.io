@@ -29,7 +29,7 @@ date: 2023-05-23 12:47:52
 
 ### Why not others?
 
-首先我肯定先看了1Password这个我老早就熟悉的方案，但它和别的方案（如BitWarden）一样有一个我不能接收的地方：贵。
+首先我肯定先看了1Password，LastPass等方案，但它和别的方案（如BitWarden）一样有一个我不能接收的地方：贵。
 
 首先对于我这种**轻度需求**的人来说，它没有免费订阅，而且订阅费都是刀乐，实在有点难顶。
 
@@ -155,19 +155,28 @@ KeePass使用树状目录组织密码，树的层级间会继承父级的规则�
 
 使用它甚至都不需要教程，直接上手即可。
 
-<img src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523123957.png" alt="image-20230523123956528" style="zoom:80%;" />
+![image-20230523123956528](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523123957.png)
 
 在个人习惯方面，我对其作了如下设置，尤其是**最小化那一块非常重要（经常手滑关掉导致浏览器连不上）**
 
-<img src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124230.png" alt="image-20230523124229507" style="zoom:80%;" />
+![image-20230523124229507](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124230.png)
 
-<img src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124313.png" alt="image-20230523124312862" style="zoom:80%;" />
+![image-20230523124312862](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124313.png)
 
-<img src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124334.png" alt="image-20230523124333159" style="zoom:80%;" />
+![image-20230523124333159](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124334.png)
 
 ### 移动端改进
 
 除了客户端换用了更现代的 KeepassDX 外没有什么改变。
+
+### 其他改进
+
+#### 多URL方案
+
+BitWarden有内建的单条目对应多URL方案，但KeePass并不支持。我简单搜索了一下有以下几种解决方案：
+
+- **克隆多条记录，并使用引用同步账号密码，设置不同URL**（也是我的方案）
+- 设置属性（需要插件或客户端支持），如KP2A_URL（KeePassHttp）、App（Keepass4Android）等
 
 ## 番外篇：2FA与TOTP
 
