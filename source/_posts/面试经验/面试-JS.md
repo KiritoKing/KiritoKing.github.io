@@ -59,9 +59,13 @@ JavaScript 是基于**原型**的而不是基于类的，面向对象**用原型
 JavaScript 对象是动态的属性“包”（指其自己的属性），对象又分为**普通对象**和**函数对象**两种。
 
 - **每个对象**都有 `__proto__` 属性，它指向这个对象的**原型对象（prototype）**
-- 只有**函数对象**有 `prototype`（原型对象）属性，它有**默认**拥有两个属性：`constructor` 和 `__proto__`（默认表示在 `log` 时不会显示出来）
+- **只有函数对象有 `prototype`（原型对象）属性**，它有**默认**拥有两个属性：`constructor` 和 `__proto__`（默认表示在 `log` 时不会显示出来）
   - `constructor` 属性用于记录实例是由哪个**构造函数**创建，函数对象的 `prototype` 的 `constructor` 默认是它自己，普通对象则是它的构造函数。
-  - `__proto__` 属性指向对象的父类（对象）的原型对象（prototype），直到 `Object` 的 `prototype` 属性为 `null`，原型链结束
+  - `__proto__` 属性指向对象的父类（对象）的原型对象（prototype），直到 `Object` 的 `prototype` 属性为 `null`，原型链结束.
+  - `construtor`代表自身（子类自己），`__proto__`代表父类（原型链）
+
+![1.drawio](https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230531221550.png)
+
 - **任何函数都可以作为构造函数**，但是并不能将任意函数叫做构造函数，**只有当一个函数通过 `new` 关键字调用的时候才可以成为构造函数**。
 - 当试图访问一个对象的属性时，它**不仅仅在该对象上搜寻，还会搜寻该对象的原型，以及该对象的原型的原型，依次层层向上搜索**，直到找到一个名字匹配的属性或到达原型链的末尾。
 - 需要注意的是，**当继承的函数被调用时，this 指向的是当前继承的对象，而不是继承的函数所在的原型对象。**
@@ -74,8 +78,9 @@ JavaScript 对象是动态的属性“包”（指其自己的属性），对象
 以下事实均可以在浏览器环境或Node环境中验证。
 
 - 由于 JS 会递归地查询原型链上的属性，因此在对象中可以直接访问直接父类的 `constructor` 属性，其他顶层的未被遮蔽的父类属性也可以被直接访问，但修改会直接赋值到 `this` 中，并掩蔽 `prototype` 中的属性
-- 如果你使用普通对象作为 `prototype` 赋值给 `__proto__` 时，它寻找 `constructor` 时会调用它的 `__proto__.constructor`，实际上就是 `Object`（因为普通对象的`__proto__`属性就是`Object`，根据规则，函数对象的`prototype.constructor`就是它本身）。
-- 修改构造函数的 `prototype` 和修改实例的 `__proto__` 在行为上是等价的（**同一构造函数的所有实例的`__proto__`都指向同一个对象**，即构造函数的 `prototype`）
+- 如果你使用普通对象作为 `prototype` 赋值给 `__proto__` 时，它寻找 `constructor` 时会调用它的 `__proto__.constructor`，实际上就是 `Object`（因为普通对象的`__proto__`属性就是`Object.prototype`）。
+- 修改构造函数的 `prototype` 和修改实例的 `__proto__` 在行为上是等价的（因为**同一构造函数的所有实例的`__proto__`都指向同一个对象**，即构造函数的 `prototype`）
+- 由于原型对象中`constructor`代表自身，`__proto__`代表父类，因此任何**构造函数**（或者说任何函数）的`constructor`是`Function()`，`__proto__`则指向`Object.prototype`（MHY面试题）
 
 ### JavaScript 如何实现继承
 
@@ -132,7 +137,7 @@ console.log(xiaoming);
 
 是的，想必你也想到了，我们可以直接修改 `prototype` 属性来得到正确的原型链，只是我们必须**借助中间对象来实现正确的原型链**。
 
-我们将这个过程包装在一个函数中：
+我们将这个过程包装在一个函数中，函数中定义了一个**空壳函数F**来作为原型链的中间一环（F的`constructor`是子类的**构造函数**，而`__proto__`指向父类的**原型**）：
 
 ```javascript
 function inherits(Child, Parent) {
@@ -148,9 +153,8 @@ function inherits(Child, Parent) {
 ```javascript
 inherits(Student, Person);
 inherits(PrimaryStudent, Student);
+// PrimaryStudent -> Student -> Person -> Object
 ```
-
-
 
 ## this 指针
 
