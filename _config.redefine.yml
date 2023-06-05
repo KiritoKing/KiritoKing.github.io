@@ -1,5 +1,5 @@
 info:
-  title: ChlorineC's Blog
+  title: Top-Down Web
   author: ChlorineC
 
 defaults:
@@ -23,9 +23,9 @@ global:
 
 
 home_banner:
-  title: Hello, World!
+  title: Develop web apps from top to down.
   subtitle:
-    text: ["Stay Hungry, Stay Foolish.", "Keep Your Curiosity."]
+    text: ["Stay Hungry, Stay Foolish.", "Keep Your Curiosity.", "Top to Down, Front to Back."]
   social_links:
     enable: true
     links: 
