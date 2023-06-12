@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "preinstall": "node -e \"if (process.platform === 'linux' || process.platform === 'darwin') { require('child_process').execSync('brew install libtool automake autoconf nasm', {stdio:[0, 1, 2]}); }\"",
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
@@ -14,6 +15,7 @@
   "dependencies": {
     "hexo": "^6.3.0",
     "hexo-abbrlink": "^2.2.1",
+    "hexo-all-minifier": "^0.5.7",
     "hexo-auto-category": "^0.2.1",
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-category": "^2.0.0",
@@ -22,9 +24,9 @@
     "hexo-generator-tag": "^2.0.0",
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-markdown-it": "^7.1.0",
-    "hexo-renderer-stylus": "^2.1.0",
+    "hexo-renderer-stylus": "^3.0.0",
+    "hexo-seo": "^1.2.3",
     "hexo-server": "^3.0.0",
-    "hexo-theme-landscape": "^0.0.3",
     "hexo-theme-redefine": "^2.1.3"
   }
 }
