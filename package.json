@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "preinstall": "node -e \"if (process.platform === 'linux' || process.platform === 'darwin') { require('child_process').execSync('brew install libtool automake autoconf nasm', {stdio:[0, 1, 2]}); }\"",
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
