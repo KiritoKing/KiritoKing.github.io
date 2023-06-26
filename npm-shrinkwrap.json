@@ -21,7 +21,7 @@
         "hexo-renderer-markdown-it": "^7.1.0",
         "hexo-renderer-stylus": "^3.0.0",
         "hexo-server": "^3.0.0",
-        "hexo-theme-redefine": "^2.1.3"
+        "hexo-theme-redefine": "^2.2.1"
       }
     },
     "node_modules/@adobe/css-tools": {
@@ -2625,9 +2625,9 @@
       }
     },
     "node_modules/hexo-theme-redefine": {
-      "version": "2.1.5",
-      "resolved": "https://registry.npmjs.org/hexo-theme-redefine/-/hexo-theme-redefine-2.1.5.tgz",
-      "integrity": "sha512-H/EkUvpkW1lRtWgW0gAR3m1pBwQ8W8xbB0K86YIF5p8QyI9X66mN217tgIpt+J5SEjRxcbNhB74B9hdQRfpWQg=="
+      "version": "2.2.1",
+      "resolved": "https://registry.npmjs.org/hexo-theme-redefine/-/hexo-theme-redefine-2.2.1.tgz",
+      "integrity": "sha512-vfPIDjt0yPWiMhiE8ZRdgu8N8KcfqXQu+U7c2N0HslonMAkHBvbwyUcnHSJLLVxpkCrXd+bZolYMLROoIDU3yw=="
     },
     "node_modules/hexo-util": {
       "version": "2.7.0",
