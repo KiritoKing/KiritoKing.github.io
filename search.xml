@@ -829,14 +829,14 @@
 <li>直接在 VS Code 里开写，调试配置会自动生成（Run Code也可以直接运行）</li>
 </ol>
 <h3 id="C-Script">C# Script</h3>
-<p>这里不再推荐传统C#项目，而是C# Script，什么是C# Script可以看看我的<a href="https://chlorinec.top/posts/3021583790/">这篇文章</a>。毕竟 C# Script（下文简称CSX）就是利用了顶层语句和隐式引用语法糖+REPL解释环境的C#环境，也就是说里面<strong>完完全全就是C#的语法和环境</strong>，只是变成了<strong>脚本语言</strong>的形式。</p>
+<p>这里不再推荐传统C#项目，而是C# Script，什么是C# Script可以看看我的<a class="link"   href="https://chlorinec.top/posts/3021583790/" >这篇文章 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。毕竟 C# Script（下文简称CSX）就是利用了顶层语句和隐式引用语法糖+REPL解释环境的C#环境，也就是说里面<strong>完完全全就是C#的语法和环境</strong>，只是变成了<strong>脚本语言</strong>的形式。</p>
 <p>它最大的优势就是<strong>C#完备的轮子（各种容器、数据处理和LinQ）</strong>，还有C#大量的语法糖降低了编写复杂度（如<code>var</code>类型、隐式元组等），而这一切又以脚本的形式呈现出来（感觉就像 Python++），还支持单步调试。</p>
 <p>它也有几点缺点，而且这些缺点还不小，所以排名才这么靠后：</p>
 <ul>
 <li>性能问题：REPL环境天生性能更差，在线平台C#的性能表现也不尽人意，但是过关肯定没问题</li>
 <li>大部分刷题环境不支持CSX，需要手动转换成类语法比较麻烦</li>
 </ul>
-<p>具体配置的话还是参考我的另一篇文章：<a href="https://chlorinec.top/posts/3021583790/">初探 C# Script - ChlorineC’s Blog</a></p>
+<p>具体配置的话还是参考我的另一篇文章：<a class="link"   href="https://chlorinec.top/posts/3021583790/" >初探 C# Script - ChlorineC’s Blog <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 <h3 id="Java">Java</h3>
 <p><s>个人感觉Java最大的槽点是擦除式泛型，但是这对刷题几乎没有影响。</s></p>
 <p>Java 个人感觉最大的问题和 C# 这样的强OOP语言一样，是与项目深度绑定，但 C# Script 已经出了，所以现在只有 Java 一枝独秀了（谁让JS和Java不算是一门语言呢）。</p>
@@ -1948,7 +1948,7 @@
 <li>使用JSON数据库存储元数据，方便扩展（缺点是体量大了可能会有性能缺陷，后续要考虑长期维护的话是一个问题）</li>
 <li>插件较多，自定义性方便（后面会给到我的插件方案）</li>
 <li>部署方便，可以直接使用Git进行CI/CD自动化部署（如Github Action）</li>
-<li>主流平台（这里我使用<strong>腾讯云</strong>）都支持直接<strong>通过serverless部署hexo</strong>（不知道什么是serverless的可以参考我的<a href="https://chlorinec.top/posts/317388827/">这篇博客</a>）</li>
+<li>主流平台（这里我使用<strong>腾讯云</strong>）都支持直接<strong>通过serverless部署hexo</strong>（不知道什么是serverless的可以参考我的<a class="link"   href="https://chlorinec.top/posts/317388827/" >这篇博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>）</li>
 </ul>
 <h2 id="博客架构">博客架构</h2>
 <p>Hexo采用<code>hexo-6.3.0</code>和<code>node-v16.17.1</code>+<code>npm-v9</code>在本地构建，主题使用<a class="link"   href="https://github.com/EvanNotFound/hexo-theme-redefine" >Redefine <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>（可能后续会进行改动和二次开发）。</p>
@@ -4375,7 +4375,7 @@
 </li>
 </ul>
 <h2 id="yarn-v2-（Berry）">yarn-v2+（Berry）</h2>
-<p>yarn的新版（Berry）和旧版（Classic）的工作方式截然不同，新版本中比较显著的新特性有：<strong>monorepo支持，PnP机制</strong>，零依赖安装等。这里将重点介绍PnP机制，monorepo相关内容请移步<a href="https://chlorinec.top/posts/3828472050/">这篇文章</a>。</p>
+<p>yarn的新版（Berry）和旧版（Classic）的工作方式截然不同，新版本中比较显著的新特性有：<strong>monorepo支持，PnP机制</strong>，零依赖安装等。这里将重点介绍PnP机制，monorepo相关内容请移步<a class="link"   href="https://chlorinec.top/posts/3828472050/" >这篇文章 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
 <h3 id="安装并启用Berry">安装并启用Berry</h3>
 <p>根据<a class="link"   href="https://yarnpkg.com/getting-started/install" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>的指引，对于node&gt;=16.10版本，推荐使用corepack进行安装，如果你对corepack还不熟悉，可以移步我关于<a href="">npm</a>的文章。这里默认你已经学会并启用了corepack。</p>
 <p>在终端中运行下列指令安装最新版的yarn。</p>
@@ -4544,7 +4544,7 @@
 </ul>
 <blockquote>
 <p><strong>最终我也没有解决这个报错问题</strong>，是使用<code>nodeLinker: &quot;node-modules&quot;</code>解决的。（<s>还是推荐pnpm</s>）</p>
-<p>个人猜测是Vite与PnP的兼容性导致的，问题可能出在tsconfig中某一环，因为我使用之前例子中的<code>require</code>和此前在<a href="https://chlorinec.top/posts/3828472050/">monorepo改造</a>一文的开发过程中都并没有报错，而在Vite+pnpm的实践中也没有报错。</p>
+<p>个人猜测是Vite与PnP的兼容性导致的，问题可能出在tsconfig中某一环，因为我使用之前例子中的<code>require</code>和此前在<a class="link"   href="https://chlorinec.top/posts/3828472050/" >monorepo改造 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>一文的开发过程中都并没有报错，而在Vite+pnpm的实践中也没有报错。</p>
 <p><strong>如果有谁解决了这个问题不嫌麻烦可以联系我一下QaQ</strong>（kiritoclzh@gmail.com）</p>
 </blockquote>
 <h3 id="什么是零安装">什么是零安装</h3>
