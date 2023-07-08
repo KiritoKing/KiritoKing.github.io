@@ -73,11 +73,11 @@ articles:
     style: simple
 
 comment:
-  enable: true
+  enable: false
   system: gitalk
   config:
     gitalk:
-      clientID: ff01280298235e34dda1
+      clientID: 3256e2afae94fc3928ce
       clientSecret: 415ade8511f1e170013904e34eec79fa4820318e
       repo: blog-gitalk
       owner: KiritoKing
