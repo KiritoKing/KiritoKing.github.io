@@ -2104,8 +2104,54 @@
 <blockquote>
 <p>Web 应用托管采用<strong>按量计费</strong>模式，自身能力免费，应用按照其使用的 TCB 底层环境的各项资源独立计费，如静态托管等。</p>
 </blockquote>
-<h3 id="Vercel部署">Vercel部署</h3>
 <h3 id="Github-Page">Github Page</h3>
+<p>由于腾讯云的方案无法做加载优化（资源压缩处理）和SEO优化，原因是其Hexo模板的Dockerfile是写死的（而且node版本特别老），无法进行定制，因此我被迫尝试了其他方案进行尝试。这里先尝试了Github Page，因为其开源且文档丰富。</p>
+<p>我对这里方案的要求有下：</p>
+<ul>
+<li>体验对标收费的Serverless服务，即不创建额外仓库，且通过Action自动化构建流程</li>
+<li>解决原有环境问题，支持进行SEO和加载优化
+<ul>
+<li>使用<code>hexo-all-minifier</code> 做资源压缩和加载速度优化</li>
+<li>使用<code>hexo-seo</code> 做SEO优化</li>
+</ul>
+</li>
+</ul>
+<h4 id="部署教程">部署教程</h4>
+<blockquote>
+<p>这里参考了<a class="link"   href="https://hexo.io/zh-cn/docs/github-pages.html" >Hexo官方教程 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</blockquote>
+<ol>
+<li>创建Github Pages服务，根据Github Pages文档我们需要将hexo仓库更名为 <code>username.github.io</code> （注意这里username和我们的用户名必须完全匹配）</li>
+<li>编写Github Action工作流
+<ol>
+<li>使用 <code>node --version</code> 指令检查你电脑上的 Node.js 版本，并记下该版本</li>
+<li>在储存库中建立 <code>.github/workflows/pages.yml</code>，具体代码如下，注意将<code>node-version</code> 字段的<code>16</code> 改成自己环境里的node版本</li>
+<li>工作流定义在Push后会运行部署流程，并将生成的页面放在<code>gh-pages</code> 分支中（由<code>peaceiris/actions-gh-pages@v3</code> 定义）</li>
+</ol>
+</li>
+</ol>
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># .github/workflows/pages.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">name:</span> <span class="string">Pages</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span> <span class="comment"># default branch</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">pages:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">permissions:</span></span><br><span class="line">      <span class="attr">contents:</span> <span class="string">write</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Use</span> <span class="string">Node.js</span> <span class="number">16.</span><span class="string">x</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">&quot;16&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Cache</span> <span class="string">NPM</span> <span class="string">dependencies</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/cache@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">path:</span> <span class="string">node_modules</span></span><br><span class="line">          <span class="attr">key:</span> <span class="string">$&#123;&#123;</span> <span class="string">runner.OS</span> <span class="string">&#125;&#125;-npm-cache</span></span><br><span class="line">          <span class="attr">restore-keys:</span> <span class="string">|</span></span><br><span class="line"><span class="string">            $&#123;&#123; runner.OS &#125;&#125;-npm-cache</span></span><br><span class="line"><span class="string"></span>      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">Dependencies</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">run</span> <span class="string">build</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">peaceiris/actions-gh-pages@v3</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">github_token:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.GITHUB_TOKEN</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">publish_dir:</span> <span class="string">./public</span></span><br></pre></td></tr></table></figure></div>
+<ol>
+<li>在仓库的Settings → Github Pages → Source中设置分支为<code>gh_pages</code></li>
+<li>访问 <a href="https://kiritoking.github.io">username.github.io</a> 就可以看见自己的网站啦</li>
+</ol>
+<h4 id="添加CNAME解析">添加CNAME解析</h4>
+<ol>
+<li>在<code>./source</code> 目录下添加<code>CNAME</code> 文件，内容你自己的域名，如下所示</li>
+</ol>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">chlorinec.top</span><br></pre></td></tr></table></figure></div>
+<ol>
+<li>在域名提供商处添加或修改DNS解析，我的是DNSPod，如下图所示</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://secure2.wostatic.cn/static/kTtVCVJFznswWDgaFhhD1Y/image.png?auth_key=1688837942-843UhhkReGXiLpy1uBAnud-0-6ca7faae1be25c0065739b219b1bacb7"
+                      alt=""
+                ></p>
+<h4 id="CDN加速">CDN加速</h4>
+<h3 id="Vercel部署">Vercel部署</h3>
+<p>如果上述方案都失败了就会采用Vercel部署</p>
 <h2 id="SEO-优化">SEO 优化</h2>
 <hr>
 <h2 id="参考链接">参考链接</h2>
