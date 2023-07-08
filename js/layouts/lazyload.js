@@ -1,0 +1,1 @@
+Global.initLazyLoad=()=>{const t=document.querySelectorAll("img");const e={rootMargin:"0px",threshold:.1};const o=new IntersectionObserver((t,r)=>{t.forEach(t=>{if(t.isIntersecting){const e=t.target;const o=e.getAttribute("data-src");e.src=o;e.removeAttribute("lazyload");r.unobserve(e)}})},e);t.forEach(t=>{if(t.hasAttribute("lazyload")){o.observe(t)}})};
