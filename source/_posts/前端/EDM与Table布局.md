@@ -1,5 +1,6 @@
 ---
 title: 利用Table布局实现EDM设计
+date: 2023-03-20
 thumbnail: >-
   https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80
 cover: >-
@@ -14,7 +15,7 @@ categories:
 abbrlink: 3247330139
 ---
 
-在金山办公实习的时候被安排了EDM编写，个人也是第一次接触这个领域。本来以为就是简单的HTML编写，后来发现EDM-HTML有它独特的地方，如邮件客户端奇特的渲染引擎限制，和普通HTML5网页不同的布局设计等。这里记录我在编写EDM时的一些想法。
+在实习的时候被安排了EDM编写，个人也是第一次接触这个领域。本来以为就是简单的HTML编写，后来发现EDM-HTML有它独特的地方，如邮件客户端奇特的渲染引擎限制，和普通HTML5网页不同的布局设计等。这里记录我在编写EDM时的一些想法。
 
 <!-- more -->
 

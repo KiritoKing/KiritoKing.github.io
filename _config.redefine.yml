@@ -9,7 +9,7 @@ defaults:
 
 global:
   chinese:
-    enable: true
+    enable: false
     family: Noto Sans SC
     url: https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap
   busuanzi_counter:
@@ -44,7 +44,7 @@ navbar:
         归档: /archives/
     简历:
       icon: fa-solid fa-address-card
-      path: /resume
+      path: https://www.wolai.com/kiritoking/4WWg85fMbYGinKhXQb83vw
     友链:
       icon: fa-solid fa-link
       path: /links/
