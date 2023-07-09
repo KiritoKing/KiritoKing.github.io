@@ -2259,8 +2259,48 @@
                       alt=""
                 ></p>
 <h4 id="CDN加速">CDN加速</h4>
+<p>在更新完博客部署方式的几小时后，我发现我的域名已经不能正常访问了，感叹一下防火墙的速度，要是搜索引擎的爬虫有这一半快就好了。</p>
+<p>学习过计网的同学都知道，CDN是一种部署在端侧的缓存加速方案，CDN（内容分发网络）负责缓存通过网络的内容，并将这些缓存的内容传递给就近的用户，使用户可以从就近的CDN源获取而不是远方的源服务器。</p>
+<p>正常情况下CDN是加速网络访问，缓解主信道压力的手段，在某些不可言说的特殊网络波动因素的影响下，CDN就成了拯救页面可访问性的救命稻草。</p>
+<p>这里我选择Cloudfare的国内服务进行CDN加速服务，因为其对个人开发者提供<strong>免费</strong>服务。</p>
+<ol>
+<li>创建Cloudfare账号，点击创建网站，输入你的域名，选择服务套餐</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://secure2.wostatic.cn/static/m2WQH29E72vFrQjaHZDEXT/image.png?auth_key=1688922885-g32AXVHuS2LkqE9rRmjacV-0-c1fcb49042ca97a660c2e6b2892e5417"
+                      alt=""
+                ></p>
+<ol>
+<li>在你的域名注册机构→域名管理处更改DNS提供商为Cloudfare提供的两个链接，这里以腾讯云为例</li>
+</ol>
+<div class="highlight-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="code"><pre><span class="line">dayana.ns.cloudflare.com</span><br><span class="line">rob.ns.cloudflare.com</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://secure2.wostatic.cn/static/9LkaVc8c2XMvVkCFNqQLfj/image.png?auth_key=1688923173-t1gampvBGrSXw1XLKo4Guo-0-3e40b5172ed1e2d58797b7cd4127782c"
+                      alt=""
+                ></p>
+<ol>
+<li>等待一段时间后，Cloudfare就会接管DNS解析和CDN加速，如果你验证了邮箱也会收到邮件通知</li>
+</ol>
+<p>当域名配置了HTTPS时可能会遇到“重定向次数过多”的问题，这是CDN的回源政策导致的，解决方案如下：</p>
+<p>Cloudface默认提供了4种**回源（用户请求CDN服务器，CDN服务器请求源服务器再返回给用户的过程）**政策，当源网站和CDN的HTTPS（SSL）设置冲突时就会发生循环重定向。</p>
+<ul>
+<li>关闭：完全不访问源站HTTPS</li>
+<li>灵活（Flexible，默认情况）：当HTTPS没有配置或不受信任时，会访问HTTP 问题就出在这里，当源站支持HTTPS且配置了HTTP转HTTPS时，Flexible策略会访问HTTP，HTTP再通过源站转化成对HTTPS的访问，此时<strong>又会回源到HTTP</strong>，形成一个重定向闭环。将策略改成完全即可解决。</li>
+<li>完全：必须使用HTTPS访问</li>
+<li>完全（严格）：必须使用受信任的HTTPS证书访问</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://secure2.wostatic.cn/static/nNKgTwh1UdXzJiv1VXiEig/image.png?auth_key=1688923559-k4sqQav6HMsN6iszq6Pzaj-0-c88ec5649933c4a84ea06aa6f4fa1cc1"
+                      alt=""
+                ></p>
 <h3 id="Vercel部署">Vercel部署</h3>
-<p>如果上述方案都失败了就会采用Vercel部署</p>
+<p>Vercel部署很简单，直接注册账号选仓库就行，一切都是自动化的。</p>
 <h2 id="SEO-优化">SEO 优化</h2>
 <hr>
 <h2 id="参考链接">参考链接</h2>
