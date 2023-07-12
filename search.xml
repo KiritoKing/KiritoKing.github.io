@@ -1,765 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>我的个人密码管理方案 - KeePass</title>
-    <url>/posts/3202227099/</url>
-    <content><![CDATA[<p>大约高中的时候我就接触了一些密码管理软件，如1Password这些，但最终由于上手还是有些难度（那个时候也没有心思折腾）而回归了传统的 passwords.txt 方案。</p>
-<p>早些年（大概在大一暑假）的时候，我在偶然的一次多端密码同步需求下开始重新了解密码管理方案，最终选择了 Keepass 这一开源方案，当初潦草配置了一下 Keepass 满足了我的基本需求（密码存储+多端同步+自动填充），但仍有很多小bug或者其他让我用得不是很舒心的地方困扰我。</p>
-<p>于是，在另一个契机下~~（指公司电脑里需要登录一个东西但是我用keepass生成的16位强密码记不住又不能粘贴密码这样一个非常麻烦的事情）~~，我开始在另一台电脑重新配置我的 Keepass，并借此机会改善我的Keepass解决方案。</p>
-<h2 id="为什么选择-Keepass">为什么选择 Keepass</h2>
-<p>最初的情况是这样的，我开开心心的用我的OneDrive同步我心爱的Password.txt，并每日使用Ctrl+F寻找密码；但是，这并不是事情的全部，由于我并不是每次都能记住要在Password里记上一笔（特别是在网页里），但大部分Chromium浏览器又自带一个密码管理器，因此大部分网页密码就存在了浏览器里。</p>
-<p>彼时我已经从Chrome投奔了Edge阵营~~（现在又想投奔回来因为我的Edge太卡了）~~，在Edge里也已经有了几百条密码记录，得益于微软账户的同步，我在手机和其他设备上也可以访问这些密码（浏览器中）。</p>
-<p>这时，有一天我突发奇想，想要大统一密码方案，比如我的QQ在网页上、在应用里、在各种地方，都应该可以使用同一个密码和同一个服务进行填充（是的，我最初的需求就是因为我不记得我电脑上重置QQ密码是存在哪个网页上了，然后就经常找不到密码）。</p>
-<p>正好，我发现了Edge也提供了类似的填充服务（在手机中设置），但我发现它并不好用，比如经常找不到或者无法调出，也无法方便地管理密码。也对，毕竟它本职就是一个浏览器，这只是一个附加功能罢了。</p>
-<p>遂放弃Edge，开始寻找其他解决方案。</p>
-<h3 id="Why-not-others">Why not others?</h3>
-<p>首先我肯定先看了1Password，LastPass等方案，但它和别的方案（如BitWarden）一样有一个我不能接收的地方：贵。</p>
-<p>首先对于我这种<strong>轻度需求</strong>的人来说，它没有免费订阅，而且订阅费都是刀乐，实在有点难顶。</p>
-<p>所以，<s>选择Keepass的原因其实是没钱</s>，它是开源的，缺了什么功能也可以自定义，何乐而不为呢？遂一拍即合，开整！</p>
-<h2 id="最初的-Keepass-方案">最初的 Keepass 方案</h2>
-<p>最初的Keepass方案的参考资料已经不可考了~~，我记得甚至有小红书的资料~~，这里我就简述一下方案思路和现状。</p>
-<h3 id="需求分析">需求分析</h3>
-<p>由于我个人本来就是一个明文TXT存密码的人，生在这个地方也明白自己的隐私其实没什么好保护的，甚至都没什么人关心，只要保护好财产相关的隐私就可以了。因此，我对于互联网密码的安全性其实没有特别高的要求。</p>
-<p>综上，我提出了以下几点需求，优先级依次递减：</p>
-<ul>
-<li>便捷且统一的密码管理和自动填充（网页和应用）</li>
-<li>全平台多端同步（PC/Windows+Android+iOS）</li>
-<li>自动生成和保存密码（可以在我注册时自动提示保存）</li>
-<li>All-In-One体验（如集成TOTP认证）</li>
-<li>安全性保证（至少不是明文）</li>
-</ul>
-<h3 id="Windows-端与基础配置">Windows 端与基础配置</h3>
-<p>最初的方案使用了官方的Keepass客户端，但是官方客户端UI比较简陋，功能也不完全，需要安装很多对应的插件才能满足需求。</p>
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233015.png"
-                      alt="image-20230522233014611"  
-                >
-<h4 id="数据底层与同步方案">数据底层与同步方案</h4>
-<p>采用了单密码认证数据库+OneDrive同步的方案，这方面不在赘述。</p>
-<h4 id="界面和逻辑优化插件">界面和逻辑优化插件</h4>
-<ul>
-<li>KPEnhancedEntryView：优化了条目列表的显示</li>
-<li>YetAnotherFaviconDownloader：自动下载网页图标</li>
-<li>SourceForgeUpdateChecker：自动检查插件更新</li>
-<li>简体中文语言包：略</li>
-</ul>
-<h4 id="自动填充配置">自动填充配置</h4>
-<p>KeePass使用树状目录组织密码，树的层级间会继承父级的规则，如自动填充、模板等，因此只需要在根目录配置好自动填充规则，所有条目都会共享这个规则，当然你也可以对特定条目/层级作自定义规则。</p>
-<ol>
-<li>在根目录处打开该层配置选项。</li>
-</ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233608.png"
-                      alt=""
-                ></p>
-<ol start="2">
-<li>在自动输入栏里输入配置：<code>&#123;USERNAME&#125;&#123;TAB&#125;&#123;PASSWORD&#125;&#123;DELAY 100&#125;&#123;ENTER&#125;</code>（这里是一个模拟键盘输入的过程，意思是先输入USERNAME，按下TAB然后输入PASSWORD，最后等待100ms后按下回车），你也可以按照自己的喜好进行配置</li>
-</ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233703.png"
-                      alt=""
-                ></p>
-<h4 id="自动填充服务优化">自动填充服务优化</h4>
-<p>这是最重要的一步，毕竟自带的自动填充真的甚至不能说差强人意，连浏览器场景都不好应对。</p>
-<p>首先是应用程序场景，我选择 <strong>AutoTypeSearch</strong> 插件来实现快捷键搜索Entry+选择后运行自动填充过程。</p>
-<p>在浏览器场景下有以下几种方案可选：</p>
-<ul>
-<li>KeepassHttp：老牌方案，通过RPC传输SHA-256加密后的密码到浏览器，调用浏览器的自动填充（而不是模拟输入），但问题是也太老牌了（上次更新是6年前）</li>
-<li>WebAutoType：在网页中运行自动输入过程，但个人体验下来不是很好（因为网页很多表单不规范导致模拟输入不好实施）</li>
-<li>Kee Vault：我当时不知道从哪里得到的方案，个人感觉很方便，因此以下主要介绍该方案</li>
-</ul>
-<h5 id="Vault-方案">Vault 方案</h5>
-<blockquote>
-<p>Kee Vault的在线服务是商业服务（虽然起步是免费的），而连接本地Keepass是免费服务</p>
-</blockquote>
-<p><a class="link"   href="https://www.kee.pm/" >Vault <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>的使用非常简单，只需要三步：</p>
-<ol>
-<li>在浏览器安装<a class="link"   href="https://chrome.google.com/webstore/detail/kee-password-manager/mmhlniccooihdimnnjhamobppdhaolme" >Vault插件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li>给Keepass安装KeePassRPC插件</li>
-<li>在浏览器端连接二者的RPC过程</li>
-</ol>
-<p>而它的优点有：</p>
-<ul>
-<li>免配置，很方便</li>
-<li>直接调用自动填充而没有模拟输入</li>
-<li>可以在注册新账号（出现密码的场景）时提示你保存密码</li>
-</ul>
-<h4 id="使用体验优化">使用体验优化</h4>
-<ul>
-<li>快速解锁：KeePassWinHello - 调用Windows Hello解锁数据库，但目前体验下来不太稳定（经常没法唤醒，得输入密码）</li>
-<li>条目模板：KPEntryTemplates - 这个我没有深究，不过挺重要的，让你新建条目的时候更轻松一点。</li>
-</ul>
-<p>没有模板的界面是这样的：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522234538.jpg"
-                      alt=""
-                ></p>
-<p>有模板的界面（配置好后）是这样的：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522234600.jpg"
-                      alt=""
-                ></p>
-<h3 id="移动端配置">移动端配置</h3>
-<p>个人有一台Android设备和一台iPad OS设备，但主战场其实在Windows端，手机端基本只起到读取的作用，因此就简单配置了一下：</p>
-<ul>
-<li>
-<p>OneDrive用于同步</p>
-</li>
-<li>
-<p>Android：KeePass4Android</p>
-<ul>
-<li>优点：老牌方案，保持更新，稳定；支持<strong>快速解锁</strong>和本地缓存</li>
-<li>缺点：部分界面优点过于老旧（如密码键盘）</li>
-</ul>
-</li>
-<li>
-<p>iPadOS：奇密（FantasyPass）</p>
-<ul>
-<li>这个方案我找了很久，其他方案要么太贵要么没法用（少功能如自动填充和同步）</li>
-<li>优点：便宜（买断制），支持快速解锁、本地缓存和自动填充；对平板显示支持良好</li>
-</ul>
-</li>
-</ul>
-<h2 id="改进后的-Keepass-方案">改进后的 Keepass 方案</h2>
-<p>这次在新电脑上重新配置Keepass，改进主要从以下几个方面入手：</p>
-<ul>
-<li>改进客户端体验：包括界面、解锁和输入等</li>
-<li>改善密码管理：在一段时间使用Keepass+Vault后，加之之前浏览器导入的密码，数据库中存储了大量冗余或无效的密码，需要对其进行清理和合并</li>
-<li>统一管理TOTP登录码：具体参考<a href="#%E5%9C%A8KeePass%E4%B8%AD%E7%AE%A1%E7%90%86TOTP">后文</a></li>
-</ul>
-<h3 id="Windows-客户端改进">Windows 客户端改进</h3>
-<p>在新的客户端上我选择使用 KeepassXC，其是一个Keepass的开源客户端，支持Windows、Mac和Linux主流发行版（也可以自己编译）。</p>
-<p>它最大的优点就是界面好看，且开箱即用。它虽然没有KeePass那么丰富的插件，但好处就是插件有的功能它自己都已经覆盖了，包括：</p>
-<ul>
-<li>Windows Hello 解锁</li>
-<li>浏览器集成（Chromium+Firefox）</li>
-<li>网页图标下载</li>
-<li>TOTP生成</li>
-</ul>
-<p>使用它甚至都不需要教程，直接上手即可。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523123957.png"
-                      alt=""
-                ></p>
-<p>在个人习惯方面，我对其作了如下设置，尤其是<strong>最小化那一块非常重要（经常手滑关掉导致浏览器连不上）</strong></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124230.png"
-                      alt=""
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124313.png"
-                      alt=""
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124334.png"
-                      alt=""
-                ></p>
-<h3 id="移动端改进">移动端改进</h3>
-<p>除了客户端换用了更现代的 KeepassDX 外没有什么改变。</p>
-<h3 id="其他改进">其他改进</h3>
-<h4 id="多URL方案">多URL方案</h4>
-<p>BitWarden有内建的单条目对应多URL方案，但KeePass并不支持。我简单搜索了一下有以下几种解决方案：</p>
-<ul>
-<li><strong>克隆多条记录，并使用引用同步账号密码，设置不同URL</strong>（也是我的方案）</li>
-<li>设置属性（需要插件或客户端支持），如KP2A_URL（KeePassHttp）、App（Keepass4Android）等</li>
-</ul>
-<h2 id="番外篇：2FA与TOTP">番外篇：2FA与TOTP</h2>
-<h3 id="2FA">2FA</h3>
-<p>2FA（双因素认证，2-Factor Authentication）是一种安全认证方案。</p>
-<p>一般有三种因素可以作为认证一个人身份的凭据，如果用到了其中两种就是2FA：</p>
-<ul>
-<li><strong>秘密信息</strong>：只有该用户知道、其他人不知道的某种信息，比如<strong>密码</strong></li>
-<li><strong>个人物品</strong>：该用户的私人物品，比如身份证、钥匙、手机</li>
-<li><strong>生理特征</strong>：该用户的私人物品，比如身份证、钥匙。</li>
-</ul>
-<p>生活中常见的2FA有银行卡（银行卡+密码），网上支付（U盾+密码）等。但在手机普及的现代社会，<strong>手机</strong>就成为了2FA中除密码外个人物品中重要的一个认证物件。常见的实验方案有<strong>短信认证、发送认证通知</strong>等</p>
-<p>但短信可以被伪基站等劫持，因此有一定的安全风险，这里就需要引入更安全的TOTP算法。</p>
-<h3 id="TOTP算法">TOTP算法</h3>
-<p>TOTP 的全称是&quot;基于时间的一次性密码&quot;（Time-based One-time Password）。它是公认的可靠解决方案，已经写入国际标准 <a class="link"   href="https://tools.ietf.org/html/rfc6238" >RFC6238 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
-<p>TOTP的认证过程其实相当简单：</p>
-<ol>
-<li>用户开启双因素认证后，服务器生成一个密钥（这个密钥就类似于一个<strong>token</strong>）</li>
-<li>服务器提示用户扫描二维码（或者使用其他方式），把密钥保存到用户的手机。也就是说，服务器和用户的手机，现在都有了同一把密钥</li>
-<li>用户登录时，手机客户端使用这个密钥和当前时间戳，生成一个哈希，有效期默认为30秒。用户在有效期内，把这个哈希提交给服务器</li>
-<li>由于双端都持有同一个密钥，因此可以根据时间戳生成同一个Hash，跟用户提交的哈希比对。只要两者不一致，就拒绝登录。</li>
-</ol>
-<blockquote>
-<p>注意，密钥必须跟手机绑定。一旦用户更换手机，就必须生成全新的密钥</p>
-</blockquote>
-<p>那么它的代码实现是不是也一样简单呢？答案是，是的。</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">TC = floor((unixtime(now) − unixtime(T0)) / TS) <span class="comment"># TS: 有效时长，默认30s T0： 起始时间戳，默认为0</span></span><br><span class="line">TOTP = HASH(SecretKey, TC) <span class="comment"># HASH 为约定的哈希函数，默认是 SHA-1</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="在KeePass中管理TOTP">在KeePass中管理TOTP</h3>
-<p>了解了上述原理后相信大家也就知道了，不必绑定某一家的Authenticator，直接使用KeePass或某些软件就能管理基于TOTP的2FA；而能集成到KeePass中统一管理自然是最好的。</p>
-<p>在 KeePassXC 中可以 <strong>直接右键条目（或者菜单中的编辑条目）-&gt; 添加TOTP -&gt; 将SecretKey（二维码的值）复制进来</strong> 就将TOTP导入到了对应条目中。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523112544.png"
-                      alt=""
-                ></p>
-<p>在设置成功后就可以在条目旁边看到一个时钟小图标，在下方条目预览中也可以直接看到TOTP的值。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523113131.png"
-                      alt=""
-                ></p>
-<p>在官方KeePass客户端中可能需要借助第三方插件如KeeTOTP来实现。</p>
-<h2 id="参考资料">参考资料</h2>
-<ul>
-<li><a class="link"   href="https://zhuanlan.zhihu.com/p/39645975" >一劳永逸：KeePass全网最详使用指南 - 知乎 (zhihu.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://post.smzdm.com/p/a25gd9lp/" >密码管理软件KeePass教程 篇一：Windows端的配置和使用教程（上）_软件应用_什么值得买 (smzdm.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>密码</tag>
-        <tag>keepass</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Python 编程环境重新构建</title>
-    <url>/posts/768258525/</url>
-    <content><![CDATA[<p>虽然日常工作里做Web开发比较多，一般都是全套JS/TS解决问题，但偶尔也会有用到Python的场景，如涉及到数据分析、科学计算和机器学习等领域，Python往往是绕不开的，也会在特定领域用Python去展开一些后端或者RPC的开发。</p>
-<p>但是好巧不巧，现在我的工作电脑上Python的环境可以说是一塌糊涂，版本和依赖都很混乱。为此，我打算好好地整理一下我的Python使用流程和环境，打造一个干净快速的开发环境。</p>
-<p>这篇博客主要记录我折腾和理解Python环境的过程，主要有两项工作</p>
-<ul>
-<li><strong>从零开始</strong>构建面向PyQt5的Python环境</li>
-<li>重新整理已有的混乱Python环境，并重建conda+pytorch+cuda工作环境</li>
-</ul>
-<h2 id="解决方案总结">解决方案总结</h2>
-<blockquote>
-<p>🌟全局只使用一个Python（winget官方源），使用miniconda管理多个Python环境</p>
-</blockquote>
-<ul>
-<li>默认环境变量中只留下一个Python（winget-ms-store源），使用Windows Store安装，保持最新同步，<strong>不做虚拟环境管理，使用一个共享环境来满足简单开发需求</strong>（路径为：<code>~/AppData/Local/Microsoft/WindowsApps/python.exe</code>）</li>
-<li>使用miniconda来管理虚拟环境，满足特定环境开发需求，如机器学习、Qt开发等
-<ul>
-<li>相较于之前的环境，现在的全局变量不再包含conda的Python路径，而只包含必要的Scripts，在默认Shell中只能操作conda而不能使用其他Python版本</li>
-<li>使用专门的Anaconda Prompt终端来使用conda的虚拟环境，切换Python和pip版本等</li>
-<li>在VS Code中使用自带的解释器选择来切换虚拟环境。由于Conda的虚拟环境切换是物理路径隔离，因此Code Runner使用<code>$pythonPath -u $fullFileName</code> 配置即可</li>
-<li>使用miniconda来替换anaconda是因为我只对conda的管理功能有需求，其它科学计算库我更倾向于按需引入</li>
-</ul>
-</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145600.png"
-                      alt="" title="整理环境后，干干净净"
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145602.png"
-                      alt="" title="整理环境前， 结果里赫然显示了6个Python"
-                ></p>
-<h2 id="conda的使用">conda的使用</h2>
-<p>conda是一个<strong>包管理器</strong>，也提供<strong>虚拟环境管理</strong>功能，这二者也是我们使用conda的重要原因。</p>
-<ul>
-<li>conda相比pip它使用自建的源提供软件包（这也是很多软件找不到的原因），而不像pip只提供一个指向SourceForge的链接<br>
-注：在环境变量正常的情况下，激活虚拟环境后可以使用指定环境的pip</li>
-<li>conda支持所有语言编写的二进制软件包，不像pip只提供Python软件包（虽然pip也支持安装二进制wheel）</li>
-<li>conda的虚拟环境管理相比venv更完善、更好用</li>
-</ul>
-<h3 id="anaconda和miniconda">anaconda和miniconda</h3>
-<p>在conda之上，我们有两个“分支”都可以获取conda本体：</p>
-<ul>
-<li>anaconda：包含了所有科学运算需要的包和conda，一个大而全的Python科学运算库，适合不专精开发的数据科学研究者</li>
-<li>miniconda：仅包含conda, python和一些必须的依赖，其他科学运算库需要按需引入，一个小而美的Python解决方案，适合喜欢自定义的开发者</li>
-</ul>
-<p>这里由于我的需求并不需要anaconda的全部库，选择了miniconda。</p>
-<h3 id="终端配置">终端配置</h3>
-<blockquote>
-<p>终端美化方面请移步：<a class="link"   href="https://www.wolai.com/mWoCoTKv9jJRQDKUQyEpct"  title="终端解决方案">终端解决方案 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-</blockquote>
-<p>使用<code>conda init &lt;shell&gt;</code> 可以为指定Shell注入conda-hooks，启用虚拟环境能力</p>
-<blockquote>
-<p>🌟<strong>不推荐在日用Shell中启用，这就是我Powershell卡的罪魁祸首</strong></p>
-</blockquote>
-<h4 id="直接在Powershell中使用Conda">直接在Powershell中使用Conda</h4>
-<p>现在的conda在安装时不再建议添加环境变量，而是使用专门的Anaconda Prompt（即专门的Shell）来操作。</p>
-<blockquote>
-<p>Not recommended.Instead,open Anaconda with the Windows Start menu and select &quot;Anaconda (64-bit).This add to “PATH” option makes Anaconda get found before previously installed software,but may cause problems requiring you to uninstall and reinstall Anaconda.</p>
-</blockquote>
-<p>我本来不理解，直到配置了新电脑发现我的老电脑的Powershell启动奇慢无比，才开始找原因。</p>
-<h4 id="环境变量（PATH）">环境变量（PATH）</h4>
-<p>如果不将conda的相关路径添加到环境变量，如下图的四项所示（其实GCC那项如果你已经安装了其他GCC就不用了），你就不能在Anaconda Prompt以外的地方（如Powershell）中使用<code>conda</code>命令。</p>
-<p>这不会对你的性能产生什么影响，如果你没有程序不兼容的话可以添加，比较方便。</p>
-<p>这里个人推荐只添加<code>$CONDA/Library/bin</code>和<code>$CONDA/Library/usr/bin</code>两个目录到PATH中，而不要添加根目录（包含Python），这样就可以使用conda功能而不破坏全局Python版本管理。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145607.png"
-                      alt=""
-                ></p>
-<h4 id="自动激活base环境">自动激活<code>base</code>环境</h4>
-<p>运行<code>conda init powershell</code>会在你的用户目录<code>$PROFILE</code>生成一个<code>profile.ps1</code>，里面的内容如下，而<strong>这个就是我Powershell启动慢的罪魁祸首</strong>：</p>
-<div class="highlight-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment">#region conda initialize</span></span><br><span class="line"><span class="comment"># !! Contents within this block are managed by &#x27;conda init&#x27; !!</span></span><br><span class="line"><span class="keyword">If</span> (<span class="built_in">Test-Path</span> <span class="string">&quot;C:\Users\kirito\anaconda3\Scripts\conda.exe&quot;</span>) &#123;</span><br><span class="line">    (&amp; <span class="string">&quot;C:\Users\kirito\anaconda3\Scripts\conda.exe&quot;</span> <span class="string">&quot;shell.powershell&quot;</span> <span class="string">&quot;hook&quot;</span>) | <span class="built_in">Out-String</span> | ?&#123;<span class="variable">$_</span>&#125; | <span class="built_in">Invoke-Expression</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#endregion</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p>性能对比如下，可以说是立竿见影：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145610.png"
-                      alt="" title="加载 profile.ps1 ： 2309ms"
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145612.png"
-                      alt="" title="不加载 profile.ps1 ： 664ms"
-                ></p>
-<blockquote>
-<p>🚦如果你没有频繁调试Python的需求，请不要将这个<code>profile.ps1</code>设为常加载项，即使你使用<code>conda config --set auto_activate_base false</code>取消了自动激活<code>base</code>环境，它也会执行上述检查路径的过程拖慢启动。</p>
-</blockquote>
-<h3 id="conda的常用指令">conda的常用指令</h3>
-<h4 id="虚拟环境相关">虚拟环境相关</h4>
-<ul>
-<li><code>conda create -n &lt;name&gt; python=&lt;version&gt;</code> 创建一个虚拟环境并指定版本</li>
-<li><code>conda activate &lt;name&gt;</code> 激活虚拟环境</li>
-<li><code>conda deactivate</code> 退出当前虚拟环境，回到base环境</li>
-<li><code>conda env info</code> 查看当前虚拟环境信息</li>
-<li><code>conda env list</code>列出所有虚拟环境</li>
-<li><code>conda env remove -n &lt;name&gt;</code>移除一个虚拟环境（并删除其依赖）</li>
-<li><code>conda env export &gt; env.yaml</code> 导出当前虚拟环境配置</li>
-<li><code>conda create -f &lt;config&gt;</code> 从配置文件复制虚拟环境 </li>
-</ul>
-<h4 id="包管理相关">包管理相关</h4>
-<ul>
-<li><code>conda update -n &lt;env&gt; &lt;pkg&gt;</code> 更新依赖
-<ul>
-<li><code>&lt;env&gt;</code> 可以不指定，默认更新base环境（或当前环境）</li>
-<li><code>&lt;pkg&gt;</code> 可以指定为conda或anaconda来更新自身</li>
-</ul>
-</li>
-<li><code>conda install -n &lt;env&gt; &lt;pkg&gt; -c &lt;channel&gt;</code> 安装依赖
-<ul>
-<li><code>&lt;env&gt;</code> 可以不指定，默认更新base环境（或当前环境）</li>
-<li><strong><code>&lt;pkg&gt;</code></strong>** 可以指定为Python，为当前环境安装自己的Python，否则将使用环境变量中的Python**​</li>
-</ul>
-</li>
-</ul>
-<h3 id="使用mamba改进conda">使用mamba改进conda</h3>
-<p>conda虽然有着优秀的科学计算环境和虚拟环境管理，但其令人诟病的依赖解析速度 <s>（永远在solving）</s> 和单线程下载不禁让人想起隔壁的难兄难弟npm。</p>
-<p>mamba为了改写conda下载慢的局面应运而生了，主打下面这些特性：</p>
-<ul>
-<li><code>conda</code>无缝替换为<code>mamba</code>（<strong>drop-in alternative</strong>），可以用mamba来执行任何conda指令，包括安装依赖和虚拟环境</li>
-<li>使用多线程并行加速下载</li>
-<li>使用<code>libsolv</code> 加速依赖解析</li>
-<li>核心部分是通过C++实现，以获得最大执行效率</li>
-</ul>
-<p>安装mamba的指令</p>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ conda install -c conda-forge mamba</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p>安装完成后飞速体验了下，确实起飞</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145614.gif"
-                      alt=""
-                ></p>
-<p>使用<code>mamba</code> 安装pytorch：</p>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建并激活虚拟环境</span></span><br><span class="line">$ mamba create -n pytorch python=3.9</span><br><span class="line">$ mamba activate pytorch</span><br><span class="line"><span class="comment"># 使用官方推荐的安装方式</span></span><br><span class="line">$ mamba install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia</span><br></pre></td></tr></table></figure></div>
-<p>可以看到1.5GB的文件相较于mamba的速度可以说是直接起飞，限制你的只有网速和防火墙。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145617.png"
-                      alt=""
-                ></p>
-<p>由于我之前安装好了cuda11.8和对应的cudnn，这里直接展示结果（<strong>也可以看到mamba全新安装pytorch居然只用了10分钟</strong>）：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145619.png"
-                      alt=""
-                ></p>
-<h2 id="重新构建Pytorch生产环境">重新构建Pytorch生产环境</h2>
-<p>由于之前Winget手贱更新Conda的时候不小心把我之前辛苦配好的环境卸载了，当时安装的时候就挺痛苦的，半天都启用不了cuda。</p>
-<p>半年后的今天我再来捋一捋这个环境依赖的逻辑，看看能不能跑通。</p>
-<blockquote>
-<p>使用环境：miniconda+mamba</p>
-</blockquote>
-<h3 id="安装cuda">安装cuda</h3>
-<blockquote>
-<p>如果你不是N卡用户或者只想使用CPU请跳过这部分</p>
-</blockquote>
-<ol>
-<li>首先确保你正确安装了显卡驱动，在Shell中运行<code>nvidia-smi</code> 查看显卡信息，可以看到我的cuda版本是12.0</li>
-</ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145622.png"
-                      alt=""
-                ></p>
-<ol>
-<li>根据cuda版本在<a href="https://developer.nvidia.com/cuda-toolkit-archive" title="官网"><strong>官网</strong></a>中下载对应版本的CUDA Toolkit，版本要求是不高于自身GPU版本的Pytorch最高支持版本
-<ul>
-<li>个人实测cuda本身是<strong>向下兼容</strong>的，即GPU支持更低版本的cuda，如我的就支持18</li>
-<li>pytorch目前只官方支持到cuda18，但<strong>社区</strong>表示是<strong>向上兼容</strong>的，即pytorch的cuda18支持Toolkit 的20+</li>
-</ul>
-</li>
-<li>根据Toolkit版本去<a class="link"   href="https://developer.nvidia.com/rdp/cudnn-download"  title="官网">官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>下载安装cudnn，压缩包解压后放进Cuda Toolkit安装目录的对应文件夹里</li>
-</ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145624.png"
-                      alt=""
-                ></p>
-<ol>
-<li>检查安装，Shell运行<code>nvcc -V</code> </li>
-</ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145626.png"
-                      alt=""
-                ></p>
-<h3 id="安装Pytorch">安装Pytorch</h3>
-<p>访问<a class="link"   href="https://pytorch.org/"  title="Pytorch官网">Pytorch官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>获取你的平台的安装代码：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145628.png"
-                      alt=""
-                ></p>
-<p>我的平台安装代码如下（我使用mamba替代conda加快了安装进程）</p>
-<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建并激活虚拟环境</span></span><br><span class="line">$ mamba create -n pytorch python=3.9</span><br><span class="line">$ mamba activate pytorch</span><br><span class="line"><span class="comment"># 使用官方推荐的安装方式</span></span><br><span class="line">$ mamba install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p>由于我之前安装好了cuda11.8和对应的cudnn，这里直接展示结果（<strong>也可以看到mamba全新安装pytorch居然只用了10分钟</strong>）：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145631.png"
-                      alt="" title="安装过程"
-                ></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145633.png"
-                      alt="" title="安装结果"
-                ></p>
-]]></content>
-      <tags>
-        <tag>python</tag>
-        <tag>开发环境</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>寻找 ReSharper 开源替代</title>
-    <url>/posts/2913837123/</url>
-    <content><![CDATA[<p>众所周知 JetBrains 家的IDE都十分的智能好用，Visual Studio 的代码提示和感知相比之下就略逊一筹。</p>
-<p>凭着短暂的学生授权，我短暂地体验了几周 NetUltimate 工具包，其优秀的代码提示和质量检查功能令我印象深刻，这也是我Java环境选择IDEA的原因。</p>
-<p>但基于以下几点，我最终还是选择了放弃ReSharper，回归原生Visual Studio体验。</p>
-<ul>
-<li>NetUltimate是收费工具，如果习惯该环境进行开发，在毕业后不从事.Net行业会额外付出高昂的授权费</li>
-<li>ReSharper会严重拖慢VS的启动速度，在打开公司的大型项目时尤为如此</li>
-<li>ReSharper配置项太多，相当于一个独立体系，学习成本较高</li>
-</ul>
-<p>但我对其优秀的IDE功能印象深刻，因此为了部分复刻其功能，我选择对VS进行以下自定义来尽可能还原ReSharper功能。</p>
-<h2 id="前言">前言</h2>
-<p>假期实习中短暂体验了.Net开发，让我对.Net和C#开发环境有一些自己的想法。</p>
-<p>之前主要使用Typescript和React框架进行前端开发，对前端完整优秀的工具链印象深刻，直接使用VS进行开发给我带来了一定落差感。使用ReSharper一部分弥补了这种落差感，但基于上述缺点我又不得不放弃。</p>
-<p>下面，我从一个前端开发者的角度，对Code Lint（代码质量）、Formatting（代码格式）、IntelliSense（代码提示和自动化工具）、编辑器样式等方面改造Visual Studio，改进.NET开发体验。</p>
-<h2 id="外观部分">外观部分</h2>
-<p>配置完后（主题OneMonokai，字体Noto Sans CJK Mono）</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141419805.png"
-                      alt=""
-                ></p>
-<h3 id="主题">主题</h3>
-<p>原本使用VS Code一样的One Dark Pro，但为了保证拓展兼容性，最终选择了OneMonokai主题。</p>
-<p><em>注：One Dark Pro使用SonarLint后导致提示文本也为黑色，无法在深色背景下看清</em></p>
-<h3 id="字体">字体</h3>
-<p>根据最佳编程字体原则：</p>
-<ul>
-<li>所有字母等距（Mono Space）</li>
-<li>多语言支持（遇到中文字体不会回落到默认字体）</li>
-<li>多语言等距（英文字母半角和中文字符全角宽度严格1比2）</li>
-</ul>
-<p>选择以下备选项（优先级从高到低），我选择的是Noto Sans</p>
-<ul>
-<li><strong>Noto Sans CJK Mono（Google家）</strong></li>
-<li>更纱黑体 Mono Nerd</li>
-<li>JetBrains Mono Nerd（JB家）</li>
-<li>Consolas（微软家）</li>
-</ul>
-<hr>
-<h2 id="拓展部分">拓展部分</h2>
-<h3 id="1-代码提示与重构">1. 代码提示与重构</h3>
-<p>ReSharper中的代码重构提示令人印象深刻，我选择以下两款插件来尽可能还原</p>
-<h4 id="SonarLint">SonarLint</h4>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141425329.png"
-                      alt=""
-                ></p>
-<ul>
-<li>形式：离线使用/免费注册后使用</li>
-<li>功能：参考EsLint或PyLint，根据既定规则对代码质量进行改进提示
-<ul>
-<li>可以自定义规则</li>
-<li>在线文档提供修改建议</li>
-<li>实时在编辑器中显示建议</li>
-</ul>
-</li>
-<li>Bug：可能导致重构菜单自己消失</li>
-</ul>
-<h4 id="CodeRush">CodeRush</h4>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141427738.png"
-                      alt=""
-                ></p>
-<ul>
-<li>形式：免费注册后使用</li>
-<li>功能：提供ReSharper中部分快速重构功能</li>
-</ul>
-<h3 id="2-代码格式化">2. 代码格式化</h3>
-<h4 id="Code-Maid">Code Maid</h4>
-<p>Code Maid是一个十分强大的开源插件，我常用的功能有下面几个：</p>
-<ul>
-<li>
-<p>码撬窗口：显示当前文档类视图一般的列表，但支持实时重构和整理</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141430029.png"
-                      alt=""
-                ></p>
-<ul>
-<li>拖拽改变顺序</li>
-<li>自动排序（可自定义规则）</li>
-<li>支持region</li>
-</ul>
-</li>
-<li>
-<p>代码清理和格式化</p>
-<ul>
-<li>删除无用的using</li>
-<li>整理空行</li>
-<li>整理XML注释</li>
-<li>支持XAML整理</li>
-<li>支持第三方插件（Resharper、XAML Styler和自定义命令）</li>
-<li>可以保存时自动整理（但为了保证性能和兼容我选择了关闭）</li>
-</ul>
-</li>
-<li>
-<p>生成进度展示</p>
-</li>
-</ul>
-<h4 id="CSharpier">CSharpier</h4>
-<p>一个很霸道的格式化工具，不支持自定义规则，但是是体验最接近Prettier的格式化工具（支持保存时自动格式化）</p>
-<p>体验见仁见智，有人喜欢全自动，有人喜欢有自己的格式就不适合这个插件。</p>
-<p>经过我的测试，其格式化和Code Maid的代码清理并没有规则冲突。</p>
-<h4 id="XAML-Styler">XAML Styler</h4>
-<p>一个老牌XAML格式化工具，具有以下优点：</p>
-<ul>
-<li>自定义项目多</li>
-<li>兼容性好</li>
-<li>支持保存时格式化（Format on save）</li>
-</ul>
-<h3 id="3-其他代码工具">3. 其他代码工具</h3>
-<h4 id="快速创建">快速创建</h4>
-<ul>
-<li>Snippetica：提供简单的模板，方便创建代码</li>
-<li>Add New File：实现Shift+F2自动按格式从模板创建对应目录、文件</li>
-<li>Adjust C# Namespace：自动根据目录层级重构命名空间</li>
-<li>XML Doc Provider：自动生成XML注释</li>
-</ul>
-<h4 id="界面改进">界面改进</h4>
-<ul>
-<li>C# Var Type CodeLens：显示Var的实际类型</li>
-<li>Indent Guides：显示缩进层级</li>
-</ul>
-<h4 id="体验改进">体验改进</h4>
-<ul>
-<li>Open In VSCode：在VSC中打开指定文件（开发其他语言有奇效）</li>
-<li>Select Next Occurrence：获得VSCode的选择体验</li>
-<li>Auto Save：模仿VSCode按时间间隔自动保存</li>
-<li>ILSpy：自动定位到对应反编译代码</li>
-<li>Git Diff：获得VSCode中Git Lens的部分体验</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>开发环境</tag>
-        <tag>.net</tag>
-        <tag>jetbrains</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>初探 C# Script</title>
-    <url>/posts/3021583790/</url>
-    <content><![CDATA[<p><em>注：以下所有环境均为.net7.0</em></p>
-<h1>C# Script（CSX）</h1>
-<p>C#脚本的根源是伴随着VS2015发布的 <strong>C# 读取-求值-打印-循环 (REPL)</strong>，类似于一个CLI（Command-Line-Interface，命令行）环境，称为<strong>REPL CSI</strong>。这个CLI环境的发布也顺带引入了<strong>将C#脚本化的可能性</strong>。</p>
-<p>以下是官网对C#脚本用途的定义：</p>
-<p><strong>C# 脚本是一款用于测试 C# 和 .NET 代码段的工具，无需创建多个单元测试或控制台项目。它提供了轻型选项，可快速在命令行上对 LINQ 聚合方法进行编码、检查 .NET API 是否解压缩文件或调用 REST API，以了解返回的内容或工作原理。它提供了探索和了解 API 的简便方法，无需对 %TEMP% 目录中的另一个 CSPROJ 文件支付开销。</strong></p>
-<p>我个人的理解的话就是C#的REPL CSI<strong>相当于一个C#版的Python虚拟机</strong>，一方面有一个解释型的CLI，一方面支持解释型的脚本。它可能会慢一点，但是对快速测试或者快速实现一个脚本功能是非常便利的。</p>
-<p><em>理论相关参考了这篇文章：<a class="link"   href="https://learn.microsoft.com/zh-cn/archive/msdn-magazine/2016/january/essential-net-csharp-scripting" >必备 .NET - C# 脚本 | Microsoft Learn <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></em></p>
-<h2 id="编写C-脚本">编写C#脚本</h2>
-<p>接下来我们以做算法题为场景学习C#脚本的使用。</p>
-<p>C#脚本的规则与C#9中的顶层语句很像，语法也和普通C#完全一致。</p>
-<p>主要区别有以下几个：</p>
-<ul>
-<li>引入程序集：<code>#r &lt;Assembly.dll&gt;</code>
-<ul>
-<li>这里直接按相对路径引入即可</li>
-<li>VSCode有个奇怪错误就是必须<code>#r System.Console</code>才不会报错，但实际上不影响运行，甚至加了<code>.dll</code>反而会报错</li>
-</ul>
-</li>
-<li>引入其他脚本 <code>#load &lt;script.csx&gt;</code>
-<ul>
-<li>个人理解是直接把这些东西像宏一样加载进来</li>
-</ul>
-</li>
-<li>引用命名空间仍然使用 <code>using</code></li>
-</ul>
-<hr>
-<p>下面用经典的<strong>牌组大小判断</strong>为例展示一下CSX的编写：</p>
-<p><code>main.csx</code></p>
-<div class="highlight-container" data-rel="Csharp"><figure class="iseeu highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#r &quot;System.Console&quot;</span></span><br><span class="line"><span class="meta">#load &quot;CardAnalyzer.csx&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> line = <span class="string">&quot;3 4 5 6 7-10 J Q K A&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> ((line = Console.ReadLine()) != <span class="literal">null</span>)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">var</span> tokens = line.Split(<span class="string">&#x27;-&#x27;</span>);</span><br><span class="line">  <span class="keyword">if</span> (tokens.Length &lt; <span class="number">2</span>) <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">var</span> a = GetCardsType(tokens[<span class="number">0</span>]);</span><br><span class="line">  <span class="keyword">var</span> b = GetCardsType(tokens[<span class="number">1</span>]);</span><br><span class="line">  <span class="keyword">if</span> (a == CardGroupType.Illegal || b == CardGroupType.Illegal)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == CardGroupType.JokerBomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (b == CardGroupType.JokerBomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == b)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (a == CardGroupType.Multiple &amp;&amp; tokens[<span class="number">0</span>].Split(<span class="string">&#x27; &#x27;</span>).Length != tokens[<span class="number">1</span>].Split(<span class="string">&#x27; &#x27;</span>).Length)</span><br><span class="line">    &#123;</span><br><span class="line">      Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> aMin = GetBaseCard(tokens[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">var</span> bMin = GetBaseCard(tokens[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">if</span> (aMin &gt; bMin)</span><br><span class="line">      Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == CardGroupType.Bomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (b == CardGroupType.Bomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p><code>CardAnalyzer.csx</code></p>
-<div class="highlight-container" data-rel="Csharp"><figure class="iseeu highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">enum</span> CardGroupType</span><br><span class="line">&#123;</span><br><span class="line">  Single = <span class="number">0</span>,</span><br><span class="line">  Couple,</span><br><span class="line">  Triple,</span><br><span class="line">  Multiple,</span><br><span class="line">  Bomb,</span><br><span class="line">  JokerBomb,</span><br><span class="line">  Illegal</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">int</span> <span class="title">ParseCard</span>(<span class="params"><span class="built_in">string</span> card</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">int</span> num;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">int</span>.TryParse(card, <span class="keyword">out</span> num))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span> num - <span class="number">3</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">switch</span> (card)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;J&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">8</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;Q&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">9</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;K&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;A&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">11</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;joker&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">12</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;JOKER&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">13</span>;</span><br><span class="line">      <span class="literal">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">CardGroupType <span class="title">GetCardsType</span>(<span class="params"><span class="built_in">string</span> token</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">string</span>[] cards = token.Split(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">  <span class="built_in">int</span> count = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">int</span>? prev = <span class="literal">null</span>;</span><br><span class="line">  <span class="built_in">bool</span> same = <span class="literal">true</span>;</span><br><span class="line">  <span class="built_in">int</span> lastCard = <span class="number">-1</span>;</span><br><span class="line">  <span class="keyword">foreach</span> (<span class="keyword">var</span> card <span class="keyword">in</span> cards)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> cardIndex = ParseCard(card);</span><br><span class="line">    <span class="keyword">if</span> (same &amp;&amp; (prev == <span class="literal">null</span> || prev == cardIndex))</span><br><span class="line">    &#123;</span><br><span class="line">      count++;</span><br><span class="line">      prev = cardIndex;</span><br><span class="line">      lastCard = cardIndex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (cardIndex == prev + <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      count++;</span><br><span class="line">      prev = cardIndex;</span><br><span class="line">      same = <span class="literal">false</span>;</span><br><span class="line">      lastCard = cardIndex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">return</span> CardGroupType.Illegal;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (count == <span class="number">1</span>) <span class="keyword">return</span> CardGroupType.Single;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">2</span>) <span class="keyword">return</span> CardGroupType.Couple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">3</span>) <span class="keyword">return</span> CardGroupType.Triple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">4</span>) <span class="keyword">return</span> CardGroupType.Bomb;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!same &amp;&amp; count &gt;= <span class="number">5</span>) <span class="keyword">return</span> CardGroupType.Multiple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (count == <span class="number">2</span> &amp;&amp; lastCard == <span class="number">13</span>) <span class="keyword">return</span> CardGroupType.JokerBomb;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">return</span> CardGroupType.Illegal;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">int</span> <span class="title">GetBaseCard</span>(<span class="params"><span class="built_in">string</span> token</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">string</span>[] cards = token.Split(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">  List&lt;<span class="built_in">int</span>&gt; cardNums = <span class="keyword">new</span> List&lt;<span class="built_in">int</span>&gt;();</span><br><span class="line">  <span class="keyword">foreach</span> (<span class="keyword">var</span> card <span class="keyword">in</span> cards)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> cardIndex = ParseCard(card);</span><br><span class="line">    cardNums.Add(cardIndex);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> cardNums.Min();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h2 id="CSX-运行时">CSX 运行时</h2>
-<p>有两个工具可以用来运行CSX脚本：</p>
-<ul>
-<li><strong>dotnet-script</strong>：推荐</li>
-<li>scriptcs</li>
-</ul>
-<h3 id="dotnet-script">dotnet-script</h3>
-<p>这是一个官方提供的CSX运行时，提供以下功能：</p>
-<ul>
-<li>提供脚本运行环境（<code>dotnet script xxx.csx</code>直接运行脚本）</li>
-<li>提供脚手架（<code>dotnet script init</code>），初始化一个VSCode的Debug环境</li>
-<li>提供REPL环境：运行<code>dotnet script</code>调出REPL环境</li>
-<li>提供系统级直接运行脚本的功能
-<ul>
-<li>Unix系：在开头加上 <code>#!/usr/bin/env dotnet-script</code> ，直接运行</li>
-<li>Win：运行<code>dotnet script register</code>来向注册表写入CSX的处理方式</li>
-</ul>
-</li>
-<li>提供内置的Nuget包支持 <code>#r &quot;nuget: PackageName, Version&quot;</code></li>
-</ul>
-<p>它有很多分支（我也不是很懂，我只用第一个），详见下面这个表格，来自于官方仓库：<a class="link"   href="https://github.com/dotnet-script/dotnet-script" >dotnet-script/dotnet-script: Run C# scripts from the .NET CLI. (github.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Version</th>
-<th>Framework(s)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>dotnet-script</code> (global tool)</td>
-<td><a href="https://www.nuget.org/packages/dotnet-script/"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://camo.githubusercontent.com/0872d8a82cf8f7b0fc99164c3ad7e0fa23ff191895fe04029fbff187b2cc4cd4/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f646f746e65742d7363726970742e7376673f6d61784167653d3130383030"
-                      alt=""
-                ></a></td>
-<td><code>net6.0</code>, <code>net7.0</code></td>
-</tr>
-<tr>
-<td><code>Dotnet.Script</code> (CLI as Nuget)</td>
-<td><a href="https://www.nuget.org/packages/dotnet.script/"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://camo.githubusercontent.com/5a31db9298f32c0f723ae7936e928bb98995fc9163b1c8fd18cc2be3cd96d43f/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f646f746e65742e7363726970742e7376673f6d61784167653d3130383030"
-                      alt=""
-                ></a></td>
-<td><code>net6.0</code>, <code>net7.0</code></td>
-</tr>
-<tr>
-<td><code>Dotnet.Script.Core</code></td>
-<td><a href="https://www.nuget.org/packages/Dotnet.Script.Core/"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://camo.githubusercontent.com/b79194066652d5ee112ffade6e6d5e9b505a632f4a533120a2ca97372c882008/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e436f72652e7376673f6d61784167653d3130383030"
-                      alt=""
-                ></a></td>
-<td><code>net6.0</code> , <code>netstandard2.0</code></td>
-</tr>
-<tr>
-<td><code>Dotnet.Script.DependencyModel</code></td>
-<td><a href="https://www.nuget.org/packages/Dotnet.Script.DependencyModel/"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://camo.githubusercontent.com/c59b67233016398ec0b24c2ff4b31b3e262f21f8a8809e767f6e8edfb9c92397/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e446570656e64656e63794d6f64656c2e7376673f6d61784167653d3130383030"
-                      alt=""
-                ></a></td>
-<td><code>netstandard2.0</code></td>
-</tr>
-<tr>
-<td><code>Dotnet.Script.DependencyModel.Nuget</code></td>
-<td><a href="https://www.nuget.org/packages/Dotnet.Script.DependencyModel.Nuget/"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://camo.githubusercontent.com/bb9b6c94315ec1c1321681c37a59d1950980c0ab6ef08f81db88aad8dba80d8b/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e446570656e64656e63794d6f64656c2e4e756765742e7376673f6d61784167653d3130383030"
-                      alt=""
-                ></a></td>
-<td><code>netstandard2.0</code></td>
-</tr>
-</tbody>
-</table>
-<p><a class="link"   href="http://xn--15q50rh9br1q8ua.NET" >如果有全局.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 工具支持的话，<a class="link"   href="http://xn--onq35jna6315a.NET" >可以只用.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> CLI输入<code>dotnet tool install -g dotnet-script</code>即可安装（<a class="link"   href="http://xn--gswv73d.NET" >要求.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> Core 2.1 以上）。</p>
-<h3 id="scriptcs">scriptcs</h3>
-<p>这是 <strong>CodeRunner</strong> 内置的CSX运行命令环境实现，年代相比dotnet-script更久远一点，个人更推荐上一个。</p>
-<p>官方仓库：<a class="link"   href="https://github.com/scriptcs/scriptcs" >scriptcs/scriptcs: Write C# apps with a text editor, nuget and the power of Roslyn! (github.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<p>它也提供类似的功能：</p>
-<ul>
-<li>脚本运行环境：<code>scriptcs xxx.csx</code>直接运行脚本</li>
-<li>提供REPL环境</li>
-<li>提供Nuget包支持，但是方式不如dotnet-script方便</li>
-</ul>
-<p>安装是通过Chocolatey进行：<code>cinst scriptcs </code>，优势是直接顶层环境变量。</p>
-<p>个人对比下来，scriptcs比dotnet-script要慢一点，功能更少，Nuget引入也没那么方便，最后一次更新也更早，个人更推荐<strong>dotnet-script</strong>一点。</p>
-<h1>传统项目作为环境</h1>
-<p>由于大部分刷题环境不支持CSX，这里还是用传统的CLI方法<code>dotnet new</code>搭配VSCode管理项目搭建刷题环境。</p>
-<ul>
-<li>使用 <code>dotnet new console</code>创建一个新的控制台项目
-<ul>
-<li>这样在新版本创建的是一个运用<strong>顶层语句</strong>和<strong>隐式全局Using</strong>的项目</li>
-<li>要创建老版本带类的项目可以使用 <code>--use-program-main</code> 参数</li>
-<li>消除隐式Using可以在项目配置中取消<code>ImplicitUsing</code></li>
-</ul>
-</li>
-<li>使用<code>dotnet run</code>直接运行项目</li>
-<li>在VSCode中使用C#插件配置<code>launch.json</code>和<code>tasks.json</code>可以实现单步调试</li>
-</ul>
-]]></content>
-      <categories>
-        <category>刷题笔记</category>
-      </categories>
-      <tags>
-        <tag>开发环境</tag>
-        <tag>.net</tag>
-        <tag>c#</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>全排列问题</title>
     <url>/posts/5519175/</url>
     <content><![CDATA[<p><strong>排列 (Permutation)</strong> 是将相异对象或符号根据确定的顺序重排。每个顺序都称作一个排列。</p>
@@ -974,13 +215,13 @@
         <category>刷题笔记</category>
       </categories>
       <tags>
-        <tag>python</tag>
         <tag>开发环境</tag>
-        <tag>c#</tag>
         <tag>c/c++</tag>
         <tag>java</tag>
+        <tag>python</tag>
         <tag>js</tag>
         <tag>ts</tag>
+        <tag>c#</tag>
       </tags>
   </entry>
   <entry>
@@ -2588,6 +1829,1085 @@
         <tag>防抖与节流</tag>
         <tag>闭包</tag>
         <tag>性能优化</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我的个人密码管理方案 - KeePass</title>
+    <url>/posts/3202227099/</url>
+    <content><![CDATA[<p>大约高中的时候我就接触了一些密码管理软件，如1Password这些，但最终由于上手还是有些难度（那个时候也没有心思折腾）而回归了传统的 passwords.txt 方案。</p>
+<p>早些年（大概在大一暑假）的时候，我在偶然的一次多端密码同步需求下开始重新了解密码管理方案，最终选择了 Keepass 这一开源方案，当初潦草配置了一下 Keepass 满足了我的基本需求（密码存储+多端同步+自动填充），但仍有很多小bug或者其他让我用得不是很舒心的地方困扰我。</p>
+<p>于是，在另一个契机下~~（指公司电脑里需要登录一个东西但是我用keepass生成的16位强密码记不住又不能粘贴密码这样一个非常麻烦的事情）~~，我开始在另一台电脑重新配置我的 Keepass，并借此机会改善我的Keepass解决方案。</p>
+<h2 id="为什么选择-Keepass">为什么选择 Keepass</h2>
+<p>最初的情况是这样的，我开开心心的用我的OneDrive同步我心爱的Password.txt，并每日使用Ctrl+F寻找密码；但是，这并不是事情的全部，由于我并不是每次都能记住要在Password里记上一笔（特别是在网页里），但大部分Chromium浏览器又自带一个密码管理器，因此大部分网页密码就存在了浏览器里。</p>
+<p>彼时我已经从Chrome投奔了Edge阵营~~（现在又想投奔回来因为我的Edge太卡了）~~，在Edge里也已经有了几百条密码记录，得益于微软账户的同步，我在手机和其他设备上也可以访问这些密码（浏览器中）。</p>
+<p>这时，有一天我突发奇想，想要大统一密码方案，比如我的QQ在网页上、在应用里、在各种地方，都应该可以使用同一个密码和同一个服务进行填充（是的，我最初的需求就是因为我不记得我电脑上重置QQ密码是存在哪个网页上了，然后就经常找不到密码）。</p>
+<p>正好，我发现了Edge也提供了类似的填充服务（在手机中设置），但我发现它并不好用，比如经常找不到或者无法调出，也无法方便地管理密码。也对，毕竟它本职就是一个浏览器，这只是一个附加功能罢了。</p>
+<p>遂放弃Edge，开始寻找其他解决方案。</p>
+<h3 id="Why-not-others">Why not others?</h3>
+<p>首先我肯定先看了1Password，LastPass等方案，但它和别的方案（如BitWarden）一样有一个我不能接收的地方：贵。</p>
+<p>首先对于我这种<strong>轻度需求</strong>的人来说，它没有免费订阅，而且订阅费都是刀乐，实在有点难顶。</p>
+<p>所以，<s>选择Keepass的原因其实是没钱</s>，它是开源的，缺了什么功能也可以自定义，何乐而不为呢？遂一拍即合，开整！</p>
+<h2 id="最初的-Keepass-方案">最初的 Keepass 方案</h2>
+<p>最初的Keepass方案的参考资料已经不可考了~~，我记得甚至有小红书的资料~~，这里我就简述一下方案思路和现状。</p>
+<h3 id="需求分析">需求分析</h3>
+<p>由于我个人本来就是一个明文TXT存密码的人，生在这个地方也明白自己的隐私其实没什么好保护的，甚至都没什么人关心，只要保护好财产相关的隐私就可以了。因此，我对于互联网密码的安全性其实没有特别高的要求。</p>
+<p>综上，我提出了以下几点需求，优先级依次递减：</p>
+<ul>
+<li>便捷且统一的密码管理和自动填充（网页和应用）</li>
+<li>全平台多端同步（PC/Windows+Android+iOS）</li>
+<li>自动生成和保存密码（可以在我注册时自动提示保存）</li>
+<li>All-In-One体验（如集成TOTP认证）</li>
+<li>安全性保证（至少不是明文）</li>
+</ul>
+<h3 id="Windows-端与基础配置">Windows 端与基础配置</h3>
+<p>最初的方案使用了官方的Keepass客户端，但是官方客户端UI比较简陋，功能也不完全，需要安装很多对应的插件才能满足需求。</p>
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233015.png"
+                      alt="image-20230522233014611"  
+                >
+<h4 id="数据底层与同步方案">数据底层与同步方案</h4>
+<p>采用了单密码认证数据库+OneDrive同步的方案，这方面不在赘述。</p>
+<h4 id="界面和逻辑优化插件">界面和逻辑优化插件</h4>
+<ul>
+<li>KPEnhancedEntryView：优化了条目列表的显示</li>
+<li>YetAnotherFaviconDownloader：自动下载网页图标</li>
+<li>SourceForgeUpdateChecker：自动检查插件更新</li>
+<li>简体中文语言包：略</li>
+</ul>
+<h4 id="自动填充配置">自动填充配置</h4>
+<p>KeePass使用树状目录组织密码，树的层级间会继承父级的规则，如自动填充、模板等，因此只需要在根目录配置好自动填充规则，所有条目都会共享这个规则，当然你也可以对特定条目/层级作自定义规则。</p>
+<ol>
+<li>在根目录处打开该层配置选项。</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233608.png"
+                      alt=""
+                ></p>
+<ol start="2">
+<li>在自动输入栏里输入配置：<code>&#123;USERNAME&#125;&#123;TAB&#125;&#123;PASSWORD&#125;&#123;DELAY 100&#125;&#123;ENTER&#125;</code>（这里是一个模拟键盘输入的过程，意思是先输入USERNAME，按下TAB然后输入PASSWORD，最后等待100ms后按下回车），你也可以按照自己的喜好进行配置</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522233703.png"
+                      alt=""
+                ></p>
+<h4 id="自动填充服务优化">自动填充服务优化</h4>
+<p>这是最重要的一步，毕竟自带的自动填充真的甚至不能说差强人意，连浏览器场景都不好应对。</p>
+<p>首先是应用程序场景，我选择 <strong>AutoTypeSearch</strong> 插件来实现快捷键搜索Entry+选择后运行自动填充过程。</p>
+<p>在浏览器场景下有以下几种方案可选：</p>
+<ul>
+<li>KeepassHttp：老牌方案，通过RPC传输SHA-256加密后的密码到浏览器，调用浏览器的自动填充（而不是模拟输入），但问题是也太老牌了（上次更新是6年前）</li>
+<li>WebAutoType：在网页中运行自动输入过程，但个人体验下来不是很好（因为网页很多表单不规范导致模拟输入不好实施）</li>
+<li>Kee Vault：我当时不知道从哪里得到的方案，个人感觉很方便，因此以下主要介绍该方案</li>
+</ul>
+<h5 id="Vault-方案">Vault 方案</h5>
+<blockquote>
+<p>Kee Vault的在线服务是商业服务（虽然起步是免费的），而连接本地Keepass是免费服务</p>
+</blockquote>
+<p><a class="link"   href="https://www.kee.pm/" >Vault <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>的使用非常简单，只需要三步：</p>
+<ol>
+<li>在浏览器安装<a class="link"   href="https://chrome.google.com/webstore/detail/kee-password-manager/mmhlniccooihdimnnjhamobppdhaolme" >Vault插件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li>给Keepass安装KeePassRPC插件</li>
+<li>在浏览器端连接二者的RPC过程</li>
+</ol>
+<p>而它的优点有：</p>
+<ul>
+<li>免配置，很方便</li>
+<li>直接调用自动填充而没有模拟输入</li>
+<li>可以在注册新账号（出现密码的场景）时提示你保存密码</li>
+</ul>
+<h4 id="使用体验优化">使用体验优化</h4>
+<ul>
+<li>快速解锁：KeePassWinHello - 调用Windows Hello解锁数据库，但目前体验下来不太稳定（经常没法唤醒，得输入密码）</li>
+<li>条目模板：KPEntryTemplates - 这个我没有深究，不过挺重要的，让你新建条目的时候更轻松一点。</li>
+</ul>
+<p>没有模板的界面是这样的：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522234538.jpg"
+                      alt=""
+                ></p>
+<p>有模板的界面（配置好后）是这样的：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230522234600.jpg"
+                      alt=""
+                ></p>
+<h3 id="移动端配置">移动端配置</h3>
+<p>个人有一台Android设备和一台iPad OS设备，但主战场其实在Windows端，手机端基本只起到读取的作用，因此就简单配置了一下：</p>
+<ul>
+<li>
+<p>OneDrive用于同步</p>
+</li>
+<li>
+<p>Android：KeePass4Android</p>
+<ul>
+<li>优点：老牌方案，保持更新，稳定；支持<strong>快速解锁</strong>和本地缓存</li>
+<li>缺点：部分界面优点过于老旧（如密码键盘）</li>
+</ul>
+</li>
+<li>
+<p>iPadOS：奇密（FantasyPass）</p>
+<ul>
+<li>这个方案我找了很久，其他方案要么太贵要么没法用（少功能如自动填充和同步）</li>
+<li>优点：便宜（买断制），支持快速解锁、本地缓存和自动填充；对平板显示支持良好</li>
+</ul>
+</li>
+</ul>
+<h2 id="改进后的-Keepass-方案">改进后的 Keepass 方案</h2>
+<p>这次在新电脑上重新配置Keepass，改进主要从以下几个方面入手：</p>
+<ul>
+<li>改进客户端体验：包括界面、解锁和输入等</li>
+<li>改善密码管理：在一段时间使用Keepass+Vault后，加之之前浏览器导入的密码，数据库中存储了大量冗余或无效的密码，需要对其进行清理和合并</li>
+<li>统一管理TOTP登录码：具体参考<a href="#%E5%9C%A8KeePass%E4%B8%AD%E7%AE%A1%E7%90%86TOTP">后文</a></li>
+</ul>
+<h3 id="Windows-客户端改进">Windows 客户端改进</h3>
+<p>在新的客户端上我选择使用 KeepassXC，其是一个Keepass的开源客户端，支持Windows、Mac和Linux主流发行版（也可以自己编译）。</p>
+<p>它最大的优点就是界面好看，且开箱即用。它虽然没有KeePass那么丰富的插件，但好处就是插件有的功能它自己都已经覆盖了，包括：</p>
+<ul>
+<li>Windows Hello 解锁</li>
+<li>浏览器集成（Chromium+Firefox）</li>
+<li>网页图标下载</li>
+<li>TOTP生成</li>
+</ul>
+<p>使用它甚至都不需要教程，直接上手即可。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523123957.png"
+                      alt=""
+                ></p>
+<p>在个人习惯方面，我对其作了如下设置，尤其是<strong>最小化那一块非常重要（经常手滑关掉导致浏览器连不上）</strong></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124230.png"
+                      alt=""
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124313.png"
+                      alt=""
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523124334.png"
+                      alt=""
+                ></p>
+<h3 id="移动端改进">移动端改进</h3>
+<p>除了客户端换用了更现代的 KeepassDX 外没有什么改变。</p>
+<h3 id="其他改进">其他改进</h3>
+<h4 id="多URL方案">多URL方案</h4>
+<p>BitWarden有内建的单条目对应多URL方案，但KeePass并不支持。我简单搜索了一下有以下几种解决方案：</p>
+<ul>
+<li><strong>克隆多条记录，并使用引用同步账号密码，设置不同URL</strong>（也是我的方案）</li>
+<li>设置属性（需要插件或客户端支持），如KP2A_URL（KeePassHttp）、App（Keepass4Android）等</li>
+</ul>
+<h2 id="番外篇：2FA与TOTP">番外篇：2FA与TOTP</h2>
+<h3 id="2FA">2FA</h3>
+<p>2FA（双因素认证，2-Factor Authentication）是一种安全认证方案。</p>
+<p>一般有三种因素可以作为认证一个人身份的凭据，如果用到了其中两种就是2FA：</p>
+<ul>
+<li><strong>秘密信息</strong>：只有该用户知道、其他人不知道的某种信息，比如<strong>密码</strong></li>
+<li><strong>个人物品</strong>：该用户的私人物品，比如身份证、钥匙、手机</li>
+<li><strong>生理特征</strong>：该用户的私人物品，比如身份证、钥匙。</li>
+</ul>
+<p>生活中常见的2FA有银行卡（银行卡+密码），网上支付（U盾+密码）等。但在手机普及的现代社会，<strong>手机</strong>就成为了2FA中除密码外个人物品中重要的一个认证物件。常见的实验方案有<strong>短信认证、发送认证通知</strong>等</p>
+<p>但短信可以被伪基站等劫持，因此有一定的安全风险，这里就需要引入更安全的TOTP算法。</p>
+<h3 id="TOTP算法">TOTP算法</h3>
+<p>TOTP 的全称是&quot;基于时间的一次性密码&quot;（Time-based One-time Password）。它是公认的可靠解决方案，已经写入国际标准 <a class="link"   href="https://tools.ietf.org/html/rfc6238" >RFC6238 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
+<p>TOTP的认证过程其实相当简单：</p>
+<ol>
+<li>用户开启双因素认证后，服务器生成一个密钥（这个密钥就类似于一个<strong>token</strong>）</li>
+<li>服务器提示用户扫描二维码（或者使用其他方式），把密钥保存到用户的手机。也就是说，服务器和用户的手机，现在都有了同一把密钥</li>
+<li>用户登录时，手机客户端使用这个密钥和当前时间戳，生成一个哈希，有效期默认为30秒。用户在有效期内，把这个哈希提交给服务器</li>
+<li>由于双端都持有同一个密钥，因此可以根据时间戳生成同一个Hash，跟用户提交的哈希比对。只要两者不一致，就拒绝登录。</li>
+</ol>
+<blockquote>
+<p>注意，密钥必须跟手机绑定。一旦用户更换手机，就必须生成全新的密钥</p>
+</blockquote>
+<p>那么它的代码实现是不是也一样简单呢？答案是，是的。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">TC = floor((unixtime(now) − unixtime(T0)) / TS) <span class="comment"># TS: 有效时长，默认30s T0： 起始时间戳，默认为0</span></span><br><span class="line">TOTP = HASH(SecretKey, TC) <span class="comment"># HASH 为约定的哈希函数，默认是 SHA-1</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="在KeePass中管理TOTP">在KeePass中管理TOTP</h3>
+<p>了解了上述原理后相信大家也就知道了，不必绑定某一家的Authenticator，直接使用KeePass或某些软件就能管理基于TOTP的2FA；而能集成到KeePass中统一管理自然是最好的。</p>
+<p>在 KeePassXC 中可以 <strong>直接右键条目（或者菜单中的编辑条目）-&gt; 添加TOTP -&gt; 将SecretKey（二维码的值）复制进来</strong> 就将TOTP导入到了对应条目中。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523112544.png"
+                      alt=""
+                ></p>
+<p>在设置成功后就可以在条目旁边看到一个时钟小图标，在下方条目预览中也可以直接看到TOTP的值。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/05/20230523113131.png"
+                      alt=""
+                ></p>
+<p>在官方KeePass客户端中可能需要借助第三方插件如KeeTOTP来实现。</p>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a class="link"   href="https://zhuanlan.zhihu.com/p/39645975" >一劳永逸：KeePass全网最详使用指南 - 知乎 (zhihu.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://post.smzdm.com/p/a25gd9lp/" >密码管理软件KeePass教程 篇一：Windows端的配置和使用教程（上）_软件应用_什么值得买 (smzdm.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>折腾日志</category>
+      </categories>
+      <tags>
+        <tag>密码</tag>
+        <tag>keepass</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python 编程环境重新构建</title>
+    <url>/posts/768258525/</url>
+    <content><![CDATA[<p>虽然日常工作里做Web开发比较多，一般都是全套JS/TS解决问题，但偶尔也会有用到Python的场景，如涉及到数据分析、科学计算和机器学习等领域，Python往往是绕不开的，也会在特定领域用Python去展开一些后端或者RPC的开发。</p>
+<p>但是好巧不巧，现在我的工作电脑上Python的环境可以说是一塌糊涂，版本和依赖都很混乱。为此，我打算好好地整理一下我的Python使用流程和环境，打造一个干净快速的开发环境。</p>
+<p>这篇博客主要记录我折腾和理解Python环境的过程，主要有两项工作</p>
+<ul>
+<li><strong>从零开始</strong>构建面向PyQt5的Python环境</li>
+<li>重新整理已有的混乱Python环境，并重建conda+pytorch+cuda工作环境</li>
+</ul>
+<h2 id="解决方案总结">解决方案总结</h2>
+<blockquote>
+<p>🌟全局只使用一个Python（winget官方源），使用miniconda管理多个Python环境</p>
+</blockquote>
+<ul>
+<li>默认环境变量中只留下一个Python（winget-ms-store源），使用Windows Store安装，保持最新同步，<strong>不做虚拟环境管理，使用一个共享环境来满足简单开发需求</strong>（路径为：<code>~/AppData/Local/Microsoft/WindowsApps/python.exe</code>）</li>
+<li>使用miniconda来管理虚拟环境，满足特定环境开发需求，如机器学习、Qt开发等
+<ul>
+<li>相较于之前的环境，现在的全局变量不再包含conda的Python路径，而只包含必要的Scripts，在默认Shell中只能操作conda而不能使用其他Python版本</li>
+<li>使用专门的Anaconda Prompt终端来使用conda的虚拟环境，切换Python和pip版本等</li>
+<li>在VS Code中使用自带的解释器选择来切换虚拟环境。由于Conda的虚拟环境切换是物理路径隔离，因此Code Runner使用<code>$pythonPath -u $fullFileName</code> 配置即可</li>
+<li>使用miniconda来替换anaconda是因为我只对conda的管理功能有需求，其它科学计算库我更倾向于按需引入</li>
+</ul>
+</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145600.png"
+                      alt="" title="整理环境后，干干净净"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145602.png"
+                      alt="" title="整理环境前， 结果里赫然显示了6个Python"
+                ></p>
+<h2 id="conda的使用">conda的使用</h2>
+<p>conda是一个<strong>包管理器</strong>，也提供<strong>虚拟环境管理</strong>功能，这二者也是我们使用conda的重要原因。</p>
+<ul>
+<li>conda相比pip它使用自建的源提供软件包（这也是很多软件找不到的原因），而不像pip只提供一个指向SourceForge的链接<br>
+注：在环境变量正常的情况下，激活虚拟环境后可以使用指定环境的pip</li>
+<li>conda支持所有语言编写的二进制软件包，不像pip只提供Python软件包（虽然pip也支持安装二进制wheel）</li>
+<li>conda的虚拟环境管理相比venv更完善、更好用</li>
+</ul>
+<h3 id="anaconda和miniconda">anaconda和miniconda</h3>
+<p>在conda之上，我们有两个“分支”都可以获取conda本体：</p>
+<ul>
+<li>anaconda：包含了所有科学运算需要的包和conda，一个大而全的Python科学运算库，适合不专精开发的数据科学研究者</li>
+<li>miniconda：仅包含conda, python和一些必须的依赖，其他科学运算库需要按需引入，一个小而美的Python解决方案，适合喜欢自定义的开发者</li>
+</ul>
+<p>这里由于我的需求并不需要anaconda的全部库，选择了miniconda。</p>
+<h3 id="终端配置">终端配置</h3>
+<blockquote>
+<p>终端美化方面请移步：<a class="link"   href="https://www.wolai.com/mWoCoTKv9jJRQDKUQyEpct"  title="终端解决方案">终端解决方案 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</blockquote>
+<p>使用<code>conda init &lt;shell&gt;</code> 可以为指定Shell注入conda-hooks，启用虚拟环境能力</p>
+<blockquote>
+<p>🌟<strong>不推荐在日用Shell中启用，这就是我Powershell卡的罪魁祸首</strong></p>
+</blockquote>
+<h4 id="直接在Powershell中使用Conda">直接在Powershell中使用Conda</h4>
+<p>现在的conda在安装时不再建议添加环境变量，而是使用专门的Anaconda Prompt（即专门的Shell）来操作。</p>
+<blockquote>
+<p>Not recommended.Instead,open Anaconda with the Windows Start menu and select &quot;Anaconda (64-bit).This add to “PATH” option makes Anaconda get found before previously installed software,but may cause problems requiring you to uninstall and reinstall Anaconda.</p>
+</blockquote>
+<p>我本来不理解，直到配置了新电脑发现我的老电脑的Powershell启动奇慢无比，才开始找原因。</p>
+<h4 id="环境变量（PATH）">环境变量（PATH）</h4>
+<p>如果不将conda的相关路径添加到环境变量，如下图的四项所示（其实GCC那项如果你已经安装了其他GCC就不用了），你就不能在Anaconda Prompt以外的地方（如Powershell）中使用<code>conda</code>命令。</p>
+<p>这不会对你的性能产生什么影响，如果你没有程序不兼容的话可以添加，比较方便。</p>
+<p>这里个人推荐只添加<code>$CONDA/Library/bin</code>和<code>$CONDA/Library/usr/bin</code>两个目录到PATH中，而不要添加根目录（包含Python），这样就可以使用conda功能而不破坏全局Python版本管理。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145607.png"
+                      alt=""
+                ></p>
+<h4 id="自动激活base环境">自动激活<code>base</code>环境</h4>
+<p>运行<code>conda init powershell</code>会在你的用户目录<code>$PROFILE</code>生成一个<code>profile.ps1</code>，里面的内容如下，而<strong>这个就是我Powershell启动慢的罪魁祸首</strong>：</p>
+<div class="highlight-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment">#region conda initialize</span></span><br><span class="line"><span class="comment"># !! Contents within this block are managed by &#x27;conda init&#x27; !!</span></span><br><span class="line"><span class="keyword">If</span> (<span class="built_in">Test-Path</span> <span class="string">&quot;C:\Users\kirito\anaconda3\Scripts\conda.exe&quot;</span>) &#123;</span><br><span class="line">    (&amp; <span class="string">&quot;C:\Users\kirito\anaconda3\Scripts\conda.exe&quot;</span> <span class="string">&quot;shell.powershell&quot;</span> <span class="string">&quot;hook&quot;</span>) | <span class="built_in">Out-String</span> | ?&#123;<span class="variable">$_</span>&#125; | <span class="built_in">Invoke-Expression</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#endregion</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>性能对比如下，可以说是立竿见影：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145610.png"
+                      alt="" title="加载 profile.ps1 ： 2309ms"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145612.png"
+                      alt="" title="不加载 profile.ps1 ： 664ms"
+                ></p>
+<blockquote>
+<p>🚦如果你没有频繁调试Python的需求，请不要将这个<code>profile.ps1</code>设为常加载项，即使你使用<code>conda config --set auto_activate_base false</code>取消了自动激活<code>base</code>环境，它也会执行上述检查路径的过程拖慢启动。</p>
+</blockquote>
+<h3 id="conda的常用指令">conda的常用指令</h3>
+<h4 id="虚拟环境相关">虚拟环境相关</h4>
+<ul>
+<li><code>conda create -n &lt;name&gt; python=&lt;version&gt;</code> 创建一个虚拟环境并指定版本</li>
+<li><code>conda activate &lt;name&gt;</code> 激活虚拟环境</li>
+<li><code>conda deactivate</code> 退出当前虚拟环境，回到base环境</li>
+<li><code>conda env info</code> 查看当前虚拟环境信息</li>
+<li><code>conda env list</code>列出所有虚拟环境</li>
+<li><code>conda env remove -n &lt;name&gt;</code>移除一个虚拟环境（并删除其依赖）</li>
+<li><code>conda env export &gt; env.yaml</code> 导出当前虚拟环境配置</li>
+<li><code>conda create -f &lt;config&gt;</code> 从配置文件复制虚拟环境 </li>
+</ul>
+<h4 id="包管理相关">包管理相关</h4>
+<ul>
+<li><code>conda update -n &lt;env&gt; &lt;pkg&gt;</code> 更新依赖
+<ul>
+<li><code>&lt;env&gt;</code> 可以不指定，默认更新base环境（或当前环境）</li>
+<li><code>&lt;pkg&gt;</code> 可以指定为conda或anaconda来更新自身</li>
+</ul>
+</li>
+<li><code>conda install -n &lt;env&gt; &lt;pkg&gt; -c &lt;channel&gt;</code> 安装依赖
+<ul>
+<li><code>&lt;env&gt;</code> 可以不指定，默认更新base环境（或当前环境）</li>
+<li><strong><code>&lt;pkg&gt;</code></strong>** 可以指定为Python，为当前环境安装自己的Python，否则将使用环境变量中的Python**​</li>
+</ul>
+</li>
+</ul>
+<h3 id="使用mamba改进conda">使用mamba改进conda</h3>
+<p>conda虽然有着优秀的科学计算环境和虚拟环境管理，但其令人诟病的依赖解析速度 <s>（永远在solving）</s> 和单线程下载不禁让人想起隔壁的难兄难弟npm。</p>
+<p>mamba为了改写conda下载慢的局面应运而生了，主打下面这些特性：</p>
+<ul>
+<li><code>conda</code>无缝替换为<code>mamba</code>（<strong>drop-in alternative</strong>），可以用mamba来执行任何conda指令，包括安装依赖和虚拟环境</li>
+<li>使用多线程并行加速下载</li>
+<li>使用<code>libsolv</code> 加速依赖解析</li>
+<li>核心部分是通过C++实现，以获得最大执行效率</li>
+</ul>
+<p>安装mamba的指令</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ conda install -c conda-forge mamba</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>安装完成后飞速体验了下，确实起飞</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145614.gif"
+                      alt=""
+                ></p>
+<p>使用<code>mamba</code> 安装pytorch：</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建并激活虚拟环境</span></span><br><span class="line">$ mamba create -n pytorch python=3.9</span><br><span class="line">$ mamba activate pytorch</span><br><span class="line"><span class="comment"># 使用官方推荐的安装方式</span></span><br><span class="line">$ mamba install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia</span><br></pre></td></tr></table></figure></div>
+<p>可以看到1.5GB的文件相较于mamba的速度可以说是直接起飞，限制你的只有网速和防火墙。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145617.png"
+                      alt=""
+                ></p>
+<p>由于我之前安装好了cuda11.8和对应的cudnn，这里直接展示结果（<strong>也可以看到mamba全新安装pytorch居然只用了10分钟</strong>）：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145619.png"
+                      alt=""
+                ></p>
+<h2 id="重新构建Pytorch生产环境">重新构建Pytorch生产环境</h2>
+<p>由于之前Winget手贱更新Conda的时候不小心把我之前辛苦配好的环境卸载了，当时安装的时候就挺痛苦的，半天都启用不了cuda。</p>
+<p>半年后的今天我再来捋一捋这个环境依赖的逻辑，看看能不能跑通。</p>
+<blockquote>
+<p>使用环境：miniconda+mamba</p>
+</blockquote>
+<h3 id="安装cuda">安装cuda</h3>
+<blockquote>
+<p>如果你不是N卡用户或者只想使用CPU请跳过这部分</p>
+</blockquote>
+<ol>
+<li>首先确保你正确安装了显卡驱动，在Shell中运行<code>nvidia-smi</code> 查看显卡信息，可以看到我的cuda版本是12.0</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145622.png"
+                      alt=""
+                ></p>
+<ol>
+<li>根据cuda版本在<a href="https://developer.nvidia.com/cuda-toolkit-archive" title="官网"><strong>官网</strong></a>中下载对应版本的CUDA Toolkit，版本要求是不高于自身GPU版本的Pytorch最高支持版本
+<ul>
+<li>个人实测cuda本身是<strong>向下兼容</strong>的，即GPU支持更低版本的cuda，如我的就支持18</li>
+<li>pytorch目前只官方支持到cuda18，但<strong>社区</strong>表示是<strong>向上兼容</strong>的，即pytorch的cuda18支持Toolkit 的20+</li>
+</ul>
+</li>
+<li>根据Toolkit版本去<a class="link"   href="https://developer.nvidia.com/rdp/cudnn-download"  title="官网">官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>下载安装cudnn，压缩包解压后放进Cuda Toolkit安装目录的对应文件夹里</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145624.png"
+                      alt=""
+                ></p>
+<ol>
+<li>检查安装，Shell运行<code>nvcc -V</code> </li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145626.png"
+                      alt=""
+                ></p>
+<h3 id="安装Pytorch">安装Pytorch</h3>
+<p>访问<a class="link"   href="https://pytorch.org/"  title="Pytorch官网">Pytorch官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>获取你的平台的安装代码：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145628.png"
+                      alt=""
+                ></p>
+<p>我的平台安装代码如下（我使用mamba替代conda加快了安装进程）</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建并激活虚拟环境</span></span><br><span class="line">$ mamba create -n pytorch python=3.9</span><br><span class="line">$ mamba activate pytorch</span><br><span class="line"><span class="comment"># 使用官方推荐的安装方式</span></span><br><span class="line">$ mamba install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>由于我之前安装好了cuda11.8和对应的cudnn，这里直接展示结果（<strong>也可以看到mamba全新安装pytorch居然只用了10分钟</strong>）：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145631.png"
+                      alt="" title="安装过程"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230709145633.png"
+                      alt="" title="安装结果"
+                ></p>
+]]></content>
+      <categories>
+        <category>折腾日志</category>
+      </categories>
+      <tags>
+        <tag>开发环境</tag>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>寻找 ReSharper 开源替代</title>
+    <url>/posts/2913837123/</url>
+    <content><![CDATA[<p>众所周知 JetBrains 家的IDE都十分的智能好用，Visual Studio 的代码提示和感知相比之下就略逊一筹。</p>
+<p>凭着短暂的学生授权，我短暂地体验了几周 NetUltimate 工具包，其优秀的代码提示和质量检查功能令我印象深刻，这也是我Java环境选择IDEA的原因。</p>
+<p>但基于以下几点，我最终还是选择了放弃ReSharper，回归原生Visual Studio体验。</p>
+<ul>
+<li>NetUltimate是收费工具，如果习惯该环境进行开发，在毕业后不从事.Net行业会额外付出高昂的授权费</li>
+<li>ReSharper会严重拖慢VS的启动速度，在打开公司的大型项目时尤为如此</li>
+<li>ReSharper配置项太多，相当于一个独立体系，学习成本较高</li>
+</ul>
+<p>但我对其优秀的IDE功能印象深刻，因此为了部分复刻其功能，我选择对VS进行以下自定义来尽可能还原ReSharper功能。</p>
+<h2 id="前言">前言</h2>
+<p>假期实习中短暂体验了.Net开发，让我对.Net和C#开发环境有一些自己的想法。</p>
+<p>之前主要使用Typescript和React框架进行前端开发，对前端完整优秀的工具链印象深刻，直接使用VS进行开发给我带来了一定落差感。使用ReSharper一部分弥补了这种落差感，但基于上述缺点我又不得不放弃。</p>
+<p>下面，我从一个前端开发者的角度，对Code Lint（代码质量）、Formatting（代码格式）、IntelliSense（代码提示和自动化工具）、编辑器样式等方面改造Visual Studio，改进.NET开发体验。</p>
+<h2 id="外观部分">外观部分</h2>
+<p>配置完后（主题OneMonokai，字体Noto Sans CJK Mono）</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141419805.png"
+                      alt=""
+                ></p>
+<h3 id="主题">主题</h3>
+<p>原本使用VS Code一样的One Dark Pro，但为了保证拓展兼容性，最终选择了OneMonokai主题。</p>
+<p><em>注：One Dark Pro使用SonarLint后导致提示文本也为黑色，无法在深色背景下看清</em></p>
+<h3 id="字体">字体</h3>
+<p>根据最佳编程字体原则：</p>
+<ul>
+<li>所有字母等距（Mono Space）</li>
+<li>多语言支持（遇到中文字体不会回落到默认字体）</li>
+<li>多语言等距（英文字母半角和中文字符全角宽度严格1比2）</li>
+</ul>
+<p>选择以下备选项（优先级从高到低），我选择的是Noto Sans</p>
+<ul>
+<li><strong>Noto Sans CJK Mono（Google家）</strong></li>
+<li>更纱黑体 Mono Nerd</li>
+<li>JetBrains Mono Nerd（JB家）</li>
+<li>Consolas（微软家）</li>
+</ul>
+<hr>
+<h2 id="拓展部分">拓展部分</h2>
+<h3 id="1-代码提示与重构">1. 代码提示与重构</h3>
+<p>ReSharper中的代码重构提示令人印象深刻，我选择以下两款插件来尽可能还原</p>
+<h4 id="SonarLint">SonarLint</h4>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141425329.png"
+                      alt=""
+                ></p>
+<ul>
+<li>形式：离线使用/免费注册后使用</li>
+<li>功能：参考EsLint或PyLint，根据既定规则对代码质量进行改进提示
+<ul>
+<li>可以自定义规则</li>
+<li>在线文档提供修改建议</li>
+<li>实时在编辑器中显示建议</li>
+</ul>
+</li>
+<li>Bug：可能导致重构菜单自己消失</li>
+</ul>
+<h4 id="CodeRush">CodeRush</h4>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141427738.png"
+                      alt=""
+                ></p>
+<ul>
+<li>形式：免费注册后使用</li>
+<li>功能：提供ReSharper中部分快速重构功能</li>
+</ul>
+<h3 id="2-代码格式化">2. 代码格式化</h3>
+<h4 id="Code-Maid">Code Maid</h4>
+<p>Code Maid是一个十分强大的开源插件，我常用的功能有下面几个：</p>
+<ul>
+<li>
+<p>码撬窗口：显示当前文档类视图一般的列表，但支持实时重构和整理</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202302141430029.png"
+                      alt=""
+                ></p>
+<ul>
+<li>拖拽改变顺序</li>
+<li>自动排序（可自定义规则）</li>
+<li>支持region</li>
+</ul>
+</li>
+<li>
+<p>代码清理和格式化</p>
+<ul>
+<li>删除无用的using</li>
+<li>整理空行</li>
+<li>整理XML注释</li>
+<li>支持XAML整理</li>
+<li>支持第三方插件（Resharper、XAML Styler和自定义命令）</li>
+<li>可以保存时自动整理（但为了保证性能和兼容我选择了关闭）</li>
+</ul>
+</li>
+<li>
+<p>生成进度展示</p>
+</li>
+</ul>
+<h4 id="CSharpier">CSharpier</h4>
+<p>一个很霸道的格式化工具，不支持自定义规则，但是是体验最接近Prettier的格式化工具（支持保存时自动格式化）</p>
+<p>体验见仁见智，有人喜欢全自动，有人喜欢有自己的格式就不适合这个插件。</p>
+<p>经过我的测试，其格式化和Code Maid的代码清理并没有规则冲突。</p>
+<h4 id="XAML-Styler">XAML Styler</h4>
+<p>一个老牌XAML格式化工具，具有以下优点：</p>
+<ul>
+<li>自定义项目多</li>
+<li>兼容性好</li>
+<li>支持保存时格式化（Format on save）</li>
+</ul>
+<h3 id="3-其他代码工具">3. 其他代码工具</h3>
+<h4 id="快速创建">快速创建</h4>
+<ul>
+<li>Snippetica：提供简单的模板，方便创建代码</li>
+<li>Add New File：实现Shift+F2自动按格式从模板创建对应目录、文件</li>
+<li>Adjust C# Namespace：自动根据目录层级重构命名空间</li>
+<li>XML Doc Provider：自动生成XML注释</li>
+</ul>
+<h4 id="界面改进">界面改进</h4>
+<ul>
+<li>C# Var Type CodeLens：显示Var的实际类型</li>
+<li>Indent Guides：显示缩进层级</li>
+</ul>
+<h4 id="体验改进">体验改进</h4>
+<ul>
+<li>Open In VSCode：在VSC中打开指定文件（开发其他语言有奇效）</li>
+<li>Select Next Occurrence：获得VSCode的选择体验</li>
+<li>Auto Save：模仿VSCode按时间间隔自动保存</li>
+<li>ILSpy：自动定位到对应反编译代码</li>
+<li>Git Diff：获得VSCode中Git Lens的部分体验</li>
+</ul>
+]]></content>
+      <categories>
+        <category>折腾日志</category>
+      </categories>
+      <tags>
+        <tag>开发环境</tag>
+        <tag>.net</tag>
+        <tag>jetbrains</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>初探 C# Script</title>
+    <url>/posts/3021583790/</url>
+    <content><![CDATA[<p><em>注：以下所有环境均为.net7.0</em></p>
+<h1>C# Script（CSX）</h1>
+<p>C#脚本的根源是伴随着VS2015发布的 <strong>C# 读取-求值-打印-循环 (REPL)</strong>，类似于一个CLI（Command-Line-Interface，命令行）环境，称为<strong>REPL CSI</strong>。这个CLI环境的发布也顺带引入了<strong>将C#脚本化的可能性</strong>。</p>
+<p>以下是官网对C#脚本用途的定义：</p>
+<p><strong>C# 脚本是一款用于测试 C# 和 .NET 代码段的工具，无需创建多个单元测试或控制台项目。它提供了轻型选项，可快速在命令行上对 LINQ 聚合方法进行编码、检查 .NET API 是否解压缩文件或调用 REST API，以了解返回的内容或工作原理。它提供了探索和了解 API 的简便方法，无需对 %TEMP% 目录中的另一个 CSPROJ 文件支付开销。</strong></p>
+<p>我个人的理解的话就是C#的REPL CSI<strong>相当于一个C#版的Python虚拟机</strong>，一方面有一个解释型的CLI，一方面支持解释型的脚本。它可能会慢一点，但是对快速测试或者快速实现一个脚本功能是非常便利的。</p>
+<p><em>理论相关参考了这篇文章：<a class="link"   href="https://learn.microsoft.com/zh-cn/archive/msdn-magazine/2016/january/essential-net-csharp-scripting" >必备 .NET - C# 脚本 | Microsoft Learn <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></em></p>
+<h2 id="编写C-脚本">编写C#脚本</h2>
+<p>接下来我们以做算法题为场景学习C#脚本的使用。</p>
+<p>C#脚本的规则与C#9中的顶层语句很像，语法也和普通C#完全一致。</p>
+<p>主要区别有以下几个：</p>
+<ul>
+<li>引入程序集：<code>#r &lt;Assembly.dll&gt;</code>
+<ul>
+<li>这里直接按相对路径引入即可</li>
+<li>VSCode有个奇怪错误就是必须<code>#r System.Console</code>才不会报错，但实际上不影响运行，甚至加了<code>.dll</code>反而会报错</li>
+</ul>
+</li>
+<li>引入其他脚本 <code>#load &lt;script.csx&gt;</code>
+<ul>
+<li>个人理解是直接把这些东西像宏一样加载进来</li>
+</ul>
+</li>
+<li>引用命名空间仍然使用 <code>using</code></li>
+</ul>
+<hr>
+<p>下面用经典的<strong>牌组大小判断</strong>为例展示一下CSX的编写：</p>
+<p><code>main.csx</code></p>
+<div class="highlight-container" data-rel="Csharp"><figure class="iseeu highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#r &quot;System.Console&quot;</span></span><br><span class="line"><span class="meta">#load &quot;CardAnalyzer.csx&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> line = <span class="string">&quot;3 4 5 6 7-10 J Q K A&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> ((line = Console.ReadLine()) != <span class="literal">null</span>)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">var</span> tokens = line.Split(<span class="string">&#x27;-&#x27;</span>);</span><br><span class="line">  <span class="keyword">if</span> (tokens.Length &lt; <span class="number">2</span>) <span class="keyword">break</span>;</span><br><span class="line">  <span class="keyword">var</span> a = GetCardsType(tokens[<span class="number">0</span>]);</span><br><span class="line">  <span class="keyword">var</span> b = GetCardsType(tokens[<span class="number">1</span>]);</span><br><span class="line">  <span class="keyword">if</span> (a == CardGroupType.Illegal || b == CardGroupType.Illegal)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == CardGroupType.JokerBomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (b == CardGroupType.JokerBomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == b)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (a == CardGroupType.Multiple &amp;&amp; tokens[<span class="number">0</span>].Split(<span class="string">&#x27; &#x27;</span>).Length != tokens[<span class="number">1</span>].Split(<span class="string">&#x27; &#x27;</span>).Length)</span><br><span class="line">    &#123;</span><br><span class="line">      Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> aMin = GetBaseCard(tokens[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">var</span> bMin = GetBaseCard(tokens[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">if</span> (aMin &gt; bMin)</span><br><span class="line">      Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (a == CardGroupType.Bomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (b == CardGroupType.Bomb)</span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(tokens[<span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    Console.WriteLine(<span class="string">&quot;ERROR&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p><code>CardAnalyzer.csx</code></p>
+<div class="highlight-container" data-rel="Csharp"><figure class="iseeu highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">enum</span> CardGroupType</span><br><span class="line">&#123;</span><br><span class="line">  Single = <span class="number">0</span>,</span><br><span class="line">  Couple,</span><br><span class="line">  Triple,</span><br><span class="line">  Multiple,</span><br><span class="line">  Bomb,</span><br><span class="line">  JokerBomb,</span><br><span class="line">  Illegal</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">int</span> <span class="title">ParseCard</span>(<span class="params"><span class="built_in">string</span> card</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">int</span> num;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">int</span>.TryParse(card, <span class="keyword">out</span> num))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span> num - <span class="number">3</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">switch</span> (card)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;J&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">8</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;Q&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">9</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;K&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;A&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">11</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;joker&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">12</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;JOKER&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">13</span>;</span><br><span class="line">      <span class="literal">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">CardGroupType <span class="title">GetCardsType</span>(<span class="params"><span class="built_in">string</span> token</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">string</span>[] cards = token.Split(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">  <span class="built_in">int</span> count = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">int</span>? prev = <span class="literal">null</span>;</span><br><span class="line">  <span class="built_in">bool</span> same = <span class="literal">true</span>;</span><br><span class="line">  <span class="built_in">int</span> lastCard = <span class="number">-1</span>;</span><br><span class="line">  <span class="keyword">foreach</span> (<span class="keyword">var</span> card <span class="keyword">in</span> cards)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> cardIndex = ParseCard(card);</span><br><span class="line">    <span class="keyword">if</span> (same &amp;&amp; (prev == <span class="literal">null</span> || prev == cardIndex))</span><br><span class="line">    &#123;</span><br><span class="line">      count++;</span><br><span class="line">      prev = cardIndex;</span><br><span class="line">      lastCard = cardIndex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (cardIndex == prev + <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      count++;</span><br><span class="line">      prev = cardIndex;</span><br><span class="line">      same = <span class="literal">false</span>;</span><br><span class="line">      lastCard = cardIndex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">return</span> CardGroupType.Illegal;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (count == <span class="number">1</span>) <span class="keyword">return</span> CardGroupType.Single;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">2</span>) <span class="keyword">return</span> CardGroupType.Couple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">3</span>) <span class="keyword">return</span> CardGroupType.Triple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (same &amp;&amp; count == <span class="number">4</span>) <span class="keyword">return</span> CardGroupType.Bomb;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!same &amp;&amp; count &gt;= <span class="number">5</span>) <span class="keyword">return</span> CardGroupType.Multiple;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (count == <span class="number">2</span> &amp;&amp; lastCard == <span class="number">13</span>) <span class="keyword">return</span> CardGroupType.JokerBomb;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">return</span> CardGroupType.Illegal;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">int</span> <span class="title">GetBaseCard</span>(<span class="params"><span class="built_in">string</span> token</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">string</span>[] cards = token.Split(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">  List&lt;<span class="built_in">int</span>&gt; cardNums = <span class="keyword">new</span> List&lt;<span class="built_in">int</span>&gt;();</span><br><span class="line">  <span class="keyword">foreach</span> (<span class="keyword">var</span> card <span class="keyword">in</span> cards)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> cardIndex = ParseCard(card);</span><br><span class="line">    cardNums.Add(cardIndex);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> cardNums.Min();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="CSX-运行时">CSX 运行时</h2>
+<p>有两个工具可以用来运行CSX脚本：</p>
+<ul>
+<li><strong>dotnet-script</strong>：推荐</li>
+<li>scriptcs</li>
+</ul>
+<h3 id="dotnet-script">dotnet-script</h3>
+<p>这是一个官方提供的CSX运行时，提供以下功能：</p>
+<ul>
+<li>提供脚本运行环境（<code>dotnet script xxx.csx</code>直接运行脚本）</li>
+<li>提供脚手架（<code>dotnet script init</code>），初始化一个VSCode的Debug环境</li>
+<li>提供REPL环境：运行<code>dotnet script</code>调出REPL环境</li>
+<li>提供系统级直接运行脚本的功能
+<ul>
+<li>Unix系：在开头加上 <code>#!/usr/bin/env dotnet-script</code> ，直接运行</li>
+<li>Win：运行<code>dotnet script register</code>来向注册表写入CSX的处理方式</li>
+</ul>
+</li>
+<li>提供内置的Nuget包支持 <code>#r &quot;nuget: PackageName, Version&quot;</code></li>
+</ul>
+<p>它有很多分支（我也不是很懂，我只用第一个），详见下面这个表格，来自于官方仓库：<a class="link"   href="https://github.com/dotnet-script/dotnet-script" >dotnet-script/dotnet-script: Run C# scripts from the .NET CLI. (github.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Version</th>
+<th>Framework(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dotnet-script</code> (global tool)</td>
+<td><a href="https://www.nuget.org/packages/dotnet-script/"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://camo.githubusercontent.com/0872d8a82cf8f7b0fc99164c3ad7e0fa23ff191895fe04029fbff187b2cc4cd4/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f646f746e65742d7363726970742e7376673f6d61784167653d3130383030"
+                      alt=""
+                ></a></td>
+<td><code>net6.0</code>, <code>net7.0</code></td>
+</tr>
+<tr>
+<td><code>Dotnet.Script</code> (CLI as Nuget)</td>
+<td><a href="https://www.nuget.org/packages/dotnet.script/"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://camo.githubusercontent.com/5a31db9298f32c0f723ae7936e928bb98995fc9163b1c8fd18cc2be3cd96d43f/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f646f746e65742e7363726970742e7376673f6d61784167653d3130383030"
+                      alt=""
+                ></a></td>
+<td><code>net6.0</code>, <code>net7.0</code></td>
+</tr>
+<tr>
+<td><code>Dotnet.Script.Core</code></td>
+<td><a href="https://www.nuget.org/packages/Dotnet.Script.Core/"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://camo.githubusercontent.com/b79194066652d5ee112ffade6e6d5e9b505a632f4a533120a2ca97372c882008/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e436f72652e7376673f6d61784167653d3130383030"
+                      alt=""
+                ></a></td>
+<td><code>net6.0</code> , <code>netstandard2.0</code></td>
+</tr>
+<tr>
+<td><code>Dotnet.Script.DependencyModel</code></td>
+<td><a href="https://www.nuget.org/packages/Dotnet.Script.DependencyModel/"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://camo.githubusercontent.com/c59b67233016398ec0b24c2ff4b31b3e262f21f8a8809e767f6e8edfb9c92397/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e446570656e64656e63794d6f64656c2e7376673f6d61784167653d3130383030"
+                      alt=""
+                ></a></td>
+<td><code>netstandard2.0</code></td>
+</tr>
+<tr>
+<td><code>Dotnet.Script.DependencyModel.Nuget</code></td>
+<td><a href="https://www.nuget.org/packages/Dotnet.Script.DependencyModel.Nuget/"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://camo.githubusercontent.com/bb9b6c94315ec1c1321681c37a59d1950980c0ab6ef08f81db88aad8dba80d8b/687474703a2f2f696d672e736869656c64732e696f2f6e756765742f762f446f746e65742e5363726970742e446570656e64656e63794d6f64656c2e4e756765742e7376673f6d61784167653d3130383030"
+                      alt=""
+                ></a></td>
+<td><code>netstandard2.0</code></td>
+</tr>
+</tbody>
+</table>
+<p><a class="link"   href="http://xn--15q50rh9br1q8ua.NET" >如果有全局.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 工具支持的话，<a class="link"   href="http://xn--onq35jna6315a.NET" >可以只用.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> CLI输入<code>dotnet tool install -g dotnet-script</code>即可安装（<a class="link"   href="http://xn--gswv73d.NET" >要求.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> Core 2.1 以上）。</p>
+<h3 id="scriptcs">scriptcs</h3>
+<p>这是 <strong>CodeRunner</strong> 内置的CSX运行命令环境实现，年代相比dotnet-script更久远一点，个人更推荐上一个。</p>
+<p>官方仓库：<a class="link"   href="https://github.com/scriptcs/scriptcs" >scriptcs/scriptcs: Write C# apps with a text editor, nuget and the power of Roslyn! (github.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>它也提供类似的功能：</p>
+<ul>
+<li>脚本运行环境：<code>scriptcs xxx.csx</code>直接运行脚本</li>
+<li>提供REPL环境</li>
+<li>提供Nuget包支持，但是方式不如dotnet-script方便</li>
+</ul>
+<p>安装是通过Chocolatey进行：<code>cinst scriptcs </code>，优势是直接顶层环境变量。</p>
+<p>个人对比下来，scriptcs比dotnet-script要慢一点，功能更少，Nuget引入也没那么方便，最后一次更新也更早，个人更推荐<strong>dotnet-script</strong>一点。</p>
+<h1>传统项目作为环境</h1>
+<p>由于大部分刷题环境不支持CSX，这里还是用传统的CLI方法<code>dotnet new</code>搭配VSCode管理项目搭建刷题环境。</p>
+<ul>
+<li>使用 <code>dotnet new console</code>创建一个新的控制台项目
+<ul>
+<li>这样在新版本创建的是一个运用<strong>顶层语句</strong>和<strong>隐式全局Using</strong>的项目</li>
+<li>要创建老版本带类的项目可以使用 <code>--use-program-main</code> 参数</li>
+<li>消除隐式Using可以在项目配置中取消<code>ImplicitUsing</code></li>
+</ul>
+</li>
+<li>使用<code>dotnet run</code>直接运行项目</li>
+<li>在VSCode中使用C#插件配置<code>launch.json</code>和<code>tasks.json</code>可以实现单步调试</li>
+</ul>
+]]></content>
+      <categories>
+        <category>折腾日志</category>
+      </categories>
+      <tags>
+        <tag>开发环境</tag>
+        <tag>c#</tag>
+        <tag>.net</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>初探 Docker - 原理和实践</title>
+    <url>/posts/3542760854/</url>
+    <content><![CDATA[<p>Docker是一种Go语言编写的容器化隔离的实现，帮助我们快速地将应用打包成<strong>容器</strong>进行发布和部署，也可以方便地运行他人编写的应用。</p>
+<blockquote>
+<p>一般来说Docker是运行在Unix系统环境上的，本文也是基于Linux环境的。</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="什么是容器">什么是容器</h2>
+<p>所谓容器（container），是一种<strong>轻量级</strong>的虚拟化技术，像虚拟机一样，对运行在其中的进程提供隔离的运行环境（如地址空间、文件系统等），运行在其中的应用就像独占了整个物理机一样。</p>
+<ul>
+<li>
+<p>对比OS的虚拟化技术（如虚拟存储器等），虚拟内存虽然<strong>为每个进程提供了独立的地址空间和运行上下文，但进程本身仍是运行在操作系统中的，不能提供完全隔离的进程运行环境</strong></p>
+<ul>
+<li>进程知道自己运行在操作系统中，接受操作系统的调度</li>
+<li>进程能感知到其他进程的存在（<code>pid≠1</code>）</li>
+</ul>
+</li>
+<li>
+<p>对比虚拟机技术，虚拟机<strong>为了提供完全的隔离运行环境在宿主环境上还需要模拟一套硬件和操作系统来运行程序，对于只需要隔离运行某个进程的环境来说开销太大</strong></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712162825.png"
+                      alt=""
+                ></p>
+</li>
+</ul>
+<h3 id="容器为什么“轻量级”">容器为什么“轻量级”</h3>
+<p>如果我们想在宿主环境中轻松地部署多个服务，不考虑每个服务的细节配置（如依赖什么环境、暴露什么端口），最好的方法自然是为每个服务提供隔离的运行环境，就像运行在独立的物理机上一样。</p>
+<p>而上面给出的方法都不太适用于这个需求：</p>
+<ul>
+<li>OS的虚拟内存显然不能满足要求，它仅仅提供了独立的地址空间和运行上下文，其系统资源仍是共享的</li>
+<li>虚拟机方案需要为每个服务模拟独立的操作系统和硬件，开销过大</li>
+</ul>
+<p>为了解决这样的需求，<strong>容器化虚拟技术</strong>就应运而生了。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712162827.png"
+                      alt=""
+                ></p>
+<ul>
+<li>一个容器进程<strong>本质上是</strong>一个操作系统中的隔离<strong>进程</strong>，并没有为其建立独立的硬件和OS，开销相比虚拟机小了很多，因此是轻量级的虚拟化</li>
+<li>被隔离的进程不能感知其他进程的存在，它就是自己环境中唯一的进程，系统资源也不与其他进程共享</li>
+</ul>
+<h3 id="如何实现容器隔离">如何实现容器隔离</h3>
+<blockquote>
+<p>🌟<strong>隔离工作是由Linux系统实现的</strong>，Docker只是帮我们打包和运行一系列隔离操作后启动这个隔离进程</p>
+</blockquote>
+<p>Linux利用Namespace（隔离容器）和Cgroups（调配资源）为隔离的进程在原有的独立地址空间和运行上下文上实现了进一步的隔离：</p>
+<ul>
+<li><strong>进程隔离</strong>：利用Linux的Namespace机制实现，结果就是<strong>以隔离方式启动的进程看到的自身进程ID总是1，且看不到系统的其他进程</strong></li>
+<li><strong>文件系统隔离</strong>：利用Linux的mount机制给每个隔离进程挂载了一个虚拟的文件系统，使得<strong>一个隔离进程只能访问这个虚拟的文件系统，无法看到系统真实的文件系统</strong>（决定这个文件系统中包含哪些文件就是Docker的工作之一）</li>
+<li><strong>网络协议栈隔离</strong>：利用Linux的Namespace机制，类比虚拟机的网络模式中的NAT模式，<strong>每个隔离进程实际上都拥有并运行在自己的子网上</strong>，Docker像NAT一样帮我们将某些端口暴露出来并负责进程内子网到外部端口的转发（<code>-p &lt;source&gt;:&lt;target&gt;</code>）</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712162830.png"
+                      alt=""
+                ></p>
+<ul>
+<li><strong>限制容器资源</strong>：利用Cgroup（Linux Control Group）限制进程组（包括隔离进程）使用的资源上限，<strong>防止容器间由于不知道彼此的存在抢占所有资源导致其他服务无法运行</strong></li>
+</ul>
+<h2 id="Docker基本概念">Docker基本概念</h2>
+<p>谈Docker的使用之前，我们要先了解Docker的三个核心概念：<strong>镜像（image）、容器（container）和仓库（repository）</strong>。</p>
+<h3 id="镜像">镜像</h3>
+<blockquote>
+<p>🌟镜像负责为容器定义内部有什么东西，包括<code>root</code> 文件系统，程序所需要的依赖等，构建镜像就等同于构建应用所需的环境和应用本身的运行步骤。</p>
+</blockquote>
+<p>Linux中操作系统分为 <strong>内核</strong> 和 <strong>用户空间</strong>。对于 <code>Linux</code> 而言，内核启动后，会挂载 <code>root</code> 文件系统为其提供用户空间支持。Docker作为容器（隔离进程）管理工具的<strong>核心工作之一就是为隔离的进程提供其所需的文件系统</strong>，而这一过程就是 <strong>镜像</strong> 的工作。</p>
+<p>Docker镜像（Image）相当于一个特殊的root文件系统（如官方镜像 <code>ubuntu:18.04</code> 就包含了完整的一套 Ubuntu 18.04 最小系统的 <code>root</code> 文件系统），除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。</p>
+<p>由于镜像需要包含一个完整的<code>root</code>文件系统，其体积比较庞大，因此采用了<strong>分层存储（分层构建）</strong> 的方式简化构建。镜像构建时，会一层层构建，前一层是后一层的基础。每一层构建完就不会再发生改变，后一层上的任何改变只发生在自己这一层。</p>
+<p>因此，在分层构建镜像时，<strong>每一层尽量只包含该层需要添加的东西，任何额外的东西应该在该层构建结束前清理掉。</strong></p>
+<h3 id="容器">容器</h3>
+<blockquote>
+<p>🌟容器是镜像的实例，就像类和实例一样，其本质就是前文提到的拥有自己命名空间（Namespace）的进程。</p>
+</blockquote>
+<p>**镜像（<code>Image</code>）和容器（<code>Container</code>）的关系，就像是面向对象程序设计中的 **<code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</p>
+<p><strong>这里谈到的容器（container）和上面谈到的容器是同一个概念，其本质是操作系统中拥有独立命名空间的隔离进程。</strong></p>
+<p>在分层存储中，容器也有自己的存储层，以前面镜像存储层为基础建立自己的<strong>容器存储层</strong>，为容器运行时读写而准备，<strong>在容器启动时生成，在容器关闭后也会清除</strong>（生命周期与容器本身相同)。</p>
+<blockquote>
+<p>按照 Docker 最佳实践的要求，容器不应该向其存储层内写入任何数据，容器存储层要保持无状态化。所有的文件写入操作，都应该使用 <a href="/docker_practice/data_management/volume" title="数据卷（Volume）">数据卷（Volume）</a>、或者 <a href="/docker_practice/data_management/bind-mounts" title="绑定宿主目录">绑定宿主目录</a>，在这些位置的读写会跳过容器存储层，直接对宿主（或网络存储）发生读写，其性能和稳定性更高。<br>
+数据卷的生存周期独立于容器，容器消亡，数据卷不会消亡。因此，使用数据卷后，容器删除或者重新运行之后，数据却不会丢失。</p>
+</blockquote>
+<h3 id="仓库">仓库</h3>
+<blockquote>
+<p>🌟仓库（repository）是用于储藏、发布容器镜像的地方。</p>
+</blockquote>
+<p>以Docker Repository为例：一个 <strong>Docker Registry</strong> 中可以包含多个 <strong>仓库</strong>（<code>Repository</code>）；每个仓库可以包含多个 <strong>标签</strong>（<code>Tag</code>）；每个标签对应一个镜像。</p>
+<p>如Ubuntu仓库中<code>ubuntu</code> 是仓库的名字，其内包含有不同的版本标签，如，<code>16.04</code>, <code>18.04</code>。我们可以通过 <code>ubuntu:16.04</code>，或者 <code>ubuntu:18.04</code> 来具体指定所需哪个版本的镜像。如果忽略了标签，比如 <code>ubuntu</code>，那将视为 <code>ubuntu:latest</code>。</p>
+<h2 id="使用Docker">使用Docker</h2>
+<h3 id="启动容器-docker-run">启动容器 <code>docker run</code> </h3>
+<p>启动Docker服务后，在终端运行<code>docker run &lt;image&gt; &lt;...cmd&gt;</code> 指令即可启动容器，其运行流程如下：</p>
+<ol>
+<li>检查本地是否存在指定的镜像，不存在就从 registry 下载</li>
+<li>利用镜像创建并启动一个容器</li>
+<li>分配一个文件系统，并在只读的镜像层外面挂载一层可读写层</li>
+<li>从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去</li>
+<li>从地址池配置一个 ip 地址给容器</li>
+<li>执行用户指定的应用程序</li>
+<li>执行完毕后容器被终止</li>
+</ol>
+<p>支持的<strong>参数</strong>如下，无入参的运行参数可以合并，如<code>-it</code>：</p>
+<ul>
+<li><code>-t</code> 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上</li>
+<li><code>-i</code> 让容器的标准输入保持打开，结合<code>-t</code> 可以生成一个交互终端</li>
+<li><code>-p &lt;localPort&gt;:&lt;containerPort&gt;</code> 端口映射</li>
+<li><code>-d</code> 让容器以后台守护进程（daemon）模式运行，stdout会绑定到Docker Log中，使用<code>docker attach &lt;container&gt;</code> 可以进入容器</li>
+</ul>
+<p>使用 <code>docker exec [opts] &lt;container&gt; &lt;cmd&gt;</code> 可以执行指定指令</p>
+<h3 id="使用Dockerfile定义镜像">使用<code>Dockerfile</code>定义镜像</h3>
+<p>Dockerfile 是一个文本文件，其内包含了一条条的 <strong>指令(Instruction)</strong>，每一条指令对应分层存储中的一层，因此每一条指令的内容，就是描述该层应当如何构建，因此又称<strong>分层构建</strong>。<strong>每一层的构建指令都会在原来的层上新建一层，执行命令，然后</strong>**<code>commit</code>这一层的修改。**​</p>
+<p>可以说Dockerfile是一个Docker脚本，包含了把每一层修改、安装、构建、操作的命令，使用Dockerfile就可以定制自己的镜像。</p>
+<h4 id="使用-FROM-指定基础镜像">使用 <code>FROM</code> 指定基础镜像</h4>
+<blockquote>
+<p>特殊的镜像——<code>scratch</code> ，指一个空白镜像，在直接运行二进制程序（如Go镜像）时可能会有用，因为所需的一切库都已经在可执行文件里了，并不需要OS提供运行时支持</p>
+</blockquote>
+<p> 所谓定制镜像，那一定是以一个镜像为基础，在其上进行定制，而<code>FROM</code> 语句就是指定<strong>基础镜像</strong>，因此一个 <code>Dockerfile</code> 中 <code>FROM</code> 是必备的指令，并且<strong>必须是第一条指令</strong>。</p>
+<h4 id="使用RUN-执行命令">使用<code>RUN</code> 执行命令</h4>
+<blockquote>
+<p>🌟Dockerfile 中每一个指令都会建立一层，<code>RUN</code> 也不例外。</p>
+</blockquote>
+<p><code>RUN</code> 指令是一个强大的指令，其能力和Shell相同，可以执行系统命令或可执行文件，对应的有两种格式：</p>
+<ul>
+<li><code>RUN &lt;cmd&gt;</code> 系统命令</li>
+<li><code>RUN [&lt;filePath&gt; [, arg1, arg2, ...]]</code> 可执行文件，以数组的形式传递参数</li>
+</ul>
+<p>由于<code>RUN</code> 指令会新建一层新的UnionFS存储，因此请格外注意不要创建额外的<code>RUN</code> 指令，将能合并的指令都尽量合并在一个<code>RUN</code> 中，因为<strong>UnionFS是有层数限制的</strong>（如 AUFS曾经最大不得超过 42 层，现在是不得超过 127 层）。</p>
+<div class="highlight-container" data-rel="Docker"><figure class="iseeu highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Wrong: Too many layers</span></span><br><span class="line"><span class="keyword">FROM</span> debian:stretch</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get install -y gcc libc6-dev make wget</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> wget -O redis.tar.gz <span class="string">&quot;http://download.redis.io/releases/redis-5.0.3.tar.gz&quot;</span></span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">mkdir</span> -p /usr/src/redis</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> make -C /usr/src/redis</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> make -C /usr/src/redis install</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Correct: Only 1 layer for `RUN`</span></span><br><span class="line"><span class="keyword">FROM</span> debian:stretch</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">set</span> -x; buildDeps=<span class="string">&#x27;gcc libc6-dev make wget&#x27;</span> \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; apt-get update \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; apt-get install -y <span class="variable">$buildDeps</span> \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; wget -O redis.tar.gz <span class="string">&quot;http://download.redis.io/releases/redis-5.0.3.tar.gz&quot;</span> \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; <span class="built_in">mkdir</span> -p /usr/src/redis \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1 \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; make -C /usr/src/redis \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; make -C /usr/src/redis install \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; <span class="built_in">rm</span> -rf /var/lib/apt/lists/* \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; <span class="built_in">rm</span> redis.tar.gz \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; <span class="built_in">rm</span> -r /usr/src/redis \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; apt-get purge -y --auto-remove <span class="variable">$buildDeps</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<h4 id="构建镜像-docker-build">构建镜像 <code>docker build</code> </h4>
+<p>Shell中运行<code>docker build -t &lt;name&gt; &lt;path&gt;</code> ，如<code>docker build -t test .</code> ，即可构建一个名为<code>name</code> 的镜像。</p>
+<p>由于Docker实际上是一个C/S结构的程序，我们使用的<code>docker</code> 指令实际上只是客户端，所有的运行、构建工作都是在服务端进程进行的，二者通过一套REST API进行沟通，所以使用Docker可以方便地管理远程容器服务。</p>
+<p>因此我们在运行<code>docker build</code> 时<strong>指定的路径会被整体打包上传给Docker引擎</strong>，因此<strong>不再是本地路径</strong>，而是引入了<strong>上下文路径</strong>这一概念，<strong>在Dockerfile中访问的路径都是上下文路径</strong>，其限制是只能访问上下文路径范围内的文件，如<code>../out.file</code> 是无法在Dockerfile中访问的。</p>
+<ul>
+<li><strong>其他构建方式</strong>：Dockerfile除了手动指定本地的上下文目录外还支持其他方式
+<ul>
+<li>从Git仓库构建：<code>docker build &lt;git-url&gt;</code></li>
+<li>从tar压缩包创建：<code>docker build &lt;tar-url&gt;</code> </li>
+</ul>
+</li>
+</ul>
+<h4 id="其他指令">其他指令</h4>
+<ul>
+<li><strong>操作上下文目录</strong>
+<ul>
+<li><code>COPY &lt;src&gt; &lt;target&gt;</code> 指令将从<strong>构建上下文目录</strong>中 <code>&lt;源路径&gt;</code> 的文件/目录复制到<strong>新的一层的镜像</strong>内的 <code>&lt;目标路径&gt;</code> 位置
+<ul>
+<li><code>源路径</code> 可以有多个，可以是通配符
+<ul>
+<li>如果源路径为文件夹，复制的时候不是直接复制该文件夹，而是<strong>将文件夹中的内容复制到目标路径</strong></li>
+</ul>
+</li>
+<li><code>目标路径</code> 可以是容器内的绝对路径，也可以是相对于工作目录的相对路径（工作目录可以用 <code>WORKDIR</code> 指令来指定）。
+<ul>
+<li>目标路径不需要事先创建，如果目录不存在会在复制文件前先行创建缺失目录。</li>
+</ul>
+</li>
+<li>选项
+<ul>
+<li><code>—source &lt;stage&gt;</code> 指定上下文目录为某个阶段</li>
+<li><code>—chown</code> 更改文件状态（权限组）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>WORKDIR &lt;dir&gt;</code> 可以来指定工作目录（或者称为当前目录），<strong>以后各层</strong>的当前目录就被改为指定的目录，如该目录不存在，<code>WORKDIR</code> 会帮你建立目录<br>
+区别<code>RUN cd</code> ：<code>WORKDIR</code> 适用于以后的所有层，<code>RUN cd</code> 只适用于当前层</li>
+</ul>
+</li>
+<li><code>EXPOSE &lt;port&gt;</code> 暴露端口（指内部网络的端口），支持暴露多个端口<br>
+在映射时可以手动指定每个端口的映射，也可以自动分配</li>
+<li><code>CMD</code> 指定容器启动命令，和<code>RUN</code> 格式类似，但<code>CMD</code> 命令执行后容器将启动</li>
+<li><code>SHELL</code> 指令可以指定<code>RUN</code> 和<code>CMD</code> 指令的宿主终端</li>
+</ul>
+<h3 id="数据管理">数据管理</h3>
+<p><strong>按照 Docker 最佳实践的要求，容器不应该向其存储层内写入任何数据，所有的文件写入操作，都应该使用 数据卷（Volume）、或者 绑定宿主目录。</strong> 具体实现上，Docker使用Linux系统的mount功能来实现将指定目录挂载到特定物理存储区上。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712162837.png"
+                      alt=""
+                ></p>
+<h4 id="数据卷">数据卷</h4>
+<p>数据卷（Volumn）是一个可供一个或多个容器使用的特殊目录，独立于UnionFS外部，提供一片不会随容器终止而丢失的存储空间，其设计目的就是为了<strong>实现容器间的数据共享和持久化存储</strong>。</p>
+<ul>
+<li><code>数据卷</code> 可以在容器之间共享和重用</li>
+<li>对 <code>数据卷</code> 的修改会立马生效</li>
+<li>对 <code>数据卷</code> 的更新，不会影响镜像</li>
+<li><code>数据卷</code> 默认会一直存在，即使容器被删除</li>
+</ul>
+<p>使用 <code>docker volumn create &lt;name&gt;</code> 可以创建一个数据卷，后面通过名称来进行调用和绑定。</p>
+<p>使用 <code>docker volumn ls</code> 可以查看所有数据卷。</p>
+<p>要绑定数据卷可以在运行容器时使用<code>--mount</code> 参数，如下面的指令就把<code>/usr/share/nginx/html</code> 挂载到了<code>my-vol</code> 数据卷上。</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ docker run -d -P \</span><br><span class="line">    --name web \</span><br><span class="line">    <span class="comment"># -v my-vol:/usr/share/nginx/html \</span></span><br><span class="line">    --mount <span class="built_in">source</span>=my-vol,target=/usr/share/nginx/html \</span><br><span class="line">    nginx:alpine</span><br></pre></td></tr></table></figure></div>
+<h4 id="挂载宿主目录">挂载宿主目录</h4>
+<p>上面提到的<code>mount</code> 参数除了可以绑定创建的数据卷，也可以绑定到宿主机的某个目录上，只需要指定<code>type=bind</code> 即可。如下所示：</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ docker run -d -P \</span><br><span class="line">    --name web \</span><br><span class="line">    <span class="comment"># -v /src/webapp:/usr/share/nginx/html \</span></span><br><span class="line">    --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/src/webapp,target=/usr/share/nginx/html \</span><br><span class="line">    nginx:alpine</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>杂食编程</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker 里的 shebang 踩坑记</title>
+    <url>/posts/4246005333/</url>
+    <content><![CDATA[<p>最近手头有一个 Node 后端项目需要用 Docker 来部署，于是火急火燎地开始学习 Docker ，但在写完 Dockerfile 后却出现了以下错误：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">env: can&#x27;t execute &#x27;node&#x27;: No such file or directory</span><br></pre></td></tr></table></figure></div>
+<p>由于我的项目需要依赖本地的 pandoc 环境，因此 Dockerfile 中需要先安装 pandoc。我采用了下载预编译的二进制文件后拷贝到 <code>/usr/bin</code> 的方法进行安装，相关配置如下：</p>
+<div class="highlight-container" data-rel="Dockerfile"><figure class="iseeu highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:<span class="number">16</span>-alpine as node</span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> npm i -g pnpm pandoc-filter</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">FROM</span> node as pandoc</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /build</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apk add --no-cache curl</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> curl -L -o pandoc.tar.gz https://github.com/jgm/pandoc/releases/download/3.1.5/pandoc-3.1.5-linux-amd64.tar.gz</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> tar xvzf pandoc.tar.gz --strip-components=1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> node as deps</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> package.json pnpm-lock.yaml ./</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pnpm install</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> node as deploy</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">ENV</span> NODE_PATH=/usr/local/lib/node_modules PATH=<span class="string">&quot;/usr/local/bin:$PATH&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">mkdir</span> /app/tmp</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=pandoc /build/bin/pandoc /usr/bin/pandoc</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=deps /app/node_modules ./node_modules</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./src .</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">chmod</span> +x ./utils/filter.js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;node&quot;</span>, <span class="string">&quot;index.js&quot;</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">3000</span></span><br></pre></td></tr></table></figure></div>
+<p>我初步判断是 <strong>pandoc 在执行 JS Filter 的时候没有检测到 Node 环境的存在</strong>，但奇了怪了，我的<strong>基础镜像明明就是 Node 镜像</strong>，为什么会识别不到呢？</p>
+<h2 id="认识-shebang">认识 shebang</h2>
+<p>经过了长久的排查（甚至从最开始的官方 pandoc 镜像换成了手动 curl 安装），我确认了不是环境中没有 <code>node</code> 的问题，<code>node</code> 版本和环境变量都一切正常。</p>
+<p>最终，我定位到了我的 <code>filter.js</code> 文件上。</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="meta">#! /usr/bin/env node</span></span><br><span class="line"><span class="keyword">const</span> pandoc = <span class="built_in">require</span>(<span class="string">&quot;pandoc-filter&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&quot;path&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&quot;fs&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">action</span>(<span class="params">&#123; t: type, c: value &#125;, format, meta</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (type === <span class="string">&quot;Image&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> src = value[value.<span class="property">length</span> - <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">const</span> srcPath = path.<span class="title function_">resolve</span>(src[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">const</span> stream = fs.<span class="title function_">readFileSync</span>(srcPath, <span class="string">&quot;base64&quot;</span>);</span><br><span class="line">    <span class="keyword">const</span> ext = path.<span class="title function_">extname</span>(srcPath);</span><br><span class="line">    <span class="keyword">const</span> base64 = <span class="string">`data:image/<span class="subst">$&#123;ext&#125;</span>;base64,<span class="subst">$&#123;stream&#125;</span>`</span>;</span><br><span class="line">    <span class="keyword">return</span> pandoc.<span class="title class_">Image</span>([<span class="string">&quot;&quot;</span>, [], []], [pandoc.<span class="title class_">Str</span>(<span class="string">&quot;image&quot;</span>)], [base64, src[<span class="number">1</span>]]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pandoc.<span class="title function_">stdio</span>(action);</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>这是一个简单的用 JS 写的 pandoc filter，功能是读取文档中的图片并转为 base64 格式，在我的 Windows 环境中运行起来没有任何问题，但是在 Docker 中运行就出现了问题，而问题就出在第一行上。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/usr/bin/env node</span></span><br></pre></td></tr></table></figure></div>
+<p>第一行这个以 <code>#!</code> 开头的东西叫做 <code>shebang</code>（又称 <code>hashbang</code>），用于<strong>指定脚本文件的解释器</strong>。</p>
+<blockquote>
+<p>在文件中存在 Shebang 的情况下，类 Unix 操作系统的程序加载器会分析 Shebang 后的内容，将这些内容作为解释器指令，并调用该指令，并将载有Shebang的文件路径作为该解释器的参数。</p>
+</blockquote>
+<p>而 <code>/usr/bin/env</code> 是一个程序，用于<strong>在环境变量（PATH）中查找后面的解释器</strong>，作用是方便脚本在不同机器上可以正常运行。因此上面的 <code>shebang</code> 的意思就是：<strong>在 <code>PATH</code> 中寻找 <code>node</code> 来解释下面的脚本</strong>。</p>
+<p>而报错信息：<code>env: can't execute 'node': No such file or directory</code> 实际上是 <code>/usr/bin/env</code> 发出的，表示不能在环境变量中找到 <code>node</code>。</p>
+<p>奇也怪哉，我在 Shell 里运行 <code>node</code> 明明好好的，说明环境变量没有问题，为什么会找不到呢？</p>
+<h2 id="CRLF-和-LF">CRLF 和 LF</h2>
+<p>提到 CRLF（Windows EOL） 和 LF（Linux EOL）大家一定都不陌生，因为一些历史原因，Windows（MS-DOS）和 Unix 系统的各种标准一直都有着某些刻意为之的区别，其中就包括 EOL（End-Of-Line，行尾符）。</p>
+<ul>
+<li>在 Windows 中，行尾用 <code>\r\n</code> 两个字符来表示</li>
+<li>在 Linux 中，行尾用 <code>\n</code>  一个字符表示</li>
+<li>在 macOS 中，目前主流是用 <code>\n</code> （LF）来表示</li>
+</ul>
+<p>此前 CRLF 和 LF 一直没有给我造成太大的困扰，最多也就在 Git 提交时发出一些提示，因此我也没有太在意。</p>
+<h3 id="CRLF-和-shebang-的奇妙化学反应">CRLF 和 shebang 的奇妙化学反应</h3>
+<p>现在我们在 Windows 下编辑一个 <code>hello.js</code> 脚本文件，目的就是打印 Hello World。</p>
+<div class="highlight-container" data-rel="Js"><figure class="iseeu highlight js"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env node</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Hello World&quot;</span>);</span><br></pre></td></tr></table></figure></div>
+<p>现在我们想让它在 Linux 中直接作为脚本运行，因此上传到了我的 WSL（Ubuntu）中，修改权限后运行：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712155647.png"
+                      alt=""
+                ></p>
+<p>可以看到这里出现了相似的错误 <code>/usr/bin/env: ‘node\r’: No such file or directory</code> ，因为后面有 <code>\r</code> 导致无法正常识别 node，连错误码都是一样的 127，基本可以锁定就是 <code>\r</code> 的问题了。</p>
+<blockquote>
+<p>这里由于我使用的是 zsh + Windows Terminal，所以可以正常地打印出错误信息里的 <code>\r</code>，如果是 <strong>Docker 中默认的 Bash 默认是打印不出 <code>\r</code> 的</strong>，这也是我找了这么久才找出问题根源的原因 QaQ。</p>
+</blockquote>
+<h3 id="如何解决-CRLF-的问题">如何解决 CRLF 的问题</h3>
+<p>在 VS Code 下方底栏右侧可以看到当前行尾，如下图所示：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712161246.png"
+                      alt=""
+                ></p>
+<h4 id="在-Windows-侧管理">在 Windows 侧管理</h4>
+<p>首先，在 VS Code （或其他编辑器）中设置 File &gt; EOL 为 <code>\n</code> （LF），保证本地创建的文件都是LF的，如下图所示：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712160359.png"
+                      alt=""
+                ></p>
+<p>然后再配置 Git 相关配置，与之相关的配置有两项：</p>
+<ul>
+<li><code>core.autocrlf</code> 控制文件在 Windows 电脑上时是否自动转换 CRLF（Git 内部是 LF ）
+<ul>
+<li><code>true</code> 提交时转换为 LF，检出时转换为 CRLF</li>
+<li><code>input</code> 提交时转换为 LF，检出时不进行转换</li>
+<li><code>false</code> 提交和检出时都不进行传唤</li>
+</ul>
+</li>
+<li><code>core.safecrlf</code> 控制文件中不能同时出现 CRLF 和 LF
+<ul>
+<li><code>true </code> 拒绝提交包含混合换行符的文件</li>
+<li><code>false</code> 允许提交混合换行符的文件</li>
+<li><code>warn</code> 提交混合换行符文件时发出警告</li>
+</ul>
+</li>
+</ul>
+<h5 id="全局设置">全局设置</h5>
+<p>如果你想所有代码文件都使用 LF 的话（需要与 Unix 合作的话推荐这样做）可以修改 Git 全局配置如下，配合编辑器让 Windows 处理 LF 行尾。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global core.safecrlf <span class="literal">true</span> <span class="comment"># 不允许混合换行符提交</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global core.autocrlf input <span class="comment"># 仅在提交时将CRLF转为LF，拉取时不转换</span></span></span><br></pre></td></tr></table></figure></div>
+<h5 id="设置-gitattributes">设置 <code>.gitattributes</code></h5>
+<p>使用 <code>.gitattributes</code> 的好处是可以保证使用这个仓库的每一个人都有相同的 Git 配置，避免协作问题。</p>
+<p>以下是 Github 官方的一个模板文件：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line"># Set the default behavior, in case people don&#x27;t have core.autocrlf set.</span><br><span class="line">* text=auto</span><br><span class="line"></span><br><span class="line"># Explicitly declare text files you want to always be normalized and converted</span><br><span class="line"># to native line endings on checkout.</span><br><span class="line">*.c text</span><br><span class="line">*.h text</span><br><span class="line"></span><br><span class="line"># Declare files that will always have CRLF line endings on checkout.</span><br><span class="line">*.sln text eol=crlf</span><br><span class="line"></span><br><span class="line"># Denote all files that are truly binary and should not be modified.</span><br><span class="line">*.png binary</span><br><span class="line">*.jpg binary</span><br></pre></td></tr></table></figure></div>
+<p>修改第一行 <code>* text=auto</code> 为  <code>* text=auto eol=lf</code> 即可将所有代码文件的行尾都规定为 LF，如果不符合规范就不能提交。</p>
+<h4 id="在-Linux-侧管理">在 Linux 侧管理</h4>
+<p>由于 CRLF 和 LF 其实是一个历史悠久的问题，从 DOS 时期就有了，所以 Linux 上也有不少转化工具，如 <code>dos2unix</code> 。</p>
+<p>以上面的 <code>hello.js</code> 为例执行转换：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install dos2unix</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">dos2unix ./hello.js</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./hello.js</span></span><br></pre></td></tr></table></figure></div>
+<p>转化后就可以正确执行，运行结果如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/07/20230712161908.png"
+                      alt=""
+                ></p>
+]]></content>
+      <categories>
+        <category>杂食编程</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
