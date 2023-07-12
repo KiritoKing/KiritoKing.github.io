@@ -5,6 +5,8 @@ tags:
   - keepass
 excerpt: 个人管理密码数据库的一些经验，以及配置全平台 KeePass 解决方案的一些心得
 abbrlink: 3202227099
+categories:
+  - 折腾日志
 date: 2023-05-23 12:47:52
 ---
 

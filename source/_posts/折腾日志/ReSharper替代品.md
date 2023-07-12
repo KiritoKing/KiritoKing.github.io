@@ -6,6 +6,8 @@ tags:
   - 开发环境
   - .net
   - jetbrains
+categories:
+  - 折腾日志
 date: 2023-02-14 00:00:00
 ---
 
