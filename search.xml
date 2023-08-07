@@ -2600,6 +2600,315 @@
       </tags>
   </entry>
   <entry>
+    <title>工欲善其事，必先利其器——打造自己趁手的终端体验</title>
+    <url>/posts/651278606/</url>
+    <content><![CDATA[<p>📌 本文介绍了终端在程序开发流程中的重要性，并探讨了如何打造趁手的终端体验。文章讲解了Shell基础、Terminal和Shell的关系、什么是Prompt、Prompt工具的使用以及Profile配置文件的作用。针对Powershell的改进，作者提出了使用starship作为Prompt工具的方案，并介绍了Powershell 7的新功能。此外，文章还介绍了在macOS上配置开发环境的方案，包括使用zsh + oh-my-zsh、iterm2主题和tmux等插件来提高终端生产力。<em>（Summarized By ChatGPT）</em></p>
+<span id="more"></span>
+<p>终端在程序开发流程中显然是十分重要的，很多复杂的工具使用CLI的效率要远远高于GUI，且CLI还可以编写自动化脚本来提升工作效率。因此，打造趁手的终端体验显然是开发环境配置的重要一环。</p>
+<p>虽然在之前摸爬滚打的经历里，我已经脱离了在Windows下使用CMD和Git Bash作为终端的原始体验，在Windows Terminal和Powershell的组合下使用体验还算良好，也用oh-my-posh做了Prompt优化。</p>
+<p>后面一次偶然的机会看到了Unix开发同学的zsh，看到他的自动补全和历史记录确实很是心动，就开始对已有的终端方案进行改进。</p>
+<p>目前来说我的终端体验还有以下问题：</p>
+<ul>
+<li>缺少命令补全和历史记录提示（auto suggestion）</li>
+<li>Shell启动速度过慢</li>
+<li>WSL的Shell体验完全没有优化</li>
+</ul>
+<p>除了在Windows端优化Powershell解决上述问题外，这里还对WSL/macOS的终端（zsh）进行了美化和优化。</p>
+<h1>Shell 基础</h1>
+<p>这个<a class="link"   href="https://www.bilibili.com/video/BV1rk4y1W7dZ/?share_source=copy_web&amp;vd_source=0a01fb11a82eaf663fcad12ddb244da9" >视频 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>比较系统地讲了Shell相关的基础知识（平台无关），也和本文的主题——终端体验优化相关性较强。（这个原Po是mac上终端Warp的作者，也是用Rust写的，终端理解很强）</p>
+<h2 id="Terminal和Shell">Terminal和Shell</h2>
+<p>虽然在本文中会大量地混用Terminal和Shell的概念，并将他们都称为“终端”，但在此之前还是应该将这些概念好好地明晰一下。</p>
+<p>下面将由表及里，从用户交互到系统调用地讲明这些概念。</p>
+<h3 id="CLI-Command-Line-Interface">CLI (Command Line Interface)</h3>
+<p>CLI (Command Line Interface)，中文为命令行界面，就是一种通过文本输入输出与计算机进行交互的形式，而Shell和Terminal就是CLI的载体。</p>
+<p>形象地说就是像电视里的黑客那样对着黑乎乎绿油油的屏幕敲代码执行操作就是CLI，而平时拿鼠标点点划划进行操作就是GUI (Graphics User Interface， 图形用户界面)。</p>
+<p>常用的CLI工具有ffmpeg, git 等，这些都是CLI应用。</p>
+<h3 id="Terminal">Terminal</h3>
+<p>Terminal，中文为终端，就是输入各种命令的地方（窗口）。在CLI中需要输入命令与计算机进行交互，终端就是承载这些交互的地方，它接受你的输入，返回计算机的输出。</p>
+<p>最常见的Terminal是裸Shell，它们除了基础的文本交互功能外不提供任何其他功能。</p>
+<p>更常用的Terminal工具有 Windows Terminal，Warp等，它们还可能提供一些额外的功能如Nerd Font支持、AI工作流等，可以支持运行各种不同的Shell。</p>
+<h3 id="Shell">Shell</h3>
+<p>Shell，意为壳，顾名思义就是给系统内核套上的一层壳，通过这层壳可以用命令实现系统功能调用。</p>
+<p>当用户向终端（Terminal）输入命令时，Shell就会解释这些命令并执行。</p>
+<p>常见的Shell有：cmd, powershell, bash, zsh等。</p>
+<h2 id="什么是Prompt">什么是Prompt</h2>
+<p>这里的Prompt和AI Prompt不是一个概念。Shell Prompt是命令行终端（CLI）的提示符，通常由一个字符、字符串或图标组成，显示当前命令行环境的信息，通常包含当前所在的目录、用户名、主机名。</p>
+<p>对于开发者而言，一个好的Prompt应该包含以下信息：</p>
+<ul>
+<li>目录和用户信息（基础信息）</li>
+<li>权限信息：当前命令是否sudo</li>
+<li>Git信息，包含仓库、账号、分支等</li>
+<li>运行环境信息，如Node版本、Python虚拟环境等</li>
+<li>上一个命令运行是否成功</li>
+</ul>
+<p>拿oh-my-posh 2仓库中的图举一个例子，该图中就包含了权限、上一个命令结果、目录和用户还有Git信息。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200119.png"
+                      alt=""
+                ></p>
+<h3 id="Prompt-工具">Prompt 工具</h3>
+<p>Shell自带的Prompt引擎不能实现花花绿绿的效果，配置起来也比较麻烦，这就需要我们引入Prompt Engine来为我们渲染Prompt。</p>
+<p>Prompt Engine可以用不同的语法高亮显示各种信息，稍加定制还可以花里胡哨。可惜现在我已经过了追求炫酷的年纪，只想实用加快速，这里我对不同终端下的不同Prompt工具做了一个简单速度对比。</p>
+<blockquote>
+<p>在Windows Terminal中**将启动参数中的<code>-nol</code>**<strong>删去，显示Shell启动信息以便调试</strong>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Shell 版本</th>
+<th>Prompt 工具</th>
+<th>平均启动耗时（ms）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PS 5.1</td>
+<td>oh-my-posh 2 (legacy)</td>
+<td>650</td>
+</tr>
+<tr>
+<td>PS 5.1</td>
+<td>oh-my-posh 7+</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>PS 5.1</td>
+<td>starship</td>
+<td>500</td>
+</tr>
+<tr>
+<td>PS 7</td>
+<td>oh-my-posh 7+</td>
+<td>600</td>
+</tr>
+</tbody>
+</table>
+<p>Powershell下我主要测试了以下prompt工具，oh-my-xxx系列是每个Shell都有自己的对应工具，starship则是偶然刷到的一个新的跨平台Rust Prompt工具。</p>
+<ul>
+<li>oh-my-posh 2 (legacy): 100%用Powershell脚本完成的Prompt工具，只支持Powershell，Prompt方面只支持Git信息</li>
+<li>oh-my-posh：用Go重写的Prompt工具，可以支持不同Shell（虽然没人用），Prompt方面支持更多信息如Git、Node、Python等，代价是<strong>体积增加、运行速度慢</strong></li>
+<li>starship：用Rust写的跨平台Prompt工具，很快，信息显示也很全，代价是由于比较新主题比较少</li>
+</ul>
+<h2 id="Nerdfont-管理">Nerdfont 管理</h2>
+<blockquote>
+<p>Nerd Fonts是面向开发者的字体，它在开发友好字体（如各种mono字体）的基础上封装了一系列ICONS和表情符号，又称iconic fonts。</p>
+</blockquote>
+<p>本文所有的Nerd Font都从<a class="link"   href="https://www.nerdfonts.com"  title="nerdfonts.com">nerdfonts.com <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>下载，具体使用得字体如下：</p>
+<ul>
+<li>Noto Sans Mono CJK：VS Code字体，不含Icons</li>
+<li>Jetbrains Mono Nerd</li>
+<li>FiraMono Nerd：终端字体</li>
+</ul>
+<h1>Powershell</h1>
+<p>此前我的终端环境一直是基于Powershell 5（也就是系统内置的Windows Powershell）进行的，最多也是进行了一些Prompt美化来展示一些额外信息如Git信息、Node信息、Python信息等。</p>
+<p>在进行选择之前，我首先对Powershell本身进行了调研，因为根据微软官方的描述，自 PowerShell 6.0 起，PowerShell在Windows内始终有两个版本：Windows Powershell（PowerShell 5.1）和Powershell 7（6.0+）。</p>
+<ul>
+<li>Windows Powershell（在Windows 11中是Powershell 5.1）是基于 .NET Framework的Powershell，顾名思义只能运行在Windows上，是系统内部自带的，地位与CMD等同，提供全部的Windows接口</li>
+<li>Powershell（目前最新版是Powershell 7）是基于 .NET Core的跨平台Powershell，可以运行在任何系统上，地位与第三方Shell等同，只支持window-cmdlet的子集，但支持许多新功能</li>
+</ul>
+<h2 id="Profile-配置文件">Profile 配置文件</h2>
+<p>打开相关的<code>profile.ps1</code>，根据<a class="link"   href="https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.3"  title="微软的官方文档">微软的官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，配置文件在Windows中存储在以下目录，且<strong>按顺序加载</strong>，也就是说后加载的可以覆盖先加载的配置（不会有人在非Windows环境下使用Powershell吧）</p>
+<blockquote>
+<p>注意：Win10/11下会同时有<strong>Powershell5</strong>和<strong>Powershell7</strong>两个版本，<code>$HOME\Documents\PowerShell</code>是<strong>Powershell7</strong>的目录，而<code>$HOME\Documents\Windows Powershell</code>是<strong>Powershell5</strong>的目录（<code>system32</code>中自带的Powershell版本）</p>
+</blockquote>
+<ul>
+<li>全局配置（所有用户、所有主机）： <code>$PSHOME\Profile.ps1</code>（在我的电脑上是<code>$PSHOME=C:\Windows\System32\WindowsPowerShell\v1.0</code>）</li>
+<li>所有用户，当前主机：<code>$PSHOME\Microsoft.PowerShell_profile.ps1</code></li>
+<li>当前用户、所有主机：<code>$HOME\Documents\PowerShell\Profile.ps1</code>（或者直接是<code>$PROFILE</code>）</li>
+<li>当前用户、当前主机：<code>$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1</code></li>
+</ul>
+<h2 id="Powershell-7的更新点">Powershell 7的更新点</h2>
+<p>Powershell 6是一个划时代的版本，在此之前Powershell是基于 .NET Framework构建的，只能运行在Windows上；而Powershell 6及其更高版本则可以利用 .NET Core跨平台运行在所有OS上。</p>
+<ul>
+<li><a class="link"   href="http://xn--6kqu55g.NET" >由于.NET <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> Core是Framework的子集，因此跨平台的Powershell会移除一些针对Windows的cmdlet，<strong>Powershell 7针对此现象做了大量针对Windows的兼容性支持</strong>，但这是针对运维人员的，对我这种只用到终端和基础脚本的开发者没有什么作用。</li>
+<li>Powershell 7 作为<strong>脚本工具</strong>增加了许多新内容，特别是面向对象语法这一块比bash这种纯字符串处理在面对复杂任务时可以更加从容</li>
+<li>完全拥抱开源，在Github上源码完全公开</li>
+</ul>
+<p>输入<code>$PSVersionTable</code>可以看到详细版本信息，以下是<strong>Windows Powershell（系统内置）</strong> 的版本信息，可以看到版本是5：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200124.png"
+                      alt=""
+                ></p>
+<p>以下是<strong>Powershell 7（我手动安装的最新版本）</strong> 的版本信息：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200135.png"
+                      alt=""
+                ></p>
+<h2 id="改进方案">改进方案</h2>
+<p>在新的方案中，我将拥抱两个不同版本的Powershell，而不是像之前那样只使用自带的Windows Powershell，两个版本的Powershell将有自己的作用：</p>
+<ul>
+<li>Windows Powershell (PS 5.1)：系统终端（替代CMD）
+<ul>
+<li>语法和功能上支持CMD的全部功能，也可以向下兼容CMD命令</li>
+<li>地位上位于系统内部，其他CLI工具或脚本调用Powershell也会默认调用它</li>
+<li>需求上要求<strong>快速启动</strong>，保持稳定，有<strong>基础的Prompt展示</strong></li>
+</ul>
+</li>
+<li>Powershell 7：开发终端，Windows Terminal和VS Code默认终端
+<ul>
+<li>地位上和第三方Shell等同，虽然都叫Powershell，但和上面完全不是一个档次</li>
+<li>体验上对标zsh，有自动补全、建议等功能</li>
+<li>相较于现有方案改进启动速度</li>
+</ul>
+</li>
+</ul>
+<h3 id="Windows-Powershell-的改进">Windows Powershell 的改进</h3>
+<p>原来的Windows Powershell使用oh-my-posh进行了Prompt美化，直接在官网使用了默认方案，但启动速度一直不是很理想。</p>
+<p>后面才知道oh-my-posh 3用Golang重写了，原因是想用到不同终端上（疯了，别的终端为什么要用powershell的东西），才变得又卡又慢，体积还增大了。</p>
+<p>根据上面的速度测试结果，我打算在两个Powershell上都换用starship作为Prompt工具，Windows Powershell就不做过多配置。</p>
+<p>首先卸载现在的oh-my-posh，先用<code>(Get-Command oh-my-posh).Source</code> 得到exe的目录，然后找到卸载程序，直接运行即可。</p>
+<p>根据官网提示安装starship：</p>
+<div class="highlight-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line">scoop install starship</span><br></pre></td></tr></table></figure></div>
+<p>然后编辑<code>$PROFILE</code> ：</p>
+<div class="highlight-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-Expression</span> (&amp;starship init powershell)</span><br></pre></td></tr></table></figure></div>
+<h3 id="Powershell-7的改进">Powershell 7的改进</h3>
+<p>除了在Windows Powershell中的Prompt工具外，Powershell 7 作为开发终端，我还需求一些额外的zsh功能：</p>
+<ul>
+<li>Bash-like Tab 补全</li>
+<li>自动命令建议（IntelliSense）</li>
+<li>基于历史记录的搜索</li>
+</ul>
+<p>经过调研发现，上述这些功能都在Powershell官方提供的PSReadLine包中提供了，更巧的是这个包在Windows Powershell 5.1 和Powershell 7中都已经内置了，只需要使用选项激活即可。</p>
+<p>事不宜迟，立刻编辑<code>$PROFILE</code> ：</p>
+<div class="highlight-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-Expression</span> (&amp;starship init powershell)</span><br><span class="line"></span><br><span class="line"><span class="built_in">Set-PSReadLineOption</span> <span class="literal">-PredictionSource</span> <span class="built_in">History</span> <span class="comment"># 设置预测文本来源为历史记录</span></span><br><span class="line"><span class="built_in">Set-PSReadLineOption</span> <span class="literal">-Colors</span> <span class="selector-tag">@</span>&#123; InlinePrediction = <span class="string">&#x27;#875f5f&#x27;</span>&#125; <span class="comment"># 增加预测内容在亚克力背景下的可读性</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">Set-PSReadlineKeyHandler</span> <span class="literal">-Key</span> Tab <span class="literal">-Function</span> Complete <span class="comment"># 设置 Tab 键补全</span></span><br><span class="line"><span class="built_in">Set-PSReadLineKeyHandler</span> <span class="literal">-Key</span> Tab <span class="literal">-Function</span> MenuComplete <span class="comment"># 设置 Ctrl+d 为菜单补全和 Intellisense</span></span><br><span class="line"><span class="built_in">Set-PSReadLineKeyHandler</span> <span class="literal">-Key</span> <span class="string">&quot;Ctrl+z&quot;</span> <span class="literal">-Function</span> Undo <span class="comment"># 设置 Ctrl+z 为撤销</span></span><br><span class="line"><span class="built_in">Set-PSReadLineKeyHandler</span> <span class="literal">-Key</span> UpArrow <span class="literal">-Function</span> HistorySearchBackward <span class="comment"># 设置向上键为后向搜索历史记录</span></span><br><span class="line"><span class="built_in">Set-PSReadLineKeyHandler</span> <span class="literal">-Key</span> DownArrow <span class="literal">-Function</span> HistorySearchForward <span class="comment"># 设置向下键为前向搜索历史纪录</span></span><br></pre></td></tr></table></figure></div>
+<p>根据我的习惯，我做了以下定制：</p>
+<ul>
+<li>Tab映射为补全和菜单补全（只有一项时就直接补全）</li>
+<li>上下箭头映射为历史记录搜索，没有输入则是默认行为</li>
+<li>最重要的是，将预测文本来源为历史记录，提供了命令建议，这个键位是<strong>右箭头</strong></li>
+</ul>
+<p>最终我们的效果如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200221.gif"
+                      alt=""
+                ></p>
+<h3 id="设置VS-Code默认终端">设置VS Code默认终端</h3>
+<p>首先需要自定义一个Terminal Profile，这里直接复制Windows Terminal的参数即可。</p>
+<p>然后将默认终端设置成刚刚创建的Profile即可。</p>
+<blockquote>
+<p>等待补图</p>
+</blockquote>
+<h1>Unix终端</h1>
+<p>在Windows上个人使用终端的主要场景其实是VS Code内置终端，而类Unix系统上GUI相较于Windows更弱，终端的使用场景要远多于Windows，因此地位也更加重要，很多Windows上用GUI解决的都要使用终端解决，如从目录打开VS Code这样一个简单的功能都需要从终端完成。</p>
+<p>不过得益于Unix上终端的重要地位，其生态环境和使用体验也整体上优于Windows（也部分得益于Unix优秀的文件系统设计）。</p>
+<p>这里以macOS和Ubuntu（WSL）为例配置和完善Unix终端体验，由于时间仓促，以快速构建工作环境为主，加之第一次接触mac，以下内容可能并不完善：</p>
+<ul>
+<li>Terminal：iterm2（macOS）+ Windows Terminal（WSL）</li>
+<li>Shell：zsh</li>
+<li>Prompt Engine：oh-my-zsh</li>
+</ul>
+<h2 id="Shell强化">Shell强化</h2>
+<h3 id="iterm2-配置">iterm2 配置</h3>
+<p>原生的iterm2和系统自带的终端看起来没有什么区别，我们从配色、字体和Status Bar三个方面对其进行自定义。</p>
+<ul>
+<li>配色：在这个仓库下载预设，我使用的是 <em>mocha</em> 预设</li>
+<li>字体：使用上面提到的 <em>FiraMono Nerd Prop</em> 字体（提供Shell Prompt的字重显示）</li>
+<li>Status Bar：要达到下面的效果需要两步自定义
+<ul>
+<li><code>Preferences-Appearance-General-Theme</code> 中设置为 <code>Minimal</code> 才能像这样隐藏背景</li>
+<li>上面的页面中还可以自定义Status Bar的位置</li>
+<li>在<code>Preferences &gt; Profiles &gt; Session</code> 中打开Status Bar，然后自定义选择自己想显示的字段</li>
+</ul>
+</li>
+</ul>
+<p>注意在设置的时候一定要对Profile进行设置，不然设置就是一次性的，下一次启动就没了。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200227.png"
+                      alt=""
+                ></p>
+<h3 id="oh-my-zsh">oh-my-zsh</h3>
+<p>oh-my-zsh是一款大名鼎鼎的zsh的Prompt工具，其应用广泛，生态良好，速度也较快。</p>
+<p>根据官网指导直接安装即可：</p>
+<div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">sh -c <span class="string">&quot;<span class="subst">$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)</span>&quot;</span></span><br></pre></td></tr></table></figure></div>
+<h4 id="主题">主题</h4>
+<p>在Github的Wiki上可以查看所有主题：<a class="link"   href="https://github.com/ohmyzsh/ohmyzsh/wiki/Themes"  title="https://github.com/ohmyzsh/ohmyzsh/wiki/Themes">https://github.com/ohmyzsh/ohmyzsh/wiki/Themes <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>主题主要决定Prompt的显示模式，这里我选择gozilla主题，效果如上图所示。</p>
+<h4 id="插件">插件</h4>
+<p>oh-my-zsh的插件生态很丰富，大部分都是缩写Alias型的，这部分就根据自己喜好进行添加就好。这里只介绍几个比较关键的体验核心插件。</p>
+<ul>
+<li>autojump：需要配合autojump（通过homebrew安装）使用，作用是快速切换到工作目录<br>
+原理是将曾用目录存储在一个数据库中，根据输入匹配频率最高的目录，需要在<code>oh-my-zsh</code> 中设置<code>autojump</code> 插件才能使用下面的Alias
+<ul>
+<li><code>j</code> : 跳转到目录，智能选择频次最高的目录</li>
+<li><code>jo</code> : 利用资源管理器打开跳转的目录</li>
+</ul>
+</li>
+<li>zsh-autosuggestions：提供类似Fish的自动补全功能，原理是记忆历史命令来补全，效果就和之前Powershell演示的一样</li>
+<li>zsh-syntax-highlight：将命令本身语法高亮，在输入前就可以判断命令是否错误</li>
+</ul>
+<h3 id="vim">vim</h3>
+<p>在Shell中难免遇到一些简单的文本编辑请求，这时调用外部编辑器就有些不太方便，这时使用vim进行编辑就可以快速完成。我对vim的定位就是简易的TUI编辑器，不需要什么异步执行、内置终端等功能。</p>
+<h4 id="neovim">neovim</h4>
+<p>neovim（<code>nvim</code>）和vim（<code>vim</code>）是两个不同的软件，前者是后者的重构实现，具有以下优势：</p>
+<ul>
+<li>从头重构的架构，使用Lua JIT替代Vim Script</li>
+<li>更好的插件开发环境和生态</li>
+<li>提供异步执行和内置终端等功能，使NeoVim作为生产用IDE成为可能</li>
+</ul>
+<p>但是，我作为一个轻量级用户，我只需要简单的TUI编辑器功能，neovim吸引我的地方只有一点，开箱即用，包括开箱即用的语法高亮和插件系统（几乎不需要修改什么）。</p>
+<p>同样打开<code>.zshrc</code> ，neovim和vim不做任何配置的效果区别如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200237.png"
+                      alt="" title="neovim"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200240.png"
+                      alt="" title="vim"
+                ></p>
+<p>虽然据说vim8实现了neovim的很多功能，但秉承着省心的原则我选择neovim。</p>
+<h4 id="基本概念">基本概念</h4>
+<p>vim常用有四个模式：</p>
+<ul>
+<li>正常模式（normal mode）：正常模式一般用于浏览文件，也包括一些复制、粘贴、删除等操作。在这个模式下，我们可以通过键盘在文本中快速移动光标，光标范围从小到大是字符、单词、行、句子、段落和屏幕。
+<ul>
+<li>快速移动光标：h,j,k,l 分别对应了方向键的上下左右</li>
+<li><code>0</code> 移动到行首</li>
+<li><code>^</code> 移动到本行的第一个非空字符</li>
+<li><code>$</code> 移动到行尾</li>
+<li><code>w</code> 跳过一个单词（移动到下一个单词的开头）</li>
+<li><code>e</code> 移动到下一个单词的结尾</li>
+<li><code>f&lt;ch&gt;</code> 移动到下一个字符为ch处</li>
+<li><code>command+f/b</code> 下一页/上一页</li>
+</ul>
+</li>
+<li>插入模式（insert mode）：通过在正常模式下按下<code>i</code> 键切换，该模式启动以后，就会进入编辑状态，通过键盘输入内容。</li>
+<li>命令模式（command mode）：在正常模式中，按下<code>：</code>（冒号）键或者<code>/</code> （斜杠），会进入命令模式。在命令模式中可以执行一些输入并执行一些 VIM 或插件提供的指令
+<ul>
+<li><code>ls</code> 列出打开的所有文件</li>
+<li><code>b&lt;n&gt;</code> 切换到第n个文件</li>
+<li><code>&lt;n&gt;</code> 跳转到第n行</li>
+<li><code>set nu</code> 显示行号</li>
+<li><code>/&lt;str&gt;</code> 查找目标字符串</li>
+<li><code>&lt;n1&gt;,&lt;n2&gt;d</code> 删除从第n1行到第n2行的所有字符</li>
+<li><code>&#123;作用范围&#125;s/&#123;目标&#125;/&#123;替换&#125;/&#123;替换标志&#125;</code> 替换文本</li>
+</ul>
+</li>
+<li>可视模式（visual mode）：在正常模式按下<code>v, V, &lt;Ctrl&gt;+v</code>，可以进入可视模式。可视模式中的操作有点像拿鼠标进行操作，选择文本的时候有一种鼠标选择的即视感，有时候会很方便。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>折腾日志</category>
+      </categories>
+      <tags>
+        <tag>开发环境</tag>
+        <tag>终端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>初探 Docker - 原理和实践</title>
     <url>/posts/3542760854/</url>
     <content><![CDATA[<p>Docker是一种Go语言编写的容器化隔离的实现，帮助我们快速地将应用打包成<strong>容器</strong>进行发布和部署，也可以方便地运行他人编写的应用。</p>
@@ -5536,6 +5845,95 @@
       <tags>
         <tag>react</tag>
         <tag>hook</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>抓包工具与移动端H5开发</title>
+    <url>/posts/1411383268/</url>
+    <content><![CDATA[<p>之前一直做的是PC端的Web页面开发，很少触及移动端页面，最多也就是做一做响应式的适配，完全没有涉及过mobile-first页面的开发。站在初次涉及这个领域的立场上，我认为与普通的响应式页面相比主要的区别点有两点：</p>
+<ul>
+<li>WebView环境不同，移动端页面的运行环境受到系统（iOS/Android）和App（各大App都有自己的WebView，特别是微信）的影响，各个WebView提供不同的能力，需要单独适配</li>
+<li>因为WebView环境不同，因此也不能直接在PC端使用浏览器仿真直接调试，而是需要真机调试，这就需要使用一些特殊工具来让真机的App环境能连上开发页面（抓包劫持）</li>
+</ul>
+<p>本文主要讨论后者，学习抓包和反向代理工具的实践和使用。</p>
+<h2 id="抓包工具概览">抓包工具概览</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200846.png"
+                      alt="" title="我正在使用的抓包工具Bifrost"
+                ></p>
+<p>可以看到，抓包工具截获了所有网络请求包，并将这些Session展示了出来以供修改，我们可以通过设置规则来拦截和转发这些包，来达到开发和调试的目的。</p>
+<p>相信各位前端的同学或多或少都使用过Node http-server的Proxy功能，它的功能主要就是反向代理，将某个URL的流量通过规则Rewrite后转发到另一个URL，一般用于解决前后端的HTTP请求跨域问题。</p>
+<p>但其实在最开始的时候我还使用过另一套方案，就是上面说的抓包工具转发，它通过规则去匹配指定URL来转发，一样可以达到同样的效果。</p>
+<p>因此，我们可以简单地理解这个抓包工具在调试过程中的作用就是全局的反向代理，拦截原来的请求，将一个URL的流量重写后转发给指定的URL。</p>
+<h3 id="为什么需要它">为什么需要它</h3>
+<p>上面我们已经大致了解了抓包工具的作用，那么它在移动端调试上有什么作用呢？</p>
+<p>因为移动端Web开发依赖于Webview的特性，我们需要在真机环境里进行测试，那如何在真机环境的Webview中进入对应页面就是一个问题，很多时候我们都不能控制我们的内置浏览器的URL。</p>
+<p>因此我们想出了一个办法：<strong>我们直接访问一个现存的URL，然后利用抓包工具反向代理到本地的开发页面不就可以实现调试了吗</strong>。</p>
+<p>大概的流程如下图所示，抓包工具将自己设置成反向代理服务器，从手机→服务器的连接变成了手机→电脑（代理服务器）→服务器的过程。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200849.png"
+                      alt=""
+                ></p>
+<h3 id="代理与反向代理">代理与反向代理</h3>
+<p>所谓代理（Proxy）就是中间人，在计算机网络中就是一个端侧设备，它接收请求，并根据规则转发到对应的实际端侧目标，在整个访问过程中客户端并没有和服务端真正通信，而是通过代理这个中间人进行沟通。</p>
+<p>代理又分为正向代理和反向代理两种：</p>
+<ul>
+<li>正向代理：在客户端发送请求时<strong>不直接请求服务端，而是请求代理</strong>，通过代理间接请求服务端，这样就<strong>向服务端隐藏了真实的客户端</strong>，如通过VPN科学上网就属于正向代理。</li>
+<li>反向代理：在服务端处理请求时先通过一个类似“中枢”的代理环节，对外请求都汇总到中枢，中枢再具体决定将请求转发到哪个物理机进行响应，<strong>向客户端隐藏了真实的服务端</strong>，如使用nginx负载均衡和在http-server中代理后端地址等过程都是反向代理。</li>
+</ul>
+<p>抓包工具的代理显然是<strong>反向代理</strong>，但其在手机端的连接需要建立一个VPN，这个过程又属于正向代理。</p>
+<h3 id="常见的抓包工具">常见的抓包工具</h3>
+<p>下面列举一些常见的抓包工具：</p>
+<ul>
+<li><code>whistle</code> : 最负盛名的基于Node实现的跨平台web调试代理工具
+<ul>
+<li>主要用于查看、修改HTTP和HTTPS包</li>
+<li>也可以作为HTTP代理服务器使用<br>
+下面这个熟悉的界面就是whistle啦<br>
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200857.png"
+                      alt=""
+                ></li>
+</ul>
+</li>
+<li><code>Fiddler</code> ：Windows平台为主的网络调试代理工具，后来也支持mac和Linux</li>
+<li><code>Charles</code> : mac平台的网络代理调试工具</li>
+<li><code>Bifrost</code> : 字节跳动出品的抓包代理工具，也是我正在使用的（虽然不确定外网能不能搜到hhh）
+<ul>
+<li>Electron前端，全平台支持</li>
+<li>简单易用的GUI</li>
+</ul>
+</li>
+</ul>
+<h2 id="Bifrost使用">Bifrost使用</h2>
+<h3 id="安装与连接">安装与连接</h3>
+<p>在官网下载安装PC/mac客户端<a class="link"   href="https://bifrost.bytedance.net/"  title="Bifrost (bytedance.net)">Bifrost (bytedance.net) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，手机端同时安装。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230806200901.png"
+                      alt=""
+                ></p>
+<p>点击顶部的手机图标，手机扫码连接（同一Wi-Fi下），后面会在手机端建立一个VPN连接，随后电脑端就可以收到手机端的请求包信息。</p>
+<blockquote>
+<p>手机端可以设置应用白名单，避免全局代理产生问题</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>移动端</category>
+      </categories>
+      <tags>
+        <tag>webview</tag>
+        <tag>代理</tag>
+        <tag>h5</tag>
+        <tag>移动端</tag>
       </tags>
   </entry>
 </search>
