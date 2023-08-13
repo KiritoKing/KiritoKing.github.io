@@ -5848,6 +5848,165 @@
       </tags>
   </entry>
   <entry>
+    <title>从设计模式看 react-redux 的工作原理</title>
+    <url>/posts/2764449389/</url>
+    <content><![CDATA[<p>在研究原生的<code>useContext</code> 和<code>useReducer</code> 方案时我就感到非常疑惑，数据对象更新导致的组件刷新是由react控制的，这导致了在状态增多后会产生意外刷新的问题。</p>
+<p>但是redux明明采用了相近的思路，是<strong>如何避免整个对象刷新带来的意外组件更新</strong>的呢？</p>
+<h2 id="发布-订阅模式">发布-订阅模式</h2>
+<p>redux的核心就是<strong>发布-订阅模式</strong>，我们回忆一下redux的基本结构和流程：</p>
+<ul>
+<li>有且仅有一个全局状态store，维护着所有states</li>
+<li>所有组件从store中获取状态，并通过dispatch action来更新状态</li>
+<li><strong>当状态更新时，所有订阅了该状态的组件发生刷新</strong></li>
+</ul>
+<p>可以看见，问题的关键就在于订阅了状态的组件按需刷新这一点，前两点通过原生的<code>useContext</code> + <code>useReducer</code> 其实都可以实现，但只有redux能实现按需刷新，不会刷新无关组件。</p>
+<p>那这是怎么做到的呢？我们先从发布-订阅模式入手，看看redux是如何实现该模式的。</p>
+<h3 id="基本概念">基本概念</h3>
+<p>发布-订阅模式天然具有两个对象：<strong>发布者</strong>和<strong>订阅者</strong>，比如在视频网站中，up主就是发布者，关注了up的用户就是订阅者，up主发布视频后关注了该up的所有人都会收到推送。</p>
+<ul>
+<li>发布者（publisher）：该类型实例可以发布某一类型的消息，并通知所有所有订阅了该消息的订阅者</li>
+<li>订阅者（subscriber）：该类型实例可以订阅和退订某些消息源，并在收到消息时可选地做出反应</li>
+</ul>
+<p>利用OOP，我们可以定义以下两个接口来表示发布者和订阅者需要实现的基础能力。</p>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 订阅者</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ISubscribe</span> &#123;</span><br><span class="line">  <span class="comment">// 注册对IPublish实例的监听，并添加事件处理函数</span></span><br><span class="line">  <span class="attr">subscribe</span>: <span class="function">(<span class="params">publisher: IPublish, callback: (payload: ...<span class="built_in">any</span>) =&gt; <span class="built_in">void</span></span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">  <span class="comment">// 取消对IPublish实力的监听</span></span><br><span class="line">  <span class="attr">cancel</span>: <span class="function">(<span class="params">publisher: IPublish</span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发布者</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">IPublish</span> &#123;</span><br><span class="line">  <span class="comment">// 通知所有订阅了该发布者的订阅者实例</span></span><br><span class="line">  <span class="attr">notify</span>: <span class="function">(<span class="params">message: ...<span class="built_in">any</span></span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>在具体实现方面，订阅者比较简单，只需要向发布者注册和注销监听即可；发布者一方可以<strong>维护一个线性表来保存所有订阅了该消息的订阅者实例</strong>。具体实现上可以参考下面的（伪）代码：</p>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Publisher</span> <span class="keyword">implements</span> <span class="title class_">IPublish</span> &#123;</span><br><span class="line">  <span class="attr">subscribers</span>: <span class="title class_">Map</span>&lt;<span class="title class_">ISubscribe</span>, <span class="function">(<span class="params">...<span class="built_in">any</span></span>) =&gt;</span> <span class="built_in">void</span>&gt; = <span class="keyword">new</span> <span class="title class_">Map</span>();</span><br><span class="line">  <span class="title function_">addListener</span>(<span class="params">subscriber: ISubscribe, callback?: (...<span class="built_in">any</span>) =&gt; <span class="built_in">void</span></span>) &#123;</span><br><span class="line">    subsicribers[subscriber] = callback; </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">removeListener</span>(<span class="params">subscriber: ISubscriber</span>) &#123;</span><br><span class="line">    <span class="comment">// remove</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">notify</span>(<span class="params">...message: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    subscribers.<span class="property">values</span>.<span class="title function_">forEach</span>(<span class="function"><span class="params">fn</span> =&gt;</span> <span class="title function_">fn</span>(message));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码中我们创建了一个哈希表来存储订阅者，主要是为了方便管理订阅者（添加和删除），在发送消息时直接调用表中存储的回调来通知订阅者，实现了一个最基础的发布-订阅模式。</p>
+<h3 id="与观察者模式的对比">与观察者模式的对比</h3>
+<p>上面的实现看起来一眼观察者模式对吧，我们的Publisher就是Subject（被观察者），Subscriber就是Observer（观察者），Publisher状态变化时就会去主动通知Subscriber，就像下面这样。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230814004718.png"
+                      alt=""
+                ></p>
+<p>但真正的发布-订阅模式不是这样的，与观察者模式直接相连的方式不同，发布-订阅模式最直观的区别就是<strong>发布者和订阅者之间维护了一层类似消息队列的东西，负责分发消息</strong>，像下面这样。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230814004720.png"
+                      alt=""
+                ></p>
+<p>还是拿刚刚B站视频订阅举例子，在up更新视频后给观众推送订阅消息时，并不是up自己主动地给每个关注了自己的人发消息，而是告诉了一个中间人（broker）“我更新了视频”，然后这个中间人再向订阅了这个消息的人推送这条消息“xx up更新了视频，快来看吧”。</p>
+<p>虽然它们的结果是相同的，但他们中间的实现过程有着最本质的区别：<strong>发布者和订阅者之间完全不需要有直接联系，是完全解耦的</strong>，而不像观察者模式一样是松耦合的（基于接口抽象）。</p>
+<p>因此我们上面的例子可以说完全不是发布-订阅模式，只是观察者模式；而接口描述只是描述了这个模型的能力，而二者又是几乎相同的。</p>
+<p>在应用场景上，二者虽然结果相同，但面向的应用场景和规模是不同的：</p>
+<ul>
+<li>观察者模式多用于单个应用内部</li>
+<li>发布-订阅模式多用于跨应用的消息中间件，如操作系统的消息队列</li>
+</ul>
+<p>在redux中，我们把<strong>整个更新机制看作发布-订阅模式的实现，其中dispatch action的一方看作发布者，mapState使用状态的一方看作订阅者。</strong> 二者是完全解耦的，符合定义要求。</p>
+<ul>
+<li>dispatch action的一方并不知道它的修改会影响哪些组件，它只管负责通知“中间人”store它做出了什么修改</li>
+<li>“中间人”store负责对修改做出响应，并通知受到影响的组件更新</li>
+</ul>
+<h3 id="redux中的实现">redux中的实现</h3>
+<p>在redux中，观察和订阅的实现要稍微复杂一点。准确地说，redux中的<code>Subscription</code> 实例既可以发布，也可以订阅。</p>
+<ul>
+<li>它可以订阅父级的<code>Subscription</code> ，并<strong>在它们更新时得到通知</strong></li>
+<li>它也可以被子组件订阅，并<strong>在自己更新时通知它们</strong></li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/08/20230814004729.png"
+                      alt=""
+                ></p>
+<p>在上面的流程图中有一个小细节需要注意，那就是<code>Subscription</code>的来源：</p>
+<ul>
+<li>在生成<code>Provider</code> 组件的Context时会自动生成一个<code>Subscription</code> 实例，它包含了我们的store，并使用redux store的<code>subscribe(callback)</code>订阅了最顶层的消息，即<strong>在整个store发生更新时得到通知</strong>，其逻辑和其他层级的<code>subscribe</code> 是一致的</li>
+<li>在使用<code>connect()</code> 包裹组件时，它除了生成一个HOC外还会生成一个<code>Subscription</code> 实例，它<strong>将订阅当前Context中的<code>Subscription</code>对象，并更新当前Context的​<code>Subscription</code>对象为自己</strong></li>
+<li>根据Context的就近原则，<strong>实际调用store中的对象时会使用的是组件树中最近的Context Value</strong></li>
+</ul>
+<blockquote>
+<p>为什么要选择嵌套的Provider结构？确保树中较低层的连接组件只有在最近的连接祖先被更新后才会收到 store 更新通知来避免一些过长更新链带来的“边缘情况”。<br>
+参考链接：<a class="link"   href="https://cn.react-redux.js.org/api/hooks#stale-props-%E5%92%8C-zombie-children"  title="https://cn.react-redux.js.org/api/hooks#stale-props-和-zombie-children">https://cn.react-redux.js.org/api/hooks#stale-props-和-zombie-children <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</blockquote>
+<p>以下是简化后的subscription实现代码：</p>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Subscriotion.js</span></span><br><span class="line"><span class="keyword">const</span> nullListeners = &#123; <span class="title function_">notify</span>(<span class="params"></span>) &#123;&#125; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听集合是一个双向链表</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">createListenerCollection</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// 也就是React里的unstable_batchedUpdates</span></span><br><span class="line">  <span class="comment">// 来自司徒正美微博：unstable_batchedUpdates会把子组件的forceUpdate干掉，防止组件在一个批量更新中重新渲染两次</span></span><br><span class="line">  <span class="keyword">const</span> batch = <span class="title function_">getBatch</span>();</span><br><span class="line">  <span class="keyword">let</span> first = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> last = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="title function_">clear</span>(<span class="params"></span>) &#123;</span><br><span class="line">      first = <span class="literal">null</span>;</span><br><span class="line">      last = <span class="literal">null</span>;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知订阅者更新</span></span><br><span class="line">    <span class="title function_">notify</span>(<span class="params"></span>) &#123;</span><br><span class="line">      <span class="title function_">batch</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> listener = first;</span><br><span class="line">        <span class="keyword">while</span> (listener) &#123;</span><br><span class="line">          <span class="comment">// 这个callback的本质就是让组件本身forceUpdate</span></span><br><span class="line">          listener.<span class="title function_">callback</span>();</span><br><span class="line">          listener = listener.<span class="property">next</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 订阅</span></span><br><span class="line">    <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">      <span class="keyword">let</span> isSubscribed = <span class="literal">true</span>;</span><br><span class="line">      <span class="comment">// 把last赋值为新的</span></span><br><span class="line">      <span class="keyword">let</span> listener = (last = &#123;</span><br><span class="line">        callback,</span><br><span class="line">        <span class="attr">next</span>: <span class="literal">null</span>,</span><br><span class="line">        <span class="attr">prev</span>: last</span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 如果存在前一个，就把前一个的next指向当前（最后一个）</span></span><br><span class="line">      <span class="keyword">if</span> (listener.<span class="property">prev</span>) &#123;</span><br><span class="line">        listener.<span class="property">prev</span>.<span class="property">next</span> = listener;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 否则它就是第一个</span></span><br><span class="line">        first = listener;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 返回退订函数</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">function</span> <span class="title function_">unsubscribe</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// ...退订逻辑</span></span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">class</span> <span class="title class_">Subscription</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params">store, parentSub</span>) &#123;</span><br><span class="line">    <span class="comment">// redux store</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">store</span> = store;</span><br><span class="line">    <span class="comment">// 父级的Subscription实例</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">parentSub</span> = parentSub;</span><br><span class="line">    <span class="comment">// 退订函数</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">unsubscribe</span> = <span class="literal">null</span>;</span><br><span class="line">    <span class="comment">// 监听者</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">listeners</span> = nullListeners;</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">handleChangeWrapper</span> = <span class="variable language_">this</span>.<span class="property">handleChangeWrapper</span>.<span class="title function_">bind</span>(<span class="variable language_">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 添加嵌套的订阅者</span></span><br><span class="line">  <span class="title function_">addNestedSub</span>(<span class="params">listener</span>) &#123;</span><br><span class="line">    <span class="comment">// 首先先将当前的Subscription实例绑定到父级</span></span><br><span class="line">    <span class="comment">// 绑定的同时会初始化listeners</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">trySubscribe</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">listeners</span>.<span class="title function_">subscribe</span>(listener);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 通知子级</span></span><br><span class="line">  <span class="title function_">notifyNestedSubs</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">listeners</span>.<span class="title function_">notify</span>();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当父级Subscription的listeners通知时调用</span></span><br><span class="line">  <span class="title function_">handleChangeWrapper</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 这个是new出实例的时候加上的，感觉有点秀</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">onStateChange</span>) &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onStateChange</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title function_">trySubscribe</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 不会重复绑定</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">unsubscribe</span>) &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">unsubscribe</span> = <span class="variable language_">this</span>.<span class="property">parentSub</span></span><br><span class="line">        ? <span class="variable language_">this</span>.<span class="property">parentSub</span>.<span class="title function_">addNestedSub</span>(<span class="variable language_">this</span>.<span class="property">handleChangeWrapper</span>)</span><br><span class="line">        : <span class="comment">// subscribe是redux里的方法，在redux state改变的时候会调用</span></span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">store</span>.<span class="title function_">subscribe</span>(<span class="variable language_">this</span>.<span class="property">handleChangeWrapper</span>);</span><br><span class="line">      <span class="comment">// 创建新的listeners，每个connect的组件都会有listeners</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">listeners</span> = <span class="title function_">createListenerCollection</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 退订</span></span><br><span class="line">  <span class="title function_">tryUnsubscribe</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">unsubscribe</span>) &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">unsubscribe</span>();</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">unsubscribe</span> = <span class="literal">null</span>;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">listeners</span>.<span class="title function_">clear</span>();</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">listeners</span> = nullListeners;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="API实现">API实现</h2>
+<h3 id="Provider-组件"><code>&lt;Provider&gt;</code> 组件</h3>
+<p>Provider只实现了两个简单的功能：</p>
+<ul>
+<li>创建根层级的<code>Subscription</code> 实例，订阅redux store的消息事件</li>
+<li>创建包含<code>Subscription</code> 实例和store的Context，供其包裹的组件使用状态</li>
+</ul>
+<p>其简单的代码实现如下：</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// components/Provider.js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">Provider</span>(<span class="params">&#123; store, context, children &#125;</span>) &#123;</span><br><span class="line">  <span class="comment">// useMemo仅在store变化时再重新返回</span></span><br><span class="line">  <span class="keyword">const</span> contextValue = <span class="title function_">useMemo</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> subscription = <span class="keyword">new</span> <span class="title class_">Subscription</span>(store);</span><br><span class="line">    <span class="comment">// 通知订阅这个subscription的子级刷新</span></span><br><span class="line">    subscription.<span class="property">onStateChange</span> = subscription.<span class="property">notifyNestedSubs</span>;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      store,</span><br><span class="line">      <span class="comment">// 将此subscription传入context方便子级订阅</span></span><br><span class="line">      subscription</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;, [store]);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 缓存上次的state</span></span><br><span class="line">  <span class="keyword">const</span> previousState = <span class="title function_">useMemo</span>(<span class="function">() =&gt;</span> store.<span class="title function_">getState</span>(), [store]);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; subscription &#125; = contextValue;</span><br><span class="line">    <span class="comment">// 在这里是订阅的reudx store的subscribe事件</span></span><br><span class="line">    subscription.<span class="title function_">trySubscribe</span>();</span><br><span class="line">    <span class="keyword">if</span> (previousState !== store.<span class="title function_">getState</span>()) &#123;</span><br><span class="line">      subscription.<span class="title function_">notifyNestedSubs</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      subscription.<span class="title function_">tryUnsubscribe</span>();</span><br><span class="line">      subscription.<span class="property">onStateChange</span> = <span class="literal">null</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;, [contextValue, previousState, store]);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 传入的context或者react-redux自带的</span></span><br><span class="line">  <span class="keyword">const</span> <span class="title class_">Context</span> = context || <span class="title class_">ReactReduxContext</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">Context.Provider</span> <span class="attr">value</span>=<span class="string">&#123;contextValue&#125;</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">Context.Provider</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>我们关注到以下细节：</p>
+<ul>
+<li><code>ContextValue</code> 其实包含了<code>store</code> 和Subscription实例，而Subscription实例内部的store只是用于订阅store的改变事件</li>
+<li>在redux核心概念中我们知道，store的本质就是一个reducer，可以看成state+dispatch两部分构成，state会不断改变，但dispatch应是不会改变的（只要传入Provider的store不变）</li>
+</ul>
+<h3 id="connect-API"><code>connect</code> API</h3>
+<p>虽然在现代的redux中<code>connect</code> API几乎已经被废弃了，官方也推荐使用Hook API替代。但<code>connect</code> API仍然是可用的，而且理解它对理解Hooks的原理也是有帮助的。</p>
+<blockquote>
+<p>代码太多了不想逐行分析了，这里就大概说下我对流程的理解。</p>
+</blockquote>
+<p><code>connect()</code> 函数的作用就是生成一个高阶组件（HOC）来包裹要调用store的组件，这个HOC主要负责以下工作：</p>
+<ul>
+<li>创建自己的Subscription Context
+<ul>
+<li>订阅来自上层的变化</li>
+<li>通知下层自身的变化</li>
+</ul>
+</li>
+<li>将state和dispatch写入被包裹组件的props中，以便组件调用
+<ul>
+<li><code>mapStateToProps</code></li>
+<li><code>mapDispatchToProps</code></li>
+</ul>
+</li>
+<li><strong>将store更新和视图更新解耦，判断当前组件是否需要刷新，避免不需要的刷新</strong>
+<ul>
+<li>某个Subscription触发更新后，会通过<code>notify</code>通知所有订阅了它的Subscription实例，并触发<code>onStateChange</code> 回调</li>
+<li>Connect组件中<code>checkForUpdates</code> 用于处理<code>onStateChange</code> 回调事件，它负责处理数据的刷新，判断当前组件是否需要刷新
+<ul>
+<li>通过检查当前mappedStates（当前组件调用的状态对象）是否更新来判断是否刷新</li>
+<li>不论mappedStates是否更新，都需要通知子组件检查更新</li>
+<li>采用记忆化（memo）、Ref和强等于来进行优化和判断</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Hook-API">Hook API</h3>
+<h4 id="useSelector"><code>useSelector</code></h4>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="attr">result</span>: <span class="built_in">any</span> = <span class="title function_">useSelector</span>(<span class="attr">selector</span>: <span class="title class_">Function</span>, equalityFn?: <span class="title class_">Function</span>)</span><br></pre></td></tr></table></figure></div>
+<p>selector Hook在概念上与connect中的<code>mapStateToProps</code> 类似，都是按需获取store中的部分状态。</p>
+<ul>
+<li>和<code>mapStateToProps</code> 一样，<code>useSelector</code> 会在store更新后触发运行，但在订阅的数据没有更新时不会触发组件刷新，而是使用缓存值</li>
+<li>由于<code>useSelector</code> 是一个Hook，它也具有一些<code>mapState</code> 不具备的特性
+<ul>
+<li>和其他Hook一样，在组件刷新时会运行Selector（除非组件被memo导致地址没有发生变化）</li>
+<li>通过闭包或柯里化来引入props</li>
+<li>selector函数的返回值可以是任何值而不只是对象，值得注意的是由于<code>useSelector</code> 采用严格引用相等来判断更新，因此建议对每一个原子状态单独设置selector而不是合成在一个对象中，在react-redux v7中使用react批量更新会将这些Selector放在一起执行（只会执行一次）</li>
+</ul>
+</li>
+</ul>
+<h4 id="useDispatch"><code>useDispatch</code></h4>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> dispatch = <span class="title function_">useDispatch</span>()</span><br></pre></td></tr></table></figure></div>
+<p><code>useDispatch</code> 相对于<code>useSelector</code>更加简单，它只是返回<code>store.dispatch</code>。</p>
+<p>只要传入Provider的store没有改变，dispatch的函数引用地址就应该是稳定不变的，但<code>useMemo</code> 和<code>useCallback</code> 这样的记忆化Hook还是会要求把<code>dispatch</code> 放进deps数组中。</p>
+<h4 id="useStore"><code>useStore</code> </h4>
+<blockquote>
+<p>⚠️在任何时候都应该尽量避免使用这个Hook来获取状态</p>
+</blockquote>
+<div class="highlight-container" data-rel="Typescript"><figure class="iseeu highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> store = <span class="title function_">useStore</span>()</span><br></pre></td></tr></table></figure></div>
+<p>这个 hook 返回一个 Redux store 引用，该 store 与传递给 <code>&lt;Provider&gt;</code> 组件的 store 相同。</p>
+<p>不应该频繁使用这个 hook。宁愿将 <code>useSelector()</code> 作为主要选择。然而，对于少量需要访问 store 的场景而言，例如替换 reducer，这个 hook 很有用。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>状态管理</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>状态管理</tag>
+        <tag>redux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>抓包工具与移动端H5开发</title>
     <url>/posts/1411383268/</url>
     <content><![CDATA[<p>之前一直做的是PC端的Web页面开发，很少触及移动端页面，最多也就是做一做响应式的适配，完全没有涉及过mobile-first页面的开发。站在初次涉及这个领域的立场上，我认为与普通的响应式页面相比主要的区别点有两点：</p>
