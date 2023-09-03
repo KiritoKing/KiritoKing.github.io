@@ -1272,6 +1272,79 @@
       </tags>
   </entry>
   <entry>
+    <title>【译&amp;补】使用ref回调替代useRef吧</title>
+    <url>/posts/1538866606/</url>
+    <content><![CDATA[<blockquote>
+<p>原文：<a href="https://medium.com/welldone-software/usecallback-might-be-what-you-meant-by-useref-useeffect-773bc0278ae" title="useCallback Might Be What You Meant By useRef &amp; useEffect"><em>useCallback Might Be What You Meant By useRef &amp; useEffect</em></a></p>
+</blockquote>
+<p>在React中，<code>useRef</code>和<code>useEffect</code>是常用的钩子函数，用于不同的目的。</p>
+<p><code>useRef</code>通常用于保存在组件渲染之间持久存在的可变值，而<code>useEffect</code>用于执行诸如数据获取、订阅或DOM操作等副作用。</p>
+<p>然而，当涉及对React元素挂载做出响应时，有一个更好的选择：<code>useCallback</code>。</p>
+<span id="more"></span>
+<h2 id="尝试在Effect中使用Ref">尝试在Effect中使用Ref</h2>
+<p>如果你想要对React元素在DOM中的挂载做出响应，你可能会尝试<strong>使用useRef来获取它的引用，并使用useEffect来响应其挂载和卸载。但这样做是无效的。</strong></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-core/2023/09/20230904013711.png"
+                      alt=""
+                ></p>
+<p>这是因为当组件被（卸载）挂载并通过<code>useRef</code>连接到<code>ref.current</code>时，<code>ref.current</code>的更改并没有触发回调或重新渲染，自然也不会触发预期的生命周期回调。</p>
+<p>甚至react-hooks 的ESLint规则也会对此发出警告。请注意，<strong>无论是ref还是ref.current作为useEffect的依赖项，都不会触发它的执行</strong>（这是useRef的特性决定的）。</p>
+<p>下面的例子展示了上面的方法确实不可行的（在<a class="link"   href="https://codesandbox.io/s/how-useref-and-useeffect-cant-track-a-nodes-render-27br6?from-embed"  title="Code Sandbox">Code Sandbox <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>中尝试）。</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = <span class="title function_">useState</span>(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">const</span> shouldShowImageOfCat = count % <span class="number">3</span> === <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> [catInfo, setCatInfo] = <span class="title function_">useState</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// notice how none of the deps of useEffect</span></span><br><span class="line">  <span class="comment">// manages to trigger the hook in time</span></span><br><span class="line">  <span class="keyword">const</span> catImageRef = <span class="title function_">useRef</span>();</span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(catImageRef.<span class="property">current</span>);</span><br><span class="line">    <span class="title function_">setCatInfo</span>(catImageRef.<span class="property">current</span>?.<span class="title function_">getBoundingClientRect</span>());</span><br><span class="line">    <span class="comment">// notice the warning below</span></span><br><span class="line">  &#125;, [catImageRef, catImageRef.<span class="property">current</span>]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;App&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">h1</span>&gt;</span>useEffect &amp; useRef vs useCallback<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        An image of a cat would appear on every 3rd render.</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        Would our hook be able to make the emoji see it?</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        &#123;catInfo ? &quot;😂&quot; : &quot;😩&quot;&#125; - I &#123;catInfo ? &quot;&quot; : &quot;don&#x27;t&quot;&#125; see the cat 🐈</span></span><br><span class="line"><span class="language-xml">        &#123;catInfo ? `, it&#x27;s height is $&#123;catInfo.height&#125;` : &quot;&quot;&#125;!</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">disabled</span> <span class="attr">value</span>=<span class="string">&#123;</span>`<span class="attr">render</span> #$&#123;<span class="attr">count</span>&#125;`&#125; /&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;()</span> =&gt;</span> setCount((c) =&gt; c + 1)&#125;&gt;next render<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">      &#123;shouldShowImageOfCat ? (</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">img</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">ref</span>=<span class="string">&#123;catImageRef&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">src</span>=<span class="string">&#123;catImageUrl&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">alt</span>=<span class="string">&quot;cat&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">width</span>=<span class="string">&quot;50%&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">padding:</span> <span class="attr">10</span> &#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">        /&gt;</span></span></span><br><span class="line"><span class="language-xml">      ) : (</span></span><br><span class="line"><span class="language-xml">        &quot;&quot;</span></span><br><span class="line"><span class="language-xml">      )&#125;</span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>那我们应该怎么做呢？<strong>使用useCallback</strong>。（参考<a class="link"   href="https://legacy.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node"  title="react官方文档">react官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>）</p>
+<h2 id="使用useCallback替代Ref">使用useCallback替代Ref</h2>
+<p>我们可以依赖于将一个普通函数通过useCallback包装后传递给ref，并对它返回的最新DOM节点引用做出反应。</p>
+<p>下面的代码是一个例子（在<a class="link"   href="https://codesandbox.io/s/usecallback-as-ref-ytdt0?from-embed"  title="Code Sandbox">Code Sandbox <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>中尝试）：</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = <span class="title function_">useState</span>(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">const</span> shouldShowImageOfCat = count % <span class="number">3</span> === <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> [catInfo, setCatInfo] = <span class="title function_">useState</span>(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// notice how this is a useCallback</span></span><br><span class="line">  <span class="comment">// that&#x27;s used as the &quot;ref&quot; of the image below</span></span><br><span class="line">  <span class="keyword">const</span> catImageRef = <span class="title function_">useCallback</span>(<span class="function">(<span class="params">catImageNode</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(catImageNode);</span><br><span class="line">    <span class="title function_">setCatInfo</span>(catImageNode?.<span class="title function_">getBoundingClientRect</span>());</span><br><span class="line">  &#125;, []);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;App&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">h1</span>&gt;</span>useEffect &amp; useRef vs useCallback<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        An image of a cat would appear on every 3rd render.</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        Would our hook be able to make the emoji see it?</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">        &#123;catInfo ? &quot;😂&quot; : &quot;😩&quot;&#125; - I &#123;catInfo ? &quot;&quot; : &quot;don&#x27;t&quot;&#125; see the cat 🐈</span></span><br><span class="line"><span class="language-xml">        &#123;catInfo ? `, it&#x27;s height is $&#123;catInfo.height&#125;` : &quot;&quot;&#125;!</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">disabled</span> <span class="attr">value</span>=<span class="string">&#123;</span>`<span class="attr">render</span> #$&#123;<span class="attr">count</span>&#125;`&#125; /&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;()</span> =&gt;</span> setCount((c) =&gt; c + 1)&#125;&gt;next render<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">      &#123;shouldShowImageOfCat ? (</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">img</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">ref</span>=<span class="string">&#123;catImageRef&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">src</span>=<span class="string">&#123;catImageUrl&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">alt</span>=<span class="string">&quot;cat&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">width</span>=<span class="string">&quot;50%&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">padding:</span> <span class="attr">10</span> &#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">        /&gt;</span></span></span><br><span class="line"><span class="language-xml">      ) : (</span></span><br><span class="line"><span class="language-xml">        &quot;&quot;</span></span><br><span class="line"><span class="language-xml">      )&#125;</span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>在上面的例子中，我们可以看到<code>useCallback</code>被传入了<code>ref</code>参数中，这个过程中我们需要注意以下两点：</p>
+<ul>
+<li>ref函数保证在元素挂载和卸载时被调用，即使是第一次挂载，甚至在父元素卸载导致的情况下也是如此。</li>
+<li><strong>务必使用</strong>**<code>useCallback</code>**<strong>来包装ref回调函数</strong>。因为如果没有使用<code>useCallback</code>，在ref回调函数中引发重新渲染，会导致ref回调函数再次以null触发，可能导致无限循环，这是由于React内部机制所致。</li>
+</ul>
+<h2 id="其他方案">其他方案</h2>
+<p>实际上这种模式可以以多种方式使用，以下三种方法渐进地对Node操作进行了优化：</p>
+<h3 id="useState">useState</h3>
+<p>由于<code>useState</code>是在渲染之间保持一致的函数，它也可以用作ref。在这种情况下，整个节点将保存在state中。</p>
+<p>作为一个状态，当它发生变化时，它会触发重新渲染，并且可以安全地在渲染结果和useEffect的依赖项中使用该状态：</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> [node, setRef] = <span class="title function_">useState</span>(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!node) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;unmounted!&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;mounted&#x27;</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">fn</span> = e =&gt; <span class="variable language_">console</span>.<span class="title function_">log</span>(e);</span><br><span class="line">  </span><br><span class="line">  node.<span class="title function_">addEventListener</span>(<span class="string">&#x27;mousedown&#x27;</span>, fn);</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> node.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;mousedown&#x27;</span>, fn);</span><br><span class="line">&#125;, [node])</span><br></pre></td></tr></table></figure></div>
+<h3 id="useStateRef">useStateRef</h3>
+<p>访问DOM是一项昂贵的操作，因此我们希望尽可能少地进行这样的操作。</p>
+<p>如果你不需要像之前的钩子函数中那样保存整个节点，最好只在一个状态中保存其中的一部分：</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// the hook</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">useStateRef</span>(<span class="params">processNode</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [node, setNode] = <span class="title function_">useState</span>(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">const</span> setRef = <span class="title function_">useCallback</span>(<span class="function"><span class="params">newNode</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">setNode</span>(<span class="title function_">processNode</span>(newNode));</span><br><span class="line">  &#125;, [processNode]);</span><br><span class="line">  <span class="keyword">return</span> [node, setRef];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// how it&#x27;s used</span></span><br><span class="line"><span class="keyword">const</span> [clientHeight, setRef] = <span class="title function_">useStateRef</span>(<span class="function"><span class="params">node</span> =&gt;</span> (node?.<span class="property">clientHeight</span> || <span class="number">0</span>));</span><br><span class="line"></span><br><span class="line"><span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`the new clientHeight is: <span class="subst">$&#123;clientHeight&#125;</span>`</span>);</span><br><span class="line">&#125;, [clientHeight])</span><br><span class="line"></span><br><span class="line"><span class="comment">// &lt;div ref=&#123;setRef&#125;....</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// &lt;div&gt;the current height is: &#123;clientHeight&#125;&lt;/div&gt;</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="useRefWithCallback">useRefWithCallback</h3>
+<p>然而，有时为了性能考虑，你可以在使用ref的元素挂载和卸载时避免触发重新渲染。</p>
+<p>下面的钩子函数不会将节点保存在状态中。它直接响应挂载和卸载，因此不会触发任何重新渲染。</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// the hook</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">useRefWithCallback</span>(<span class="params">onMount, onUnmount</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> nodeRef = <span class="title function_">useRef</span>(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> setRef = <span class="title function_">useCallback</span>(<span class="function"><span class="params">node</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (nodeRef.<span class="property">current</span>) &#123;</span><br><span class="line">      <span class="title function_">onUnmount</span>(nodeRef.<span class="property">current</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    nodeRef.<span class="property">current</span> = node;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (nodeRef.<span class="property">current</span>) &#123;</span><br><span class="line">      <span class="title function_">onMount</span>(nodeRef.<span class="property">current</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [onMount, onUnmount]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> setRef;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> onMouseDown = <span class="title function_">useCallback</span>(<span class="function"><span class="params">e</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;hi!&#x27;</span>, e.<span class="property">target</span>.<span class="property">clientHeight</span>), []);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> setDivRef = <span class="title function_">useRefWithCallback</span>(</span><br><span class="line">  <span class="function"><span class="params">node</span> =&gt;</span> node.<span class="title function_">addEventListener</span>(<span class="string">&quot;mousedown&quot;</span>, onMouseDown),</span><br><span class="line">  <span class="function"><span class="params">node</span> =&gt;</span> node.<span class="title function_">removeEventListener</span>(<span class="string">&quot;mousedown&quot;</span>, onMouseDown)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// &lt;div ref=&#123;setDivRef&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>在上面这个例子中，<code>setRef</code>函数被传入了<code>ref</code>中，只有在DOM节点发生变化时才会调用它来更新<code>ref</code>，借此实现了生命周期函数。</p>
+<ul>
+<li>若调用时ref中已经有值，则说明组件出现了变化，先用调用上一个组件的<code>unmount</code>周期，再更新ref，调用其<code>mount</code>周期</li>
+<li>若调用时ref为<code>null</code>，则直接更新ref并调用其<code>mount</code>周期即可</li>
+</ul>
+<p>最终，如果你理解了将useCallback用作元素ref的原理，你可能会根据自己的特定需求提出自己的想法。</p>
+<h2 id="补：在ref中使用useCallback的原理">补：在ref中使用useCallback的原理</h2>
+<blockquote>
+<p>官方文档：<a class="link"   href="https://zh-hans.react.dev/learn/manipulating-the-dom-with-refs#how-to-manage-a-list-of-refs-using-a-ref-callback"  title="使用ref回调 - react.dev">使用ref回调 - react.dev <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</blockquote>
+<p>众所周知，<code>ref</code>并非普通的props，直观地看就是我们无法从props中直接解构出<code>ref</code>。甚至在<code>React.createElement</code>中，<code>ref</code>参数早早地就被抽离了出来。</p>
+<p>虽然<code>useRef</code>被我们当作存储视图无关变量的一般方法，但<code>ref</code> 本身作为props传递时却有些许不同，它可以接收三种类型的参数：</p>
+<ul>
+<li>string ref：不推荐，已弃用</li>
+<li>callback ref：将一个函数传给ref，称为回调函数，这个函数的签名为 <code>(ref) ⇒ void</code></li>
+<li>object ref：接收一个<code>ref</code>对象</li>
+</ul>
+<p>这三种类型的<code>ref</code>具有统一的更新时机：在组件的<code>layout</code>阶段（或者说加载完成）时调用或赋值自己的ref参数。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>hook</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用 Hexo 搭建和部署个人网站</title>
     <url>/posts/1933027073/</url>
     <content><![CDATA[<h2 id="技术选型">技术选型</h2>
@@ -1980,10 +2053,10 @@
         <category>前端</category>
       </categories>
       <tags>
+        <tag>react</tag>
         <tag>ssr</tag>
         <tag>性能优化</tag>
         <tag>seo</tag>
-        <tag>react</tag>
       </tags>
   </entry>
   <entry>
@@ -5902,164 +5975,6 @@
       </tags>
   </entry>
   <entry>
-    <title>深入JS - 1.浏览器事件循环</title>
-    <url>/posts/2939183973/</url>
-    <content><![CDATA[<p>之前在腾讯文档前端面试的时候，考官问我经典八股之一的浏览器事件循环，编程题也是与之相关的。我直接被问瓜了，深感自己在JS基础这方面的知识薄弱，虽然以后可能不做前端了，但还是来恶补一下这方面的知识为好。</p>
-<h2 id="JS是如何运行的">JS是如何运行的</h2>
-<p>为了理解事件循环，我们需要首先简要理解JS引擎的执行过程，具体过程详见我的后续文章 <a href="#">深入JS - 3. V8引擎</a>。</p>
-<p>众所周知，Javascript是<strong>解释型的脚本语言</strong>，即运行环境在拿到它要运行的JS任务的时候得到的是一串文本，而不是编译好的二进制文件，这就要求JS解释器要立刻解析语法并生成二进制代码用于执行，以Chromium的<strong>V8引擎</strong>为例：</p>
-<ul>
-<li>V8引擎模拟操作系统调用，分为两个核心部分：<strong>执行栈（execution stack）和堆（heap）</strong>
-<ul>
-<li><strong>执行栈</strong>存放函数调用的栈帧（执行上下文，execution context）</li>
-<li><strong>堆</strong>则存放本地变量的值</li>
-</ul>
-</li>
-<li>函数在运行过程中分为<strong>创建阶段（creation phase）<strong>和</strong>执行阶段（execution phase）</strong>
-<ul>
-<li><strong>创建阶段</strong>会把函数的<strong>执行上下文（execution context）<strong>压入执行栈顶，<strong>执行上下文</strong>包含了</strong>函数的参数、局部变量等信息</strong></li>
-<li>执行上下文入栈后将初始化执行上下文，包括<strong>VO(variables, functions and arguments)</strong>、<strong>Scope Chain(VO Chain, 调用链)<strong>和</strong><code>this</code>指针</strong></li>
-<li>上下文初始化完毕后开始执行，执行完毕后上下文将从栈顶弹出</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>上一个试图在浏览器中直接运行二进制的Flash坟头草已经三尺高了，而WebAssembly其实采取了一种折衷方案，相当于C-&gt;汇编-&gt;机器码中省去了汇编过程，但编译和链接的过程仍保留了下来</p>
-</blockquote>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262204968.gif"
-                      alt=""
-                ></p>
-<h2 id="为什么需要事件循环（event-loop）">为什么需要事件循环（event loop）</h2>
-<p>要回答这个问题，我们要先从JS语言和它的解释器本身的特性谈起：</p>
-<ul>
-<li>前提1：<strong>JS解释器（如V8）是单线程的</strong></li>
-<li>前提2：JS解释器<strong>在接收一段代码后会一口气从头到尾完整执行</strong>，中间不能暂停或释放所有权</li>
-<li>前提3：<strong>执行JS代码的和构建页面DOM的（渲染线程）是两个东西</strong>，且<strong>解释器线程和渲染线程是相互阻塞（互斥的）</strong>，这是由于JS引擎和渲染线程都可能读取和操作DOM，这导致二者处于竞争状态，所以<strong>为DOM这个临界资源上了一把互斥锁</strong>。</li>
-</ul>
-<blockquote>
-<p><em>前提3</em>也导致了NodeJS中的事件循环和浏览器中并不一样，理论上JS解释器标准由ECMA委员会制定（只对JS语言特性负责），而浏览器事件循环标准由HTML委员会制定，因此不同Host环境下事件循环可能是不一样的，且与JS解释器彼此独立。</p>
-</blockquote>
-<p>从以上三个前提我们可以看出，由于JS解释器只会一根筋练死劲儿（一口气跑到底），还不管其他人的死活（渲染管线），这样的话<strong>JS执行过程中用户界面出现无响应的情况（如获取数据的过程中网页假死）</strong>，也<strong>无法实现即时事件响应（如按下按钮调用函数）</strong>，这对于响应式网页UI来说是致命的缺陷。</p>
-<p>为了弥补这些缺陷，实现异步和响应的需求，我们就必须引入<strong>事件循环机制（event loop）</strong>。</p>
-<h3 id="如何实现并行（非阻塞调用）">如何实现并行（非阻塞调用）</h3>
-<p>为了实现我们的并行JS宏图，我们可以先参考操作系统中是如何实现并行多任务的。</p>
-<p>回顾专业知识，我们可以总结现代计算机操作系统的异步实现为：<strong>宏观上并行，微观上串行</strong>。</p>
-<ul>
-<li>在宏观的线程层次（调度的基本单位），通过时间片划分、抢占/非抢占策略、就绪/挂起队列等一系列软件设计手段让多个任务并行</li>
-<li>在微观上的指令层次，不同的指令仍是串行（这里不考虑底层的指令并行技术如多核心调度、超长指令字等），即一个时钟周期内仍只运行一条指令，通过极短的时间片划分和不断的上下文切换来让宏观层次看起来像并行</li>
-</ul>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262204042.webp"
-                      alt=""
-                ></p>
-<p>然而，在前面我们提到<strong>JS是单线程的</strong>，解释器和渲染管线互斥地使用一个线程，显然不能直接套用操作系统的多线程模型来实现代码并行，但我们仍可以借鉴操作系统的<strong>线程队列思路</strong>。</p>
-<p>我们可以为某些“等待态”的任务设计一个<strong>挂起队列</strong>，即在调用栈外再维护一个“任务队列”（暂且把它称为<em>callback queue</em>）用于存储<strong>可能产生阻塞但无需让程序等待</strong>的任务，在这样的任务进入调用栈后就放入挂起队列中，解释器继续运行下一行代码，这样就可以既<strong>保持JS解释器原有的特性，一次性执行完全部代码，又保持页面的响应性</strong>。</p>
-<h3 id="如何唤醒沉睡的任务">如何唤醒沉睡的任务</h3>
-<p>我们现在让这些任务等待了，但是又迎来了新的问题，该怎么唤醒呢？答案还是藏在我们熟悉的OS里：<strong>消息机制和事件响应</strong>。</p>
-<ul>
-<li>操作系统维护一个<strong>事件循环</strong>来监听事件的发生，监听到事件后（比如鼠标点击、键盘输入等）会向应用程序发送<strong>消息</strong>，存放在对应的<strong>消息队列</strong>中</li>
-<li>应用程序维护一个<strong>消息循环</strong>来监听<strong>消息队列</strong>中是否有新消息到达，将消息分发给对应的事件处理函数（handler）</li>
-<li>如果没有注册处理函数（在消息映射表中未找到），该消息最终会被<strong>丢弃</strong>。</li>
-</ul>
-<p>参考OS的设计，我们也可以在浏览器环境中加入类似<strong>消息队列和事件循环</strong>机制来处理异步式调用的请求和事件，具体来说就是<strong>在JS引擎和渲染线程外单独再开一个线程，维护事件和消息循环与队列</strong>。</p>
-<h2 id="事件循环是如何实现的">事件循环是如何实现的</h2>
-<p>首先，我们要明确一个概念，<strong>事件循环本质上是一个任务调度器</strong>，和操作系统的线程调度是对等的。</p>
-<p>然后，要知道事件循环是什么、做了什么，我们就要首先明白浏览器在渲染和执行一个网页的时候做了什么。</p>
-<p>总结上文，我们可以得到一个浏览器的结构<strong>至少</strong>需要实现<strong>三个常驻线程</strong>：</p>
-<ul>
-<li>JS引擎线程（JS解释器，如V8）</li>
-<li>渲染线程（处理DOM，渲染页面）</li>
-<li>消息线程（处理消息和事件）</li>
-</ul>
-<p>其中<strong>JS引擎</strong>是单线程运行JS脚本的；<strong>渲染引擎</strong>由于DOM是临界资源所以和JS引擎是互斥的；<strong>消息线程</strong>则是独立于二者存在的一个循环体，作用就是反复检查挂起队列的任务，并在JS线程空闲（执行栈为空）的时候将挂起队列中的回调函数压入执行栈。</p>
-<p>可以说<strong>事件循环（event loop）<strong>就是消息线程的主要任务，它的</strong>任务就是处理这些回调函数的执行</strong>。</p>
-<h3 id="运行流程">运行流程</h3>
-<p>可以说<strong>事件循环就是浏览器的消息机制</strong>，因此它也有自己的消息队列数据结构，我们叫它<strong>Callback Queue</strong>（或者说Event Queue, Message Queue）都行。</p>
-<p>然而JS解释器依然是单线程的，它只能通过引入一些其他线程来实现自己的异步执行，因此最后的工作流程就变成了下面这样：</p>
-<ul>
-<li>JS解释器照常一口气执行完所有需要执行的JS代码</li>
-<li>遇到异步调用如<code>fetch</code>, <code>setTimeOut</code>时，就会把他们的执行权交给<strong>Web API</strong>（浏览器环境，这里可能不止一个线程来执行这些任务）管理（虽然JS解释器是单线程的，但我可以把它的任务交给另亿个线程啊~~，阿巴阿巴~~）</li>
-<li>当Web API完成了某个异步任务（如<code>fetch</code>或<code>click</code>）时，就会把对应的回调函数放入<strong>Callback Queue</strong>中等待。</li>
-<li>在执行栈为空时，<strong>事件循环</strong>把Callback Queue中的队首任务放入执行栈中，回到第一步。</li>
-<li>在执行完这些命令的<strong>解释器空档期</strong>（后面会详细解释）就把DOM控制权交给<strong>渲染线程，更新UI</strong></li>
-</ul>
-<img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262205452.png"
-                      alt="image" style="zoom:67%;" 
-                >
-<p>可以在网站<a class="link"   href="http://latentflip.com/loupe/?code=JC5vbignYnV0dG9uJywgJ2NsaWNrJywgZnVuY3Rpb24gb25DbGljaygpIHsKICAgIHNldFRpbWVvdXQoZnVuY3Rpb24gdGltZXIoKSB7CiAgICAgICAgY29uc29sZS5sb2coJ1lvdSBjbGlja2VkIHRoZSBidXR0b24hJyk7ICAgIAogICAgfSwgMjAwMCk7Cn0pOwoKY29uc29sZS5sb2coIkhpISIpOwoKc2V0VGltZW91dChmdW5jdGlvbiB0aW1lb3V0KCkgewogICAgY29uc29sZS5sb2coIkNsaWNrIHRoZSBidXR0b24hIik7Cn0sIDUwMDApOwoKY29uc29sZS5sb2coIldlbGNvbWUgdG8gbG91cGUuIik7!!!PGJ1dHRvbj5DbGljayBtZSE8L2J1dHRvbj4%3D" >Javascript Online Playground <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上看到JS事件循环中各数据结构的动态过程，如下图所示：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262205148.gif"
-                      alt=""
-                ></p>
-<h3 id="引入事件分级机制（宏任务与微任务）">引入事件分级机制（宏任务与微任务）</h3>
-<p>在实际的生产应用中，对所有的异步任务都一视同仁显然是不合理的，毕竟操作系统里都有优先级队列呢，更强调响应和交互的网页理应对更重要的事件有更高的响应优先级（如IO、UI变化等），为此我们也为浏览器的消息队列（Callback Queue）引入了自己的优先级队列：<strong>宏任务（macrotask，如<code>&lt;script&gt;</code>、<code>setTimeOut</code>）和微任务（microtask，如<code>Promise</code>）</strong>。</p>
-<p>二者的执行顺序如下：</p>
-<ol>
-<li>首先检查并执行<strong>一个宏任务</strong>（一般来说第一个宏任务是<code>&lt;script&gt;</code>标签），并按JS引擎的规矩一次性执行完毕宏任务的所有同步指令，这个过程中可能注册若干个宏任务和微任务</li>
-<li>当执行栈为空且引擎空闲时（一般来说就是<strong>一个宏任务执行完毕的状态</strong>），<strong>事件循环优先检查和执行Callback Queue中的微任务</strong>，注意<strong>宏任务是一个一个地执行的</strong>，但<strong>微任务会一次性清空队列中所有的微任务</strong></li>
-<li><strong>执行完一个宏任务+微任务的循环后</strong>，将DOM控制权交还给渲染线程，更新界面</li>
-<li>再次检查执行队列，取出<strong>一个宏任务</strong>执行</li>
-</ol>
-<p>常见的**宏任务（macrotask）**有：<code>setTimeOut</code>、<code>setInterval</code>、<code>setImmediate</code>、<code>&lt;script&gt;</code>、I/O操作、UI渲染等</p>
-<p>常见的**微任务（microtask）**有：<code>Promise</code>、<code>process.nextTick</code>等</p>
-<h2 id="例题">例题</h2>
-<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">2</span>)</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">3</span>)</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">4</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
-<p>正确答案：1 5 3 4 2</p>
-<ol>
-<li>首先执行宏任务，打印1 5，入列一个<code>setTimeOut</code>宏任务，一个<code>Promise</code>微任务</li>
-<li>然后检查微任务，执行第一个<code>then()</code>，打印3，再入列一个<code>Promise</code>微任务</li>
-<li>执行第二个<code>then()</code>，打印4</li>
-<li>无微任务，执行宏任务，打印2</li>
-</ol>
-<blockquote>
-<p>Note：</p>
-<p>这个地方我犯了一个错误，在<code>Promise</code>的第一个<code>then()</code>里我认为return的值是<code>console.log</code>的回调，并没有实际执行，但实质上这里返回的是<code>console.log(3)</code>作为表达式计算后的值，如果要返回回调应该写<code>return () =&gt; console.log(3)</code>，这样3就不会被打印出来</p>
-</blockquote>
-<h2 id="现代浏览器模型">现代浏览器模型</h2>
-<p>现代浏览器不仅是<strong>多线程</strong>（任务共享资源，拥有独立上下文，靠切换上下文实现并行）的，还是<strong>多进程</strong>（资源彼此独立）的，模型也比上面的基本模型复杂得多（Chromium的内核代码量据说和操作系统相当）。</p>
-<p>在Chrome浏览器中，<strong>一个标签页就对应了一个进程，每个进程都有自己独立的线程模型</strong>：</p>
-<ul>
-<li>GUI 渲染线程</li>
-<li>JavaScript 引擎线程</li>
-<li>定时触发器线程</li>
-<li>事件触发线程</li>
-<li>异步 http 请求线程</li>
-</ul>
-<hr>
-<h2 id="参考资料">参考资料</h2>
-<ul>
-<li><a class="link"   href="https://segmentfault.com/a/1190000021295911" >javascript - 一文看懂浏览器事件循环 - 脑洞前端 - SegmentFault 思否 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://blog.csdn.net/It_sharp/article/details/86528264" >消息机制与事件处理_消息事件管理_It_sharp的博客-CSDN博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://blog.csdn.net/u014634338/article/details/45115661" >Linux操作系统–消息队列_zthgreat的博客-CSDN博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://segmentfault.com/a/1190000017893482?utm_source=sf-similar-article" >javascript - 浏览器与Node的事件循环(Event Loop)有何区别? - Fundebug - SegmentFault 思否 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://juejin.cn/post/6844903606466904078" >浏览器事件循环机制（event loop） - 掘金 (juejin.cn) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://juejin.cn/post/7024751918484291591" >浏览器事件循环看这一篇就够了 - 掘金 (juejin.cn) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://cnodejs.org/topic/5c3d554fa4d44449266b1077" >浏览器与Node的事件循环(Event Loop)有何区别? - CNode技术社区 (cnodejs.org) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>前端</category>
-        <category>深入JS</category>
-      </categories>
-      <tags>
-        <tag>js</tag>
-        <tag>事件循环</tag>
-        <tag>消息队列</tag>
-        <tag>异步</tag>
-        <tag>多线程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>深入理解 React Hooks</title>
     <url>/posts/3508312236/</url>
     <content><![CDATA[<p>2019年2月，React 16.8更新了一大波重磅内容，其中就包括函数式组件（function component）和Hooks，这一象征着React未来方向的技术。没想到已经四年多过去了，我仍对Hooks的理解处于一个皮毛状态，今天我就来深入研究一下React Hooks，探索Hook机制在前端声明式渲染框架中的具体应用。</p>
@@ -6480,8 +6395,8 @@
         <category>深入React</category>
       </categories>
       <tags>
-        <tag>性能优化</tag>
         <tag>react</tag>
+        <tag>性能优化</tag>
       </tags>
   </entry>
   <entry>
@@ -6730,6 +6645,164 @@
         <tag>代理</tag>
         <tag>h5</tag>
         <tag>移动端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>深入JS - 1.浏览器事件循环</title>
+    <url>/posts/2939183973/</url>
+    <content><![CDATA[<p>之前在腾讯文档前端面试的时候，考官问我经典八股之一的浏览器事件循环，编程题也是与之相关的。我直接被问瓜了，深感自己在JS基础这方面的知识薄弱，虽然以后可能不做前端了，但还是来恶补一下这方面的知识为好。</p>
+<h2 id="JS是如何运行的">JS是如何运行的</h2>
+<p>为了理解事件循环，我们需要首先简要理解JS引擎的执行过程，具体过程详见我的后续文章 <a href="#">深入JS - 3. V8引擎</a>。</p>
+<p>众所周知，Javascript是<strong>解释型的脚本语言</strong>，即运行环境在拿到它要运行的JS任务的时候得到的是一串文本，而不是编译好的二进制文件，这就要求JS解释器要立刻解析语法并生成二进制代码用于执行，以Chromium的<strong>V8引擎</strong>为例：</p>
+<ul>
+<li>V8引擎模拟操作系统调用，分为两个核心部分：<strong>执行栈（execution stack）和堆（heap）</strong>
+<ul>
+<li><strong>执行栈</strong>存放函数调用的栈帧（执行上下文，execution context）</li>
+<li><strong>堆</strong>则存放本地变量的值</li>
+</ul>
+</li>
+<li>函数在运行过程中分为<strong>创建阶段（creation phase）<strong>和</strong>执行阶段（execution phase）</strong>
+<ul>
+<li><strong>创建阶段</strong>会把函数的<strong>执行上下文（execution context）<strong>压入执行栈顶，<strong>执行上下文</strong>包含了</strong>函数的参数、局部变量等信息</strong></li>
+<li>执行上下文入栈后将初始化执行上下文，包括<strong>VO(variables, functions and arguments)</strong>、<strong>Scope Chain(VO Chain, 调用链)<strong>和</strong><code>this</code>指针</strong></li>
+<li>上下文初始化完毕后开始执行，执行完毕后上下文将从栈顶弹出</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>上一个试图在浏览器中直接运行二进制的Flash坟头草已经三尺高了，而WebAssembly其实采取了一种折衷方案，相当于C-&gt;汇编-&gt;机器码中省去了汇编过程，但编译和链接的过程仍保留了下来</p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262204968.gif"
+                      alt=""
+                ></p>
+<h2 id="为什么需要事件循环（event-loop）">为什么需要事件循环（event loop）</h2>
+<p>要回答这个问题，我们要先从JS语言和它的解释器本身的特性谈起：</p>
+<ul>
+<li>前提1：<strong>JS解释器（如V8）是单线程的</strong></li>
+<li>前提2：JS解释器<strong>在接收一段代码后会一口气从头到尾完整执行</strong>，中间不能暂停或释放所有权</li>
+<li>前提3：<strong>执行JS代码的和构建页面DOM的（渲染线程）是两个东西</strong>，且<strong>解释器线程和渲染线程是相互阻塞（互斥的）</strong>，这是由于JS引擎和渲染线程都可能读取和操作DOM，这导致二者处于竞争状态，所以<strong>为DOM这个临界资源上了一把互斥锁</strong>。</li>
+</ul>
+<blockquote>
+<p><em>前提3</em>也导致了NodeJS中的事件循环和浏览器中并不一样，理论上JS解释器标准由ECMA委员会制定（只对JS语言特性负责），而浏览器事件循环标准由HTML委员会制定，因此不同Host环境下事件循环可能是不一样的，且与JS解释器彼此独立。</p>
+</blockquote>
+<p>从以上三个前提我们可以看出，由于JS解释器只会一根筋练死劲儿（一口气跑到底），还不管其他人的死活（渲染管线），这样的话<strong>JS执行过程中用户界面出现无响应的情况（如获取数据的过程中网页假死）</strong>，也<strong>无法实现即时事件响应（如按下按钮调用函数）</strong>，这对于响应式网页UI来说是致命的缺陷。</p>
+<p>为了弥补这些缺陷，实现异步和响应的需求，我们就必须引入<strong>事件循环机制（event loop）</strong>。</p>
+<h3 id="如何实现并行（非阻塞调用）">如何实现并行（非阻塞调用）</h3>
+<p>为了实现我们的并行JS宏图，我们可以先参考操作系统中是如何实现并行多任务的。</p>
+<p>回顾专业知识，我们可以总结现代计算机操作系统的异步实现为：<strong>宏观上并行，微观上串行</strong>。</p>
+<ul>
+<li>在宏观的线程层次（调度的基本单位），通过时间片划分、抢占/非抢占策略、就绪/挂起队列等一系列软件设计手段让多个任务并行</li>
+<li>在微观上的指令层次，不同的指令仍是串行（这里不考虑底层的指令并行技术如多核心调度、超长指令字等），即一个时钟周期内仍只运行一条指令，通过极短的时间片划分和不断的上下文切换来让宏观层次看起来像并行</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262204042.webp"
+                      alt=""
+                ></p>
+<p>然而，在前面我们提到<strong>JS是单线程的</strong>，解释器和渲染管线互斥地使用一个线程，显然不能直接套用操作系统的多线程模型来实现代码并行，但我们仍可以借鉴操作系统的<strong>线程队列思路</strong>。</p>
+<p>我们可以为某些“等待态”的任务设计一个<strong>挂起队列</strong>，即在调用栈外再维护一个“任务队列”（暂且把它称为<em>callback queue</em>）用于存储<strong>可能产生阻塞但无需让程序等待</strong>的任务，在这样的任务进入调用栈后就放入挂起队列中，解释器继续运行下一行代码，这样就可以既<strong>保持JS解释器原有的特性，一次性执行完全部代码，又保持页面的响应性</strong>。</p>
+<h3 id="如何唤醒沉睡的任务">如何唤醒沉睡的任务</h3>
+<p>我们现在让这些任务等待了，但是又迎来了新的问题，该怎么唤醒呢？答案还是藏在我们熟悉的OS里：<strong>消息机制和事件响应</strong>。</p>
+<ul>
+<li>操作系统维护一个<strong>事件循环</strong>来监听事件的发生，监听到事件后（比如鼠标点击、键盘输入等）会向应用程序发送<strong>消息</strong>，存放在对应的<strong>消息队列</strong>中</li>
+<li>应用程序维护一个<strong>消息循环</strong>来监听<strong>消息队列</strong>中是否有新消息到达，将消息分发给对应的事件处理函数（handler）</li>
+<li>如果没有注册处理函数（在消息映射表中未找到），该消息最终会被<strong>丢弃</strong>。</li>
+</ul>
+<p>参考OS的设计，我们也可以在浏览器环境中加入类似<strong>消息队列和事件循环</strong>机制来处理异步式调用的请求和事件，具体来说就是<strong>在JS引擎和渲染线程外单独再开一个线程，维护事件和消息循环与队列</strong>。</p>
+<h2 id="事件循环是如何实现的">事件循环是如何实现的</h2>
+<p>首先，我们要明确一个概念，<strong>事件循环本质上是一个任务调度器</strong>，和操作系统的线程调度是对等的。</p>
+<p>然后，要知道事件循环是什么、做了什么，我们就要首先明白浏览器在渲染和执行一个网页的时候做了什么。</p>
+<p>总结上文，我们可以得到一个浏览器的结构<strong>至少</strong>需要实现<strong>三个常驻线程</strong>：</p>
+<ul>
+<li>JS引擎线程（JS解释器，如V8）</li>
+<li>渲染线程（处理DOM，渲染页面）</li>
+<li>消息线程（处理消息和事件）</li>
+</ul>
+<p>其中<strong>JS引擎</strong>是单线程运行JS脚本的；<strong>渲染引擎</strong>由于DOM是临界资源所以和JS引擎是互斥的；<strong>消息线程</strong>则是独立于二者存在的一个循环体，作用就是反复检查挂起队列的任务，并在JS线程空闲（执行栈为空）的时候将挂起队列中的回调函数压入执行栈。</p>
+<p>可以说<strong>事件循环（event loop）<strong>就是消息线程的主要任务，它的</strong>任务就是处理这些回调函数的执行</strong>。</p>
+<h3 id="运行流程">运行流程</h3>
+<p>可以说<strong>事件循环就是浏览器的消息机制</strong>，因此它也有自己的消息队列数据结构，我们叫它<strong>Callback Queue</strong>（或者说Event Queue, Message Queue）都行。</p>
+<p>然而JS解释器依然是单线程的，它只能通过引入一些其他线程来实现自己的异步执行，因此最后的工作流程就变成了下面这样：</p>
+<ul>
+<li>JS解释器照常一口气执行完所有需要执行的JS代码</li>
+<li>遇到异步调用如<code>fetch</code>, <code>setTimeOut</code>时，就会把他们的执行权交给<strong>Web API</strong>（浏览器环境，这里可能不止一个线程来执行这些任务）管理（虽然JS解释器是单线程的，但我可以把它的任务交给另亿个线程啊~~，阿巴阿巴~~）</li>
+<li>当Web API完成了某个异步任务（如<code>fetch</code>或<code>click</code>）时，就会把对应的回调函数放入<strong>Callback Queue</strong>中等待。</li>
+<li>在执行栈为空时，<strong>事件循环</strong>把Callback Queue中的队首任务放入执行栈中，回到第一步。</li>
+<li>在执行完这些命令的<strong>解释器空档期</strong>（后面会详细解释）就把DOM控制权交给<strong>渲染线程，更新UI</strong></li>
+</ul>
+<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262205452.png"
+                      alt="image" style="zoom:67%;" 
+                >
+<p>可以在网站<a class="link"   href="http://latentflip.com/loupe/?code=JC5vbignYnV0dG9uJywgJ2NsaWNrJywgZnVuY3Rpb24gb25DbGljaygpIHsKICAgIHNldFRpbWVvdXQoZnVuY3Rpb24gdGltZXIoKSB7CiAgICAgICAgY29uc29sZS5sb2coJ1lvdSBjbGlja2VkIHRoZSBidXR0b24hJyk7ICAgIAogICAgfSwgMjAwMCk7Cn0pOwoKY29uc29sZS5sb2coIkhpISIpOwoKc2V0VGltZW91dChmdW5jdGlvbiB0aW1lb3V0KCkgewogICAgY29uc29sZS5sb2coIkNsaWNrIHRoZSBidXR0b24hIik7Cn0sIDUwMDApOwoKY29uc29sZS5sb2coIldlbGNvbWUgdG8gbG91cGUuIik7!!!PGJ1dHRvbj5DbGljayBtZSE8L2J1dHRvbj4%3D" >Javascript Online Playground <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上看到JS事件循环中各数据结构的动态过程，如下图所示：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-new/202304262205148.gif"
+                      alt=""
+                ></p>
+<h3 id="引入事件分级机制（宏任务与微任务）">引入事件分级机制（宏任务与微任务）</h3>
+<p>在实际的生产应用中，对所有的异步任务都一视同仁显然是不合理的，毕竟操作系统里都有优先级队列呢，更强调响应和交互的网页理应对更重要的事件有更高的响应优先级（如IO、UI变化等），为此我们也为浏览器的消息队列（Callback Queue）引入了自己的优先级队列：<strong>宏任务（macrotask，如<code>&lt;script&gt;</code>、<code>setTimeOut</code>）和微任务（microtask，如<code>Promise</code>）</strong>。</p>
+<p>二者的执行顺序如下：</p>
+<ol>
+<li>首先检查并执行<strong>一个宏任务</strong>（一般来说第一个宏任务是<code>&lt;script&gt;</code>标签），并按JS引擎的规矩一次性执行完毕宏任务的所有同步指令，这个过程中可能注册若干个宏任务和微任务</li>
+<li>当执行栈为空且引擎空闲时（一般来说就是<strong>一个宏任务执行完毕的状态</strong>），<strong>事件循环优先检查和执行Callback Queue中的微任务</strong>，注意<strong>宏任务是一个一个地执行的</strong>，但<strong>微任务会一次性清空队列中所有的微任务</strong></li>
+<li><strong>执行完一个宏任务+微任务的循环后</strong>，将DOM控制权交还给渲染线程，更新界面</li>
+<li>再次检查执行队列，取出<strong>一个宏任务</strong>执行</li>
+</ol>
+<p>常见的**宏任务（macrotask）**有：<code>setTimeOut</code>、<code>setInterval</code>、<code>setImmediate</code>、<code>&lt;script&gt;</code>、I/O操作、UI渲染等</p>
+<p>常见的**微任务（microtask）**有：<code>Promise</code>、<code>process.nextTick</code>等</p>
+<h2 id="例题">例题</h2>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">2</span>)</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">3</span>)</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">4</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
+<p>正确答案：1 5 3 4 2</p>
+<ol>
+<li>首先执行宏任务，打印1 5，入列一个<code>setTimeOut</code>宏任务，一个<code>Promise</code>微任务</li>
+<li>然后检查微任务，执行第一个<code>then()</code>，打印3，再入列一个<code>Promise</code>微任务</li>
+<li>执行第二个<code>then()</code>，打印4</li>
+<li>无微任务，执行宏任务，打印2</li>
+</ol>
+<blockquote>
+<p>Note：</p>
+<p>这个地方我犯了一个错误，在<code>Promise</code>的第一个<code>then()</code>里我认为return的值是<code>console.log</code>的回调，并没有实际执行，但实质上这里返回的是<code>console.log(3)</code>作为表达式计算后的值，如果要返回回调应该写<code>return () =&gt; console.log(3)</code>，这样3就不会被打印出来</p>
+</blockquote>
+<h2 id="现代浏览器模型">现代浏览器模型</h2>
+<p>现代浏览器不仅是<strong>多线程</strong>（任务共享资源，拥有独立上下文，靠切换上下文实现并行）的，还是<strong>多进程</strong>（资源彼此独立）的，模型也比上面的基本模型复杂得多（Chromium的内核代码量据说和操作系统相当）。</p>
+<p>在Chrome浏览器中，<strong>一个标签页就对应了一个进程，每个进程都有自己独立的线程模型</strong>：</p>
+<ul>
+<li>GUI 渲染线程</li>
+<li>JavaScript 引擎线程</li>
+<li>定时触发器线程</li>
+<li>事件触发线程</li>
+<li>异步 http 请求线程</li>
+</ul>
+<hr>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a class="link"   href="https://segmentfault.com/a/1190000021295911" >javascript - 一文看懂浏览器事件循环 - 脑洞前端 - SegmentFault 思否 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://blog.csdn.net/It_sharp/article/details/86528264" >消息机制与事件处理_消息事件管理_It_sharp的博客-CSDN博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://blog.csdn.net/u014634338/article/details/45115661" >Linux操作系统–消息队列_zthgreat的博客-CSDN博客 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://segmentfault.com/a/1190000017893482?utm_source=sf-similar-article" >javascript - 浏览器与Node的事件循环(Event Loop)有何区别? - Fundebug - SegmentFault 思否 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://juejin.cn/post/6844903606466904078" >浏览器事件循环机制（event loop） - 掘金 (juejin.cn) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://juejin.cn/post/7024751918484291591" >浏览器事件循环看这一篇就够了 - 掘金 (juejin.cn) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://cnodejs.org/topic/5c3d554fa4d44449266b1077" >浏览器与Node的事件循环(Event Loop)有何区别? - CNode技术社区 (cnodejs.org) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>深入JS</category>
+      </categories>
+      <tags>
+        <tag>js</tag>
+        <tag>事件循环</tag>
+        <tag>消息队列</tag>
+        <tag>异步</tag>
+        <tag>多线程</tag>
       </tags>
   </entry>
 </search>
