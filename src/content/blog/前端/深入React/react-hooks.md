@@ -3,11 +3,9 @@ title: 深入理解 React Hooks
 tags:
   - react
   - hook
-categories:
-  - 前端
-  - 深入React
-abbrlink: 3508312236
-date: 2023-06-01 17:39:11
+pubDate: 2023-06-01T17:39:11.000Z
+slug: '3508312236'
+category: 前端
 ---
 
 2019年2月，React 16.8更新了一大波重磅内容，其中就包括函数式组件（function component）和Hooks，这一象征着React未来方向的技术。没想到已经四年多过去了，我仍对Hooks的理解处于一个皮毛状态，今天我就来深入研究一下React Hooks，探索Hook机制在前端声明式渲染框架中的具体应用。

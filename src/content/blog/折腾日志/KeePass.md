@@ -3,11 +3,10 @@ title: 我的个人密码管理方案 - KeePass
 tags:
   - 密码
   - keepass
-excerpt: 个人管理密码数据库的一些经验，以及配置全平台 KeePass 解决方案的一些心得
-abbrlink: 3202227099
-categories:
-  - 折腾日志
-date: 2023-05-23 12:47:52
+pubDate: 2023-05-23T12:47:52.000Z
+description: 个人管理密码数据库的一些经验，以及配置全平台 KeePass 解决方案的一些心得
+slug: '3202227099'
+category: 折腾日志
 ---
 
 大约高中的时候我就接触了一些密码管理软件，如1Password这些，但最终由于上手还是有些难度（那个时候也没有心思折腾）而回归了传统的 passwords.txt 方案。

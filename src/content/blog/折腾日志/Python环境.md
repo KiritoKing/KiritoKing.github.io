@@ -3,13 +3,12 @@ title: Python 编程环境重新构建
 tags:
   - python
   - 开发环境
-excerpt: >-
+pubDate: 2023-07-09T00:00:00.000Z
+description: >-
   在新机器和旧机器上重新配置统一的Python环境和管理方案，使用一个全局最新版Python +
   Conda管理项目中不同版本Python虚拟环境的方案，同时优化终端速度和体验。
-abbrlink: 768258525
-categories:
-  - 折腾日志
-date: 2023-07-09 00:00:00
+slug: '768258525'
+category: 折腾日志
 ---
 
 虽然日常工作里做Web开发比较多，一般都是全套JS/TS解决问题，但偶尔也会有用到Python的场景，如涉及到数据分析、科学计算和机器学习等领域，Python往往是绕不开的，也会在特定领域用Python去展开一些后端或者RPC的开发。

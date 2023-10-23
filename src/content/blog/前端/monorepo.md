@@ -5,10 +5,9 @@ tags:
   - 项目管理
   - yarn
   - lerna
-categories:
-  - 前端
-abbrlink: 3828472050
-date: 2023-05-26 02:55:16
+pubDate: 2023-05-26T02:55:16.000Z
+slug: '3828472050'
+category: 前端
 ---
 
 **monorepo** (monolithic repository) 是一种**项目架构**（而不是软件架构或设计模式），是一种项目管理手段，简单的来说：**一个仓库内包含系统的多个开发项目（模块，包）**，把所有相关的 package 都放在一个仓库里进行管理，**每个 package 独立发布**。

@@ -4,10 +4,9 @@ tags:
   - npm
   - 包管理
   - 项目管理
-abbrlink: 3463082280
-categories:
-  - 前端
-date: 2023-05-24 18:09:44
+pubDate: 2023-05-24T18:09:44.000Z
+slug: '3463082280'
+category: 前端
 ---
 
 在为公司一个老项目配置Prettier和ESLint、StyleLint兼容性设置后，我再次使用 npm install 生成 package-lock.json 时遇到了下面这个错误。

@@ -1,14 +1,12 @@
 ---
 title: 你真的需要useMemo和useCallback吗
-excerpt: >-
-  今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。
 tags:
   - react
   - 性能优化
-categories:
-  - 前端
-  - 深入React
-abbrlink: 2103510996
+description: >-
+  今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。
+slug: '2103510996'
+category: 前端
 ---
 
 ## 目录

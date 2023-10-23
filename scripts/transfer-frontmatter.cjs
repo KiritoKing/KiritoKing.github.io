@@ -49,7 +49,11 @@ processMarkdownFiles(directoryPath, (frontMatter) => {
 	Object.entries(convertMap).forEach(([key, value]) => {
 		if (frontMatter[key]) {
 			modified = true
-			frontMatter[value] = frontMatter[key]
+			if (key === 'abbrlink') {
+				frontMatter['slug'] = frontMatter[key].toString()
+			} else {
+				frontMatter[value] = frontMatter[key]
+			}
 			delete frontMatter[key]
 			console.log(`Convert ${key} to ${value}`)
 		}
