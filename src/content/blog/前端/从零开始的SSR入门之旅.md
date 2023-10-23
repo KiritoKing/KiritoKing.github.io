@@ -7,6 +7,7 @@ tags:
   - react
 slug: '2933489603'
 category: 前端
+pubDate: '2023-09-21 00:00:00'
 ---
 
 此前作为一个SSR一窍不通的小白，最近从目的出发研究了SSR的机制和在React中的实现。跟着这篇博客你可以理解现代SSR（同构渲染）是什么，为什么需要SSR以及SSR框架是如何实现的（非底层）。
@@ -875,8 +876,6 @@ export default function createFetchRequest(req) {
 ```
 
 完成了上述定义后我们应该已经可以在服务端生成带有数据的HTML了，如下图所示：
-
-![日志中可看到带有内容的HTML（可能略有区别）](image/image_tJvE3GOiNM.png '日志中可看到带有内容的HTML（可能略有区别）')
 
 既然完成了服务端数据获取，我们理应可以在`Contacts.js`中的Effect中删除`init()`调用，完全禁止客户端获取数据，我们会~~开心地~~发现网页一闪而过又成了白屏。
 

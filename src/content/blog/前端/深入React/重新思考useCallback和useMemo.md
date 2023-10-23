@@ -7,25 +7,27 @@ description: >-
   今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。
 slug: '2103510996'
 category: 前端
+pubDate: '2023-08-24 00:00:00'
 ---
 
 ## 目录
 
-- [从useMemo开始](#从useMemo开始)
+- [目录](#目录)
+- [从`useMemo`开始](#从usememo开始)
   - [计算属性？](#计算属性)
-  - [useMemo的真实用途](#useMemo的真实用途)
+  - [`useMemo`的真实用途](#usememo的真实用途)
     - [减少不必要的计算](#减少不必要的计算)
     - [避免复杂组件意外刷新](#避免复杂组件意外刷新)
   - [刷新判断机制](#刷新判断机制)
-  - [为什么不要随便用useMemo](#为什么不要随便用useMemo)
-    - [useMemo 的性能开销](#useMemo-的性能开销)
-- [再看useCallback](#再看useCallback)
-  - [useCallback的真正用途](#useCallback的真正用途)
-  - [什么时候需要useCallback](#什么时候需要useCallback)
+  - [为什么不要随便用`useMemo`](#为什么不要随便用usememo)
+    - [`useMemo` 的性能开销](#usememo-的性能开销)
+- [再看`useCallback`](#再看usecallback)
+  - [`useCallback`的真正用途](#usecallback的真正用途)
+  - [什么时候需要`useCallback`](#什么时候需要usecallback)
   - [其他优化方案](#其他优化方案)
-    - [useEffect闭包](#useEffect闭包)
-    - [使用useReducer](#使用useReducer)
-- [重新思考缓存Hook的使用](#重新思考缓存Hook的使用)
+    - [`useEffect`闭包](#useeffect闭包)
+    - [使用`useReducer`](#使用usereducer)
+- [重新思考缓存Hook的使用](#重新思考缓存hook的使用)
 
 今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。~~（最后发现自己之前的理解完全错了）~~
 

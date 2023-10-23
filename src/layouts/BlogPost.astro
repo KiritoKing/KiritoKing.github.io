@@ -27,20 +27,20 @@ const articleDate = pubDate.toISOString()
 	<article class='min-w-full md:py-4 sm:max-w-none md:max-w-none'>
 		<header class='mb-3 flex flex-col justify-center items-center gap-6'>
 			<div class='flex flex-col gap-2'>
+				<h1 class='title text-center text-3xl md:text-5xl md:pb-2.5 font-semibold opacity-0'>
+					{title}
+				</h1>
 				<div class='flex items-center justify-center gap-x-1'>
 					<p class='text-center text-sm text-opacity-50'>
-						Published <FormattedDate date={pubDate} />
+						发布于 <FormattedDate date={pubDate} />
 					</p>
 					<p class='text-center text-sm text-opacity-50 font-bold'>
 						- {readTime}
 					</p>
 				</div>
-				<h1 class='title text-center text-4xl md:text-6xl md:pb-2.5 font-semibold opacity-0'>
-					{title}
-				</h1>
 			</div>
 
-			<div class='flex flex-wrap justify-center items-center gap-2 gap-y-4 md:gap-5'>
+			<div class='my-2 flex flex-wrap justify-center items-center gap-2 gap-y-4 md:gap-5'>
 				{tags.map((tag) => <Tag tag={tag} />)}
 			</div>
 		</header>
