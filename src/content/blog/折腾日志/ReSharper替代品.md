@@ -1,14 +1,13 @@
 ---
 title: 寻找 ReSharper 开源替代
-abbrlink: 2913837123
-excerpt: 不做被JetBrains宠坏的开发者（虽然IDEA真香）
 tags:
   - 开发环境
   - .net
   - jetbrains
-categories:
-  - 折腾日志
-date: 2023-02-14 00:00:00
+pubDate: 2023-02-14T00:00:00.000Z
+description: 不做被JetBrains宠坏的开发者（虽然IDEA真香）
+slug: 2913837123
+category: 折腾日志
 ---
 
 众所周知 JetBrains 家的IDE都十分的智能好用，Visual Studio 的代码提示和感知相比之下就略逊一筹。

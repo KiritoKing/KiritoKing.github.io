@@ -5,9 +5,8 @@ tags:
   - 性能优化
   - seo
   - react
-categories:
-  - 前端
-abbrlink: 2933489603
+slug: 2933489603
+category: 前端
 ---
 
 此前作为一个SSR一窍不通的小白，最近从目的出发研究了SSR的机制和在React中的实现。跟着这篇博客你可以理解现代SSR（同构渲染）是什么，为什么需要SSR以及SSR框架是如何实现的（非底层）。

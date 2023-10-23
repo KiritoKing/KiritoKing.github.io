@@ -3,10 +3,9 @@ title: 【译&补】使用ref回调替代useRef吧
 tags:
   - react
   - hook
-categories:
-  - 前端
-abbrlink: 1538866606
-date: 2023-09-04 01:36:00
+pubDate: 2023-09-04T01:36:00.000Z
+slug: 1538866606
+category: 前端
 ---
 
 > 原文：[_useCallback Might Be What You Meant By useRef & useEffect_](https://medium.com/welldone-software/usecallback-might-be-what-you-meant-by-useref-useeffect-773bc0278ae 'useCallback Might Be What You Meant By useRef & useEffect')

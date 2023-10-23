@@ -1,13 +1,12 @@
 ---
 title: Docker 里的 shebang 踩坑记
-excerpt: CRLF 中的 \r 会破坏 shebang，导致无法正常找到解释器，就这个小 bug 我找了一天才修好。
 tags:
   - docker
   - shell
-categories:
-  - 杂食编程
-abbrlink: 4246005333
-date: 2023-07-12 16:21:42
+pubDate: 2023-07-12T16:21:42.000Z
+description: CRLF 中的 \r 会破坏 shebang，导致无法正常找到解释器，就这个小 bug 我找了一天才修好。
+slug: 4246005333
+category: 杂食编程
 ---
 
 最近手头有一个 Node 后端项目需要用 Docker 来部署，于是火急火燎地开始学习 Docker ，但在写完 Dockerfile 后却出现了以下错误：
