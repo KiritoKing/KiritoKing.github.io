@@ -15,7 +15,7 @@ function processMarkdownFiles(dir, callback) {
 			console.error(`Front matter not found in ${file}`)
 			return
 		}
-
+		console.log(`\n[Reading front matter from ${file}]`)
 		// 从文件内容中提取 front matter 部分
 		const frontMatterString = data.substring(4, frontMatterEnd)
 		const frontMatter = yaml.load(frontMatterString)
@@ -24,7 +24,7 @@ function processMarkdownFiles(dir, callback) {
 		const modifiedFrontMatter = callback(frontMatter)
 
 		// 将修改后的 front matter 转换为 YAML 字符串
-		const modifiedFrontMatterString = `---\n${yaml.dump(modifiedFrontMatter)}---\n`
+		const modifiedFrontMatterString = yaml.dump(modifiedFrontMatter)
 
 		// 将修改后的 front matter 替换原文件中的 front matter 部分
 		const updatedContent = data.replace(frontMatterString, modifiedFrontMatterString)
@@ -38,6 +38,8 @@ function processMarkdownFiles(dir, callback) {
 const directoryPath = 'src/content/blog' // 替换为你的目录路径
 
 processMarkdownFiles(directoryPath, (frontMatter) => {
+	let modified = false
+
 	const convertMap = {
 		date: 'pubDate',
 		excerpt: 'description',
@@ -46,10 +48,38 @@ processMarkdownFiles(directoryPath, (frontMatter) => {
 	}
 	Object.entries(convertMap).forEach(([key, value]) => {
 		if (frontMatter[key]) {
+			modified = true
 			frontMatter[value] = frontMatter[key]
 			delete frontMatter[key]
 			console.log(`Convert ${key} to ${value}`)
 		}
 	})
+
+	// if (
+	// 	frontMatter['tags'] &&
+	// 	frontMatter['tags'] instanceof Array &&
+	// 	frontMatter['tags'].length > 0
+	// ) {
+	// 	// 拍平数组并去除前后的引号
+	// 	frontMatter['tags'] = JSON.stringify(frontMatter['tags']).replace(/^[']|[']$/g, '')
+	// 	modified = true
+	// 	console.log('Convert tags to string')
+	// }
+
+	if (
+		frontMatter['categories'] &&
+		frontMatter['categories'] instanceof Array &&
+		frontMatter['categories'].length > 0
+	) {
+		// 只留下第一个分类
+		frontMatter['category'] = frontMatter['categories'][0]
+		delete frontMatter['categories']
+		modified = true
+		console.log('Convert categories to string')
+	}
+
+	if (!modified) {
+		console.log('No need to convert front matter')
+	}
 	return frontMatter // 返回修改后的 front matter
 })
