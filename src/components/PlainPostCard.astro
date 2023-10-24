@@ -17,7 +17,9 @@ const {
 } = Astro.props
 ---
 
-<article class=`grid grid-rows-auto group row-auto`>
+<article
+	class=`grid grid-rows-auto group row-auto ${title.length > 15 ? 'md:col-span-2 lg:col-span-1' : ''}`
+>
 	<div
 		class='flex justify-between flex-col py-6 gap-4 px-4 shadow-md dark:shadow-none dark:border dark:border-white'
 	>
