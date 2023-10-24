@@ -1,6 +1,6 @@
 ---
 title: WebSocket 应用研究
-heroImage: '../../../assets/images/covers/web-socket.png'
+heroImage: ../../../assets/images/covers/web-socket.png
 tags:
   - websocket
 pubDate: 2023-07-09T00:00:00.000Z

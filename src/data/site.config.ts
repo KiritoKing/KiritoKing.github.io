@@ -9,7 +9,7 @@ interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
 	author: 'Chlorine Chen',
-	title: 'ChlorineC 的编程小窝',
+	title: 'ChlorineC的编程小窝',
 	description: '记录从前端到全栈的所有开发历程',
 	lang: 'zh_CN',
 	ogLocale: 'zh_CN',

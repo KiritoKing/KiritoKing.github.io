@@ -1,12 +1,12 @@
 ---
-title: 前端面试 - JS 基础部分
+title: 深入 Javascript 基础
 tags:
   - 2023春招
   - 面试
   - 前端
   - js
 pubDate: 2023-05-16T00:32:22.000Z
-slug: '3318771591'
+slug: javascript-fundamentals
 category: 面试经验
 ---
 
