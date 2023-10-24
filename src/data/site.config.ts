@@ -13,5 +13,5 @@ export const siteConfig: SiteConfig = {
 	description: '记录从前端到全栈的所有开发历程',
 	lang: 'zh_CN',
 	ogLocale: 'zh_CN',
-	shareMessage: '这个人写的博客很不错，快来看看吧！' // Message to share a post on social media
+	shareMessage: '这篇博客很不错，快来看看吧！' // Message to share a post on social media
 }
