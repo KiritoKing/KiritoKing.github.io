@@ -1,14 +1,23 @@
 ---
+import { cn } from '@/utils'
 export interface Props {
 	date: Date
+	locale?: Intl.LocalesArgument
+	faded?: boolean
 }
 
-const { date } = Astro.props
+const { date, locale = 'zh-cn', faded = false } = Astro.props
 ---
 
-<time class='text-sm font-bold text-opacity-60' datetime={date.toISOString()}>
+<time
+	class={cn(
+		'text-sm font-bold text-opacity-60',
+		faded ? 'font-normal text-gray-500 dark:text-gray-200' : ''
+	)}
+	datetime={date.toISOString()}
+>
 	{
-		date.toLocaleDateString('zh-cn', {
+		date.toLocaleDateString(locale, {
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric'

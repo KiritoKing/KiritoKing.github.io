@@ -1,6 +1,5 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import { Image } from 'astro:assets'
 import FormattedDate from '@/components/FormattedDate'
 import ArrowUp from '@/components/icons/ArrowUp'
 
@@ -21,7 +20,7 @@ const {
 	class=`grid grid-rows-auto group row-auto ${title.length > 15 ? 'md:col-span-2 lg:col-span-1' : ''}`
 >
 	<div
-		class='flex justify-between flex-col py-6 gap-4 px-4 shadow-md dark:shadow-none dark:border dark:border-white'
+		class='flex justify-between flex-col py-6 gap-4 px-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-150 ease-in-out dark:shadow-none dark:border dark:border-white'
 	>
 		<div class='flex flex-col gap-3'>
 			<div class='flex flex-col gap-2'>
@@ -41,7 +40,7 @@ const {
 		<footer class='flex items-center'>
 			<a
 				href={`/post/${slug}/`}
-				class='flex justify-center items-center dark:text-white rounded-full hover:translate-x-1 transition-transform duration-150 ease-in-out font-semibold gap-1 group'
+				class='flex justify-center items-center dark:text-white rounded-full font-semibold gap-1'
 				aria-label={`go to ${title}`}
 			>
 				阅读 ({readTime}) <span

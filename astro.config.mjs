@@ -7,6 +7,9 @@ import { remarkReadingTime } from './src/utils/readTime.ts'
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://kiritoking.github.io/', // Write here your website url
+	redirects: {
+		'/archive': '/archive/1'
+	},
 	markdown: {
 		remarkPlugins: [remarkReadingTime],
 		drafts: true,

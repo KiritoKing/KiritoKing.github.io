@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import ListPostItem from './ListPostItem.astro'
+
+type Props = {
+	posts: CollectionEntry<'blog'>[]
+}
+
+const { posts } = Astro.props
+---
+
+<div class='flex flex-col gap-y-4'>
+	{
+		posts.map(async (post, index) => {
+			const { remarkPluginFrontmatter } = await post.render()
+
+			if (index == 0 || posts[index - 1].data.pubDate.getMonth() !== post.data.pubDate.getMonth()) {
+				return (
+					<>
+						<p class='my-5 text-4xl font-bold text-gray-800 dark:text-white'>
+							<span>{post.data.pubDate.getFullYear()}年</span>
+							<span>{post.data.pubDate.getMonth() + 1}月</span>
+						</p>
+						<ListPostItem
+							data={post.data}
+							slug={post.slug}
+							readTime={remarkPluginFrontmatter.minutesRead}
+						/>
+					</>
+				)
+			}
+
+			return (
+				<ListPostItem
+					data={post.data}
+					slug={post.slug}
+					readTime={remarkPluginFrontmatter.minutesRead}
+				/>
+			)
+		})
+	}
+</div>

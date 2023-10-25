@@ -52,3 +52,24 @@
 .shadow {
 	box-shadow: -5px 3px 8px 1px rgba(0, 0, 0, 0.12);
 }
+
+.animated-link::after {
+	content: '';
+	display: block;
+	width: 0;
+	height: 2px;
+	@apply bg-black dark:bg-white;
+}
+
+.animated-link:hover::after {
+	animation: underline 0.2s forwards;
+}
+
+@keyframes underline {
+	from {
+		width: 0;
+	}
+	to {
+		width: 100%;
+	}
+}
