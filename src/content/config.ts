@@ -1,3 +1,4 @@
+import { CATEGORIES } from '@/data/categories'
 import { defineCollection, z } from 'astro:content'
 
 const blog = defineCollection({
@@ -13,7 +14,7 @@ const blog = defineCollection({
 				.transform((val) => new Date(val)),
 			heroImage: z.optional(image()),
 			category: z.string(),
-			tags: z.array(z.string()),
+			tags: z.enum(CATEGORIES),
 			draft: z.boolean().default(false)
 		})
 })

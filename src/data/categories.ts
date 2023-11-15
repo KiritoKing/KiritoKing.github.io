@@ -14,4 +14,4 @@ function getSubdirectories(dirPath: string) {
 }
 
 // List of categories for blog posts
-export const CATEGORIES = getSubdirectories(categoryPath)
+export const CATEGORIES = ['Development', 'Algorithm', 'Technology', 'Life'] as const
