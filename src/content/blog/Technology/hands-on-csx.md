@@ -1,7 +1,7 @@
 ---
 title: 初探 C# Script
 tags:
-  - c#
+  - csharp
   - .net
   - 开发环境
 pubDate: 2023-04-11T00:00:00.000Z

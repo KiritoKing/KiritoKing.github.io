@@ -2,15 +2,15 @@
 title: 关于刷题环境的看法与选择
 tags:
   - 开发环境
-  - c/c++
+  - c++
   - java
   - python
   - js
   - ts
-  - c#
+  - csharp
 pubDate: 2023-04-12T00:00:00.000Z
 description: 如何选择合适的刷题环境以及如何快速配置一个开箱即用的环境
-category: Algorithm
+category: Development
 ---
 
 今天在准备机试，拿起很久没刷的算法题 ~~（上次刷题还是大一刷洛谷）~~ ，除了考虑刷哪一套题单，要考虑的就是**使用什么语言、什么环境**来刷。

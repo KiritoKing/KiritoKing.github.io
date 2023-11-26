@@ -3,7 +3,7 @@ import path from 'path'
 
 const categoryPath = path.join(process.cwd(), 'src', 'content', 'blog')
 
-function getSubdirectories(dirPath: string) {
+function getCategoryFromDirectories(dirPath: string) {
 	// 使用 fs 模块读取目录内容
 	const entries = fs.readdirSync(dirPath, { withFileTypes: true })
 
