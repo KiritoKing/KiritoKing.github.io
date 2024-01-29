@@ -1,0 +1,28 @@
+---
+import { Content as Description } from '@/data/aboutMe.md'
+
+export interface Props {
+	name: string
+	links?: {
+		alt?: string
+		href: string
+		icon: string
+	}[]
+	image?: string
+}
+
+const { name, links, image } = Astro.props
+---
+
+<section class='flex flex-row px-2'>
+	<section>
+		<h1>{name}</h1>
+		<Description />
+	</section>
+</section>
+
+<style>
+	h1 {
+		font-size: 3rem;
+	}
+</style>

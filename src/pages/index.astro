@@ -1,22 +1,16 @@
 ---
+import Hero from '@/components/Hero'
 import ListCategories from '@/components/ListCategories'
 import ListPosts from '@/components/PostsCardView'
 import TitlePage from '@/components/TitlePage'
 import BaseLayout from '@/layouts/BaseLayout'
 import { getPosts } from '@/utils'
 
-const MAX_POSTS = 5 // max number of posts to show on the home page
 const posts = await getPosts()
 ---
 
 <BaseLayout title='主页'>
-	<TitlePage title='Top-Down Web' />
-	<ListCategories />
-
-	<div>
-		<h2 class='text-lg font-medium tracking-wide text-end'>最新博客</h2>
-		<ListPosts posts={posts} />
-	</div>
+	<Hero name='Chlorine Chen' />
 </BaseLayout>
 
 <script>
