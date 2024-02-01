@@ -1,12 +1,12 @@
 ---
 title: 全排列问题
+pubDate: 2023-04-19T00:00:00.000Z
+category: Algorithm
 tags:
   - 全排列
   - 递归
   - 动态规划
   - 字典序
-pubDate: 2023-04-19T00:00:00.000Z
-category: Algorithm
 ---
 
 **排列 (Permutation)** 是将相异对象或符号根据确定的顺序重排。每个顺序都称作一个排列。
@@ -19,8 +19,6 @@ category: Algorithm
 
 - [46. 全排列](https://leetcode.cn/problems/permutations/)
 - [剑指Offer 38. 字符串的排列](https://leetcode.cn/problems/zi-fu-chuan-de-pai-lie-lcof/)
-
-<!-- more -->
 
 ### 1. 递归DFS+剪枝解法
 

@@ -16,8 +16,8 @@
 		"astro-blog"
 	],
 	"scripts": {
-		"dev": "astro dev",
-		"start": "astro dev",
+		"dev": "tinacms dev -c \"astro dev\"",
+		"start": "pnpm dev",
 		"build": "astro build",
 		"sync": "astro sync",
 		"preview": "astro preview",
@@ -36,7 +36,8 @@
 		"astro": "3.2.3",
 		"lodash": "^4.17.21",
 		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react-dom": "^18.0.0",
+		"tinacms": "^1.5.28"
 	},
 	"devDependencies": {
 		"@astrojs/mdx": "1.1.1",
@@ -44,8 +45,10 @@
 		"@astrojs/tailwind": "5.0.1",
 		"@pagefind/default-ui": "^1.0.3",
 		"@tailwindcss/typography": "0.5.10",
+		"@tinacms/cli": "^1.5.39",
 		"@types/js-yaml": "^4.0.9",
 		"@types/lodash": "^4.14.200",
+		"@types/node": "^20.11.14",
 		"@typescript-eslint/parser": "^6.7.4",
 		"clsx": "2.0.0",
 		"dayjs": "^1.11.10",
