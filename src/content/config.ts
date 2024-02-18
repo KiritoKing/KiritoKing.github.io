@@ -1,4 +1,4 @@
-import { CATEGORIES } from '@/data/categories'
+import { CATEGORIES, COLUMNS } from '@/data/constants'
 import { defineCollection, z } from 'astro:content'
 
 const blog = defineCollection({
@@ -15,6 +15,7 @@ const blog = defineCollection({
 			heroImage: z.optional(image()),
 			category: z.enum(CATEGORIES),
 			tags: z.array(z.string()),
+			columns: z.enum(COLUMNS).optional(),
 			draft: z.boolean().default(false)
 		})
 })
