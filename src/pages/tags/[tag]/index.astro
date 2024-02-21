@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout'
-import ListPosts from '@/components/PostsCardView'
-import TitlePage from '@/components/TitlePage'
+import ListPosts from '@/components/list/PostCardList'
+import TitlePage from '@/components/Hero'
 import { getTags, getPostByTag } from '@/utils'
 
 export async function getStaticPaths() {
@@ -19,6 +19,6 @@ const posts = await getPostByTag(tag)
 ---
 
 <BaseLayout title={tag}>
-	<TitlePage title={tag} />
+	<TitlePage text={tag} />
 	<ListPosts posts={posts} />
 </BaseLayout>

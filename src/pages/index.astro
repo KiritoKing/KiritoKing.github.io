@@ -1,7 +1,7 @@
 ---
-import HoverAnimatedLink from '@/components/HoverAnimatedLink'
-import PostCardList from '@/components/PostsCardView'
-import TitlePage from '@/components/TitlePage'
+import HoverAnimatedLink from '@/components/AnimatedLink'
+import PostCardList from '@/components/list/PostCardList'
+import TitlePage from '@/components/Hero'
 import BaseLayout from '@/layouts/BaseLayout'
 import { getPosts } from '@/utils'
 
@@ -9,7 +9,7 @@ const recentPosts = (await getPosts()).slice(0, 3)
 ---
 
 <BaseLayout title='主页'>
-	<TitlePage title='Hi! ChlorineC here.' />
+	<TitlePage text='Hi! ChlorineC here.' />
 	<p class='flex items-center justify-between'>
 		<span class='text-lg font-bold'>最近更新:</span>
 		<HoverAnimatedLink

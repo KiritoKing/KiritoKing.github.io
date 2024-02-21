@@ -1,10 +1,9 @@
 ---
-import HeaderLink from '@/components/HeaderLink'
 import TwitterIcon from '@/components/icons/TwitterIcon'
 import GithubIcon from '@/components/icons/GithubIcon'
-import MenuIcon from './icons/MenuIcon.astro'
+import MenuIcon from '../icons/MenuIcon.astro'
 import Search from '@/components/Search'
-import ToggleTheme from './ToggleTheme.astro'
+import ToggleTheme from '../ThemeToggle.astro'
 
 // ADD YOUR SOCIAL NETWORKS HERE
 const SOCIALNETWORKS = [
@@ -52,9 +51,13 @@ const NAV_LINKS = [
 			>
 				{
 					NAV_LINKS.map(({ label, href }) => (
-						<HeaderLink href={href} class='flex items-center gap-1 text-2xl md:text-base'>
+						<a
+							aria-label={`go to ${label}`}
+							href={href}
+							class='flex items-center gap-1 text-2xl md:text-base'
+						>
 							<span>{label}</span>
-						</HeaderLink>
+						</a>
 					))
 				}
 			</div>
@@ -62,9 +65,9 @@ const NAV_LINKS = [
 			<div class='flex justify-center items-center md:justify-end gap-3 md:p-0'>
 				{
 					SOCIALNETWORKS.map((network) => (
-						<HeaderLink class='' href={network.url} target='_blank' aria-label={network.name}>
-							<span>{<network.icon />} </span>
-						</HeaderLink>
+						<a class='' href={network.url} target='_blank' aria-label={network.name}>
+							<span>{<network.icon />}</span>
+						</a>
 					))
 				}
 			</div>

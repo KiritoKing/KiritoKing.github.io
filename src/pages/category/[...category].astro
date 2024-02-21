@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout'
-import ListPosts from '@/components/PostsListView'
-import ListCategories from '@/components/ListCategories'
-import TitlePage from '@/components/TitlePage'
+import ListPosts from '@/components/list/PostList'
+import ListCategories from '@/components/partials/CategoryList'
+import TitlePage from '@/components/Hero'
 import { sluglify, unsluglify, getCategories, filterPostsByCategory } from '@/utils'
 
 const { category } = Astro.params
@@ -21,7 +21,7 @@ const filterPosts = await filterPostsByCategory(unsluglifyNameCategory)
 ---
 
 <BaseLayout title={category}>
-	<TitlePage title={unsluglifyNameCategory} />
+	<TitlePage text={unsluglifyNameCategory} />
 	<ListCategories activeCategory={category} />
 	<ListPosts posts={filterPosts} />
 </BaseLayout>

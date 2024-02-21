@@ -1,8 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import CoveredPostCard from '@/components/CoveredPostCard'
+import CoveredPostCard from '@/components/list/CoveredPostCardItem'
 import { cn } from '@/utils'
-import PlainPostCard from './PlainPostCard.astro'
+import PlainPostCard from './PostCardItem.astro'
 
 type Props = {
 	posts: CollectionEntry<'blog'>[]

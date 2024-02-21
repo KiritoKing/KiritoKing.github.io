@@ -1,9 +1,9 @@
 ---
 import { type CollectionEntry } from 'astro:content'
 import BlogPost from '@/layouts/BlogPost'
-import ListRelatedPosts from '@/components/ListRelatedPosts'
-import Share from '@/components/Share'
-import TableOfContents from '@/components/TableOfContents'
+import ListRelatedPosts from '@/components/list/RelatedPostList'
+import Share from '@/components/post/Share'
+import TableOfContents from '@/components/post/TableOfContents'
 import { getPosts, getRelatedPosts } from '@/utils'
 
 type Props = CollectionEntry<'blog'>

@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout'
-import TitlePage from '@/components/TitlePage'
+import TitlePage from '@/components/Hero'
 import { getTags } from '@/utils'
 const tags = await getTags()
 ---
 
 <BaseLayout title='Tags'>
-	<TitlePage title='Tags' />
+	<TitlePage text='Tags' />
 	<div class='flex justify-center flex-wrap gap-4'>
 		{
 			tags.map((tag) => (
