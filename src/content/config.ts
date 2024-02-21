@@ -1,4 +1,5 @@
 import { CATEGORIES, COLUMNS } from '@/data/constants'
+import { getImage } from 'astro:assets'
 import { defineCollection, z } from 'astro:content'
 
 const blog = defineCollection({
@@ -12,7 +13,7 @@ const blog = defineCollection({
 				.string()
 				.or(z.date())
 				.transform((val) => new Date(val)),
-			heroImage: z.optional(image()),
+			cover: z.optional(image()),
 			category: z.enum(CATEGORIES),
 			tags: z.array(z.string()),
 			columns: z.enum(COLUMNS).optional(),

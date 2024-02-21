@@ -5,13 +5,42 @@ import TitlePage from '@/components/Hero'
 import BaseLayout from '@/layouts/BaseLayout'
 import { getPosts } from '@/utils'
 
-const recentPosts = (await getPosts()).slice(0, 3)
+const posts = await getPosts()
+
+// 以下代码是为了使推荐文章对齐
+let recentPosts = posts.slice(0, 3)
+switch (recentPosts.filter((post) => post.data.cover).length) {
+	case 1:
+		recentPosts.push(
+			...posts
+				.slice(3)
+				.filter((post) => !post.data.cover)
+				.slice(0, 2)
+		)
+		break
+	case 2:
+		recentPosts.push(
+			...posts
+				.slice(3)
+				.filter((post) => !post.data.cover)
+				.slice(0, 1)
+		)
+		break
+	case 0:
+	case 3:
+	default:
+		break
+}
 ---
 
 <BaseLayout title='主页'>
 	<TitlePage text='Hi! ChlorineC here.' />
-	<p class='flex items-center justify-between'>
-		<span class='text-lg font-bold'>最近更新:</span>
+	<p>
+		<span class='text-2xl font-bold'>最近更新</span>
+		<span class='ml-2 text-sm text-gray-600'>Latest Posts</span>
+	</p>
+	<PostCardList posts={recentPosts} />
+	<div>
 		<HoverAnimatedLink
 			class='ml-4 text-gray-500'
 			href='/category/development'
@@ -19,6 +48,5 @@ const recentPosts = (await getPosts()).slice(0, 3)
 		>
 			查看更多
 		</HoverAnimatedLink>
-	</p>
-	<PostCardList posts={recentPosts} />
+	</div>
 </BaseLayout>

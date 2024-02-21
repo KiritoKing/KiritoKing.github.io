@@ -22,7 +22,7 @@ const { posts, FirstBig = false } = Astro.props
 		posts.map(async (post) => {
 			const { remarkPluginFrontmatter } = await post.render()
 
-			return post.data.heroImage ? (
+			return post.data.cover ? (
 				<CoveredPostCard
 					data={post.data}
 					slug={post.slug}

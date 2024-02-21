@@ -22,7 +22,7 @@ const relatedPosts = await getRelatedPosts(post)
 const { Content, headings, remarkPluginFrontmatter } = await post.render()
 ---
 
-<BlogPost data={post.data} headings={headings} readTime={remarkPluginFrontmatter.minutesRead}>
+<BlogPost data={post.data} readTime={remarkPluginFrontmatter.minutesRead}>
 	<div class='grid grid-cols-1 lg:grid-cols-[20%_auto] lg:gap-20 mt-8'>
 		<!-- aside  -->
 		<aside class='lg:flex flex-col gap-8 hidden'>
