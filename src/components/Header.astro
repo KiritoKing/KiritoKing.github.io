@@ -4,8 +4,6 @@ import TwitterIcon from '@/components/icons/TwitterIcon'
 import GithubIcon from '@/components/icons/GithubIcon'
 import MenuIcon from './icons/MenuIcon.astro'
 import Search from '@/components/Search'
-import TagIcon from './icons/TagIcon.astro'
-import ArchiveIcon from './icons/Archive.astro'
 import ToggleTheme from './ToggleTheme.astro'
 
 // ADD YOUR SOCIAL NETWORKS HERE
@@ -20,6 +18,21 @@ const SOCIALNETWORKS = [
 		name: 'Twitter',
 		url: 'https://github.com/danielcgilibert/blog-template',
 		icon: TwitterIcon
+	}
+]
+
+const NAV_LINKS = [
+	{
+		label: 'Archive',
+		href: '/archive'
+	},
+	{
+		label: 'Tags',
+		href: '/tags'
+	},
+	{
+		label: 'Categories',
+		href: '/category/development'
 	}
 ]
 ---
@@ -37,15 +50,13 @@ const SOCIALNETWORKS = [
 			<div
 				class='flex flex-col gap-4 md:flex-row md:border-r-2 border-black pr-4 dark:border-white'
 			>
-				<HeaderLink href='/archive/1' class='flex items-center gap-1 text-2xl md:text-base'>
-					<span>Archive</span>
-				</HeaderLink>
-				<HeaderLink href='/tags' class='flex items-center gap-1 text-2xl md:text-base'>
-					<span class='w-8'>
-						<TagIcon width={18} height={18} />
-					</span>
-					<span>Tags</span>
-				</HeaderLink>
+				{
+					NAV_LINKS.map(({ label, href }) => (
+						<HeaderLink href={href} class='flex items-center gap-1 text-2xl md:text-base'>
+							<span>{label}</span>
+						</HeaderLink>
+					))
+				}
 			</div>
 
 			<div class='flex justify-center items-center md:justify-end gap-3 md:p-0'>

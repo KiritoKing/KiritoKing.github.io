@@ -1,0 +1,26 @@
+---
+import { cn } from '@/utils'
+import ArrowUp from '@/components/icons/ArrowUp'
+
+type Props = {
+	href?: string
+	class?: string
+	ariaLabel?: string
+}
+
+const { href, class: className, ariaLabel } = Astro.props
+---
+
+<a
+	href={href}
+	aria-label={ariaLabel}
+	class={cn(
+		'flex items-center dark:text-white rounded-full hover:translate-x-1 transition-transform duration-150 ease-in-out font-semibold gap-1 group',
+		className
+	)}
+>
+	<slot />
+	<span class='mt-[1px] group-hover:rotate-45 transition-transform duration-250 ease-in-out'>
+		<ArrowUp width='18' height='18' />
+	</span>
+</a>

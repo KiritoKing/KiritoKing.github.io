@@ -2,23 +2,18 @@
 import { cn, sluglify } from '@/utils'
 
 type Props = {
-	name?: string
+	name: string
 	activeCategory?: string
 }
 
-const DEFAULT_NAME = 'Archive'
-
-const { name = DEFAULT_NAME, activeCategory } = Astro.props
-const currentPath = Astro.url.pathname
+const { name, activeCategory } = Astro.props
 const unsluglifyNameCategory = sluglify(name.toLowerCase())
 
-const isActive =
-	activeCategory?.toLocaleLowerCase() === unsluglifyNameCategory ||
-	(currentPath === '/' && name === DEFAULT_NAME)
+const isActive = activeCategory?.toLocaleLowerCase() === unsluglifyNameCategory
 ---
 
 <a
-	href={name === DEFAULT_NAME ? '/' : sluglify(`/category/${unsluglifyNameCategory}`)}
+	href={sluglify(`/category/${unsluglifyNameCategory}`)}
 	class={cn(
 		`text-gray-600 dark:text-gray-300  pb-2.5 first-letter:uppercase font-medium hover:text-gray-800 border-b-2 border-opacity-0 dark:border-opacity-0 border-black dark:border-white dark:hover:border-white hover:border-opacity-100 transition-colors duration-150 ease-linear  `,
 		isActive &&

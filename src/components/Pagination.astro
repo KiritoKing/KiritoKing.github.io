@@ -1,10 +1,39 @@
 ---
+import { cn } from '@/utils'
+import ArrowLeft from './icons/ArrowLeft.astro'
+import ArrowRight from './icons/ArrowRight.astro'
+
 type Props = {
 	currentPage: number
-	totalPages: number
+	total: number
+	basePath: string
 }
 
-const { currentPage, totalPages } = Astro.props
+const { currentPage, total, basePath } = Astro.props
 ---
 
-<div></div>
+<div class='flex flex-row justify-between font-bold'>
+	<a
+		href={`${basePath}/${currentPage - 1}`}
+		class={cn(
+			'flex flex-row items-center gap-2 hover:translate-x-1 transition-transform ease-in-out',
+			currentPage === 1 && 'invisible'
+		)}
+	>
+		<ArrowLeft />
+		<span>上一页</span>
+	</a>
+	<div class='text-gray-600 dark:text-white mt-auto'>
+		{currentPage}/{total}
+	</div>
+	<a
+		href={`${basePath}/${currentPage + 1}`}
+		class={cn(
+			'flex flex-row items-center gap-2 hover:-translate-x-1 transition-transform ease-in-out',
+			currentPage === total && 'invisible'
+		)}
+	>
+		<span>下一页</span>
+		<ArrowRight />
+	</a>
+</div>

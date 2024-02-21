@@ -1,4 +1,4 @@
-import { getCollection } from 'astro:content'
+import { getCollection, type CollectionEntry } from 'astro:content'
 
 export const getCategories = async () => {
 	const posts = await getCollection('blog')
@@ -22,6 +22,14 @@ export const getTags = async () => {
 export const getPostByTag = async (tag: string) => {
 	const posts = await getPosts()
 	return posts.filter((post) => post.data.tags.includes(tag))
+}
+
+export const getRelatedPosts = async (post: CollectionEntry<'blog'>, postNum = 3) => {
+	const posts = await getPosts()
+	const relatedPosts = posts.filter(
+		(p) => p.slug !== post.slug && p.data.tags.some((t) => post.data.tags.includes(t))
+	)
+	return relatedPosts.slice(0, postNum)
 }
 
 export const filterPostsByCategory = async (category: string) => {

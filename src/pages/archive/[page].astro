@@ -1,12 +1,9 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro'
-import { cn, getPosts } from '@/utils'
+import { getPosts } from '@/utils'
 import PostListView from '@/components/PostsListView'
 import BaseLayout from '@/layouts/BaseLayout'
-import TitlePage from '@/components/TitlePage'
-import ListCategories from '@/components/ListCategories'
-import ArrowLeft from '../../components/icons/ArrowLeft.astro'
-import ArrowRight from '../../components/icons/ArrowRight.astro'
+import Pagination from '@/components/Pagination'
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const posts = await getPosts()
@@ -21,33 +18,9 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>
 const { page } = Astro.props
 ---
 
-<BaseLayout title={`Page ${page.currentPage}`}>
-	<PostListView posts={page.data} />
-	<div class='flex flex-row justify-between font-bold'>
-		<a
-			href={`/archive/${page.currentPage - 1}`}
-			class={cn(
-				'flex flex-row items-center gap-2 hover:translate-x-1 transition-transform ease-in-out',
-				page.currentPage === 1 && 'invisible'
-			)}
-		>
-			<ArrowLeft />
-			<span>上一页</span>
-		</a>
-		<div class='text-gray-600 dark:text-white mt-auto'>
-			{page.currentPage}/{page.lastPage}
-		</div>
-		<a
-			href={`/archive/${page.currentPage + 1}`}
-			class={cn(
-				'flex flex-row items-center gap-2 hover:-translate-x-1 transition-transform ease-in-out',
-				page.currentPage === page.lastPage && 'invisible'
-			)}
-		>
-			<span>下一页</span>
-			<ArrowRight />
-		</a>
-	</div>
+<BaseLayout title='所有博客'>
+	<PostListView posts={page.data} groupByMonth />
+	<Pagination basePath='/archive' currentPage={page.currentPage} total={page.lastPage} />
 </BaseLayout>
 
 <!-- 显示当前页面。也可以使用 Astro.params.page！-->

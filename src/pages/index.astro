@@ -1,32 +1,24 @@
 ---
-import Hero from '@/components/Hero'
-import ListCategories from '@/components/ListCategories'
-import ListPosts from '@/components/PostsCardView'
+import HoverAnimatedLink from '@/components/HoverAnimatedLink'
+import PostCardList from '@/components/PostsCardView'
 import TitlePage from '@/components/TitlePage'
 import BaseLayout from '@/layouts/BaseLayout'
 import { getPosts } from '@/utils'
 
-const posts = await getPosts()
+const recentPosts = (await getPosts()).slice(0, 3)
 ---
 
 <BaseLayout title='主页'>
-	<Hero name='Chlorine Chen' />
+	<TitlePage title='Hi! ChlorineC here.' />
+	<p class='flex items-center justify-between'>
+		<span class='text-lg font-bold'>最近更新:</span>
+		<HoverAnimatedLink
+			class='ml-4 text-gray-500'
+			href='/category/development'
+			ariaLabel='view more posts'
+		>
+			查看更多
+		</HoverAnimatedLink>
+	</p>
+	<PostCardList posts={recentPosts} />
 </BaseLayout>
-
-<script>
-	import { animate } from 'motion'
-	const showAnimations = localStorage.getItem('animations') === 'true'
-
-	if (showAnimations) {
-		animate(
-			'.title',
-			{ y: [80, 0], opacity: [0, 1] },
-			{
-				duration: 2.5,
-				opacity: { duration: 3 },
-
-				offset: [0, 0.55, 0.75]
-			}
-		)
-	}
-</script>
