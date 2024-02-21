@@ -31,7 +31,7 @@ function processMarkdownFile(filePath) {
 						frontMatter.category = 'Development'
 						break
 					case '刷题笔记':
-						frontMatter.category = 'Algorithm'
+						frontMatter.category = 'Research'
 						break
 					case '折腾日志':
 						frontMatter.category = 'Technology'

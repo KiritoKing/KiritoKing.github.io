@@ -4,6 +4,7 @@ import ListPosts from '@/components/list/PostList'
 import ListCategories from '@/components/partials/CategoryList'
 import TitlePage from '@/components/PageTitle'
 import { sluglify, unsluglify, getCategories, filterPostsByCategory } from '@/utils'
+import { CATEGORY_MAP } from '@/data/constants'
 
 const { category } = Astro.params
 
@@ -17,11 +18,12 @@ export async function getStaticPaths() {
 }
 
 const unsluglifyNameCategory = unsluglify(category!.toLowerCase())
+const mappedName = CATEGORY_MAP[category]
 const filterPosts = await filterPostsByCategory(unsluglifyNameCategory)
 ---
 
-<BaseLayout title={category}>
-	<TitlePage text={unsluglifyNameCategory} />
+<BaseLayout title={mappedName}>
+	<TitlePage text={mappedName} />
 	<ListCategories activeCategory={category} />
 	<ListPosts posts={filterPosts} />
 </BaseLayout>

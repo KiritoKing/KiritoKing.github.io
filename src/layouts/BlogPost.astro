@@ -100,10 +100,7 @@ const articleDate = pubDate.toISOString()
 </script>
 
 <script>
-	function handleIntersection(
-		entries: IntersectionObserverEntry[],
-		observer: IntersectionObserver
-	) {
+	function handleIntersection(entries: IntersectionObserverEntry[], _: IntersectionObserver) {
 		entries.forEach((entry) => {
 			const index = document.querySelector(`aside a[href="#${entry.target.id}"]`)
 
