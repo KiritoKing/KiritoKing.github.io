@@ -7,10 +7,6 @@
 		transition: background-color 0.5s ease;
 	}
 
-	.prose code {
-		@apply text-base;
-	}
-
 	@font-face {
 		font-family: Manrope;
 		src: url(../assets/fonts/Manrope-SemiBold.woff2) format('woff2');
@@ -31,18 +27,30 @@
 		src: url(../assets/fonts/Manrope-Regular.woff2) format('woff2');
 	}
 
-	/* prose styles here */
-	.prose h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		@apply text-zinc-800 dark:text-zinc-100   !important;
+	/* prose styles here (CSS nested enabled) */
+	.prose {
+		code {
+			@apply text-base;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			@apply text-zinc-800 dark:text-zinc-100   !important;
+
+			/* 消除Heading中Code样式的字号与行高 */
+			> code {
+				font-size: inherit !important;
+				line-height: inherit !important;
+			}
+		}
 	}
 }
 
-.glass {
+.glassy {
 	background: rgba(57, 56, 56, 0.52);
 	backdrop-filter: blur(13px) saturate(150%);
 	-webkit-backdrop-filter: blur(13px) saturate(150%);
