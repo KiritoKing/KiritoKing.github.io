@@ -450,62 +450,60 @@ pnpm add react-router-dom localforage match-sorter sort-by
 
 和SPA一样，我们先修改React组件部分结构，制作一个简单的多页面应用：
 
-```react
+```jsx
 // Greeting.js
 const Greeting = () => {
-  return (
-    <div>
-      <p>Hello!</p>
-      <Link to="/counter">To Counter</Link>
-    </div>
-  );
-};
+	return (
+		<div>
+			<p>Hello!</p>
+			<Link to='/counter'>To Counter</Link>
+		</div>
+	)
+}
 
 // Counter.js
 // 将原App.js迁移过来
 
 // Routes.js
-import React from "react";
-import { Route } from "react-router-dom";
-import Greeting from "./Greeting";
-import Counter from "./Counter";
-import { Routes } from "react-router-dom";
+import React from 'react'
+import { Route } from 'react-router-dom'
+import Greeting from './Greeting'
+import Counter from './Counter'
+import { Routes } from 'react-router-dom'
 
 const AppRouter = () => (
-  <Routes>
-    <Route path="/" element={<Greeting />}></Route>
-    <Route path="/counter" element={<Counter />}></Route>
-  </Routes>
-);
+	<Routes>
+		<Route path='/' element={<Greeting />}></Route>
+		<Route path='/counter' element={<Counter />}></Route>
+	</Routes>
+)
 
-export { AppRouter };
+export { AppRouter }
 
 // App.js
 const App = () => {
-  return (
-    <BrowserRouter>
-      <AppRouter />
-    </BrowserRouter>
-  );
-};
-
+	return (
+		<BrowserRouter>
+			<AppRouter />
+		</BrowserRouter>
+	)
+}
 ```
 
 注意这里我们单独声明了一个Routes组件，因为除了客户端（`<App />`）外服务端也会用到它。
 
 接下来修改服务端，我们修改`content`的内容为`<StaticRouter>`，这是服务端专用的Router，其中`location`参数用于根据URL寻找并加载组件：
 
-```react
+```jsx
 // server/index.js
-import { StaticRouter } from "react-router-dom/server";
+import { StaticRouter } from 'react-router-dom/server'
 
 // ...其他代码已省略，详见仓库
 const content = renderToString(
-  <StaticRouter location={req.path}>
-    <AppRouter />
-  </StaticRouter>
-);
-
+	<StaticRouter location={req.path}>
+		<AppRouter />
+	</StaticRouter>
+)
 ```
 
 由于我们为服务端响应添加了log打印，我们可以发现**服务端只渲染了第一次请求的页面（首屏渲染），后续都加载都是在客户端完成的**，这符合我们的预期。_（页面路由跳转后台并没有新的日志产生）_
@@ -565,42 +563,40 @@ export const store = configureStore({
 
 接下来我们为组件添加`<Provider>`，在**服务端和客户端都要添加**（仅展示改动代码，完整请见仓库）：
 
-```react
+```jsx
 // server/index.js
 // ...
 const content = renderToString(
-  <Provider store={store}>
-    <StaticRouter location={req.path}>
-      <AppRouter />
-    </StaticRouter>
-  </Provider>
-);
+	<Provider store={store}>
+		<StaticRouter location={req.path}>
+			<AppRouter />
+		</StaticRouter>
+	</Provider>
+)
 
 // components/App.js
 const App = () => {
-  return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <AppRouter />
-      </BrowserRouter>
-    </Provider>
-  );
-};
+	return (
+		<Provider store={store}>
+			<BrowserRouter>
+				<AppRouter />
+			</BrowserRouter>
+		</Provider>
+	)
+}
 
 // components/Counter.js
 const Counter = () => {
-  const count = useSelector((state) => state.counter.value);
-  const dispatch = useDispatch();
-  return (
-    <div>
-      <div>You click {count} times</div>
-      <button onClick={() => dispatch(increment())}>Click Me!</button>
-      <Link to="/">Back</Link>
-    </div>
-  );
-};
-
-
+	const count = useSelector((state) => state.counter.value)
+	const dispatch = useDispatch()
+	return (
+		<div>
+			<div>You click {count} times</div>
+			<button onClick={() => dispatch(increment())}>Click Me!</button>
+			<Link to='/'>Back</Link>
+		</div>
+	)
+}
 ```
 
 最终运行效果如下：
@@ -678,73 +674,71 @@ export default contactsSlice.reducer
 
 接着我们创建一个页面用于显示获取到的数据，**注意在Routes中也要添加这个页面**：
 
-```react
+```jsx
 // components/Contacts.js
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserList } from "../store/slices/contacts";
-import { Link } from "react-router-dom";
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getUserList } from '../store/slices/contacts'
+import { Link } from 'react-router-dom'
 
 const ContactItem = (props) => {
-  const { avatar, first_name, last_name, email, id } = props;
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: "5px",
-      }}
-    >
-      <img
-        src={avatar}
-        alt="avatar"
-        style={{
-          width: "30px",
-          height: "30px",
-          borderRadius: "50%",
-          marginRight: "5px",
-        }}
-      />
-      <div>
-        <div>Name: {`${first_name} ${last_name}`}</div>
-        <div>Email: {email}</div>
-        <div>ID: {id}</div>
-      </div>
-    </div>
-  );
-};
+	const { avatar, first_name, last_name, email, id } = props
+	return (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'row',
+				alignItems: 'center',
+				marginBottom: '5px'
+			}}
+		>
+			<img
+				src={avatar}
+				alt='avatar'
+				style={{
+					width: '30px',
+					height: '30px',
+					borderRadius: '50%',
+					marginRight: '5px'
+				}}
+			/>
+			<div>
+				<div>Name: {`${first_name} ${last_name}`}</div>
+				<div>Email: {email}</div>
+				<div>ID: {id}</div>
+			</div>
+		</div>
+	)
+}
 
 const Contacts = () => {
-  const users = useSelector((state) => state.contacts.userList);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const init = async () => {
-      const res = await dispatch(getUserList()).unwrap();
-      console.log(res);
-    };
-    init();
-  }, []);
+	const users = useSelector((state) => state.contacts.userList)
+	const dispatch = useDispatch()
+	useEffect(() => {
+		const init = async () => {
+			const res = await dispatch(getUserList()).unwrap()
+			console.log(res)
+		}
+		init()
+	}, [])
 
-  return (
-    <div>
-      <div>
-        <Link to="/">Back</Link>
-      </div>
-      <ul>
-        {users.map((user) => (
-          <li>
-            <ContactItem {...user} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+	return (
+		<div>
+			<div>
+				<Link to='/'>Back</Link>
+			</div>
+			<ul>
+				{users.map((user) => (
+					<li>
+						<ContactItem {...user} />
+					</li>
+				))}
+			</ul>
+		</div>
+	)
+}
 
-export default Contacts;
-
-
+export default Contacts
 ```
 
 运行应用，我们可以看到这样的页面，可以看到thunk请求正常处理了。
@@ -807,7 +801,7 @@ const routes = [
 
 然后我们再分别对客户端和服务端的路由做适配，让它们兼容Data API。这里需要注意的是服务端，根据react-router的要求，我们需要先将express请求转换成fetch请求。
 
-```react
+```jsx
 // components/App.js - 客户端路由修改
 const router = createBrowserRouter(routes);
 
@@ -916,37 +910,35 @@ export default function createFetchRequest(req) {
 
 在服务端完成注入后，我们要在客户端添加对应的初始化代码。
 
-```react
+```jsx
 // client/store.js: 创建专用于客户端的store
-import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "../store/slices/counter";
-import contactsReducer from "../store/slices/contacts";
+import { configureStore } from '@reduxjs/toolkit'
+import counterReducer from '../store/slices/counter'
+import contactsReducer from '../store/slices/contacts'
 
 export const clientStore = configureStore({
-  reducer: {
-    counter: counterReducer,
-    contacts: contactsReducer,
-  },
-  preloadedState: window.INITIAL_STATE, // 必须独立声明的原因是Node环境没有window
-  devTools: true,
-});
-
+	reducer: {
+		counter: counterReducer,
+		contacts: contactsReducer
+	},
+	preloadedState: window.INITIAL_STATE, // 必须独立声明的原因是Node环境没有window
+	devTools: true
+})
 
 // client/index.js
-import React from "react";
-import App from "../components/App";
-import { hydrateRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import { clientStore } from "./store";
+import React from 'react'
+import App from '../components/App'
+import { hydrateRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { clientStore } from './store'
 
 // 这里将Provider提到了index.js是因为App是服务端也会调用的通用组件，调用window就会报错
 hydrateRoot(
-  document.getElementById("root"),
-  <Provider store={clientStore}>
-    <App />
-  </Provider>
-);
-
+	document.getElementById('root'),
+	<Provider store={clientStore}>
+		<App />
+	</Provider>
+)
 ```
 
 现在就应该能正常运行应用了，如果遇到任何问题欢迎来仓库提Issue。

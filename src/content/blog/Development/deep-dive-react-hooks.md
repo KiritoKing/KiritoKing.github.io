@@ -54,7 +54,7 @@ view = render(props, @reactive states)
 
 下面是我从知乎抄的一段代码（因为我没怎么用过类组件嘿嘿）
 
-```react
+```jsx
 // withUserStatus.jsx
 const withUserStatus = (DecoratedComponent) => {
   class WrapperComponent extends React.Component {
@@ -143,62 +143,60 @@ React Hooks有两条家喻户晓的规则：
 
 为了理解hooks，我们先实现一个自己的`useState`和`useEffect`：
 
-```react
+```jsx
 // useState.js
-var _state; // 把 state 存储在外面
+var _state // 把 state 存储在外面
 
 function useState(initialValue) {
-  _state = _state || initialValue; // 如果没有 _state，说明是第一次执行，把 initialValue 复制给它
-  function setState(newState) {
-    _state = newState;
-    render();
-  }
-  return [_state, setState];
+	_state = _state || initialValue // 如果没有 _state，说明是第一次执行，把 initialValue 复制给它
+	function setState(newState) {
+		_state = newState
+		render()
+	}
+	return [_state, setState]
 }
 
 // useEffect.js
-let _deps; // _deps 记录 useEffect 上一次的 依赖
+let _deps // _deps 记录 useEffect 上一次的 依赖
 
 function useEffect(callback, depArray) {
-  const hasNoDeps = !depArray; // 如果 dependencies 不存在
-  const hasChangedDeps = _deps
-    ? !depArray.every((el, i) => el === _deps[i]) // 两次的 dependencies 是否完全相等
-    : true;
-  /* 如果 dependencies 不存在，或者 dependencies 有变化*/
-  if (hasNoDeps || hasChangedDeps) {
-    callback();
-    _deps = depArray;
-  }
+	const hasNoDeps = !depArray // 如果 dependencies 不存在
+	const hasChangedDeps = _deps
+		? !depArray.every((el, i) => el === _deps[i]) // 两次的 dependencies 是否完全相等
+		: true
+	/* 如果 dependencies 不存在，或者 dependencies 有变化*/
+	if (hasNoDeps || hasChangedDeps) {
+		callback()
+		_deps = depArray
+	}
 }
 ```
 
 可以看到，我们使用闭包（词法作用域）实现了简单的`useState`和`useEffect`的逻辑，但他们还有一个显著的弱点：**只能调用一次，在不同的地方调用他们都会使用同一个全局变量。**那么react是如何解决这个问题的呢？答案很简单：**通过有序表（数组/链表）**——我们把全局变量变成一个数组，这样不就可以存储更多的值了吗？
 
-```react
-let memoizedState = []; // hooks 存放在这个数组
-let cursor = 0; // 当前 memoizedState 下标
+```jsx
+let memoizedState = [] // hooks 存放在这个数组
+let cursor = 0 // 当前 memoizedState 下标
 
 function useState(initialValue) {
-  memoizedState[cursor] = memoizedState[cursor] || initialValue;
-  const currentCursor = cursor;
-  function setState(newState) {
-    memoizedState[currentCursor] = newState;
-    render();
-  }
-  return [memoizedState[cursor++], setState]; // 返回当前 state，并把 cursor 加 1
+	memoizedState[cursor] = memoizedState[cursor] || initialValue
+	const currentCursor = cursor
+	function setState(newState) {
+		memoizedState[currentCursor] = newState
+		render()
+	}
+	return [memoizedState[cursor++], setState] // 返回当前 state，并把 cursor 加 1
 }
 
 function useEffect(callback, depArray) {
-  const hasNoDeps = !depArray;
-  const deps = memoizedState[cursor];
-  const hasChangedDeps = deps
-    ? !depArray.every((el, i) => el === deps[i])
-    : true;
-  if (hasNoDeps || hasChangedDeps) {
-    callback();
-    memoizedState[cursor] = depArray;
-  }
-  cursor++;
+	const hasNoDeps = !depArray
+	const deps = memoizedState[cursor]
+	const hasChangedDeps = deps ? !depArray.every((el, i) => el === deps[i]) : true
+	if (hasNoDeps || hasChangedDeps) {
+		callback()
+		memoizedState[cursor] = depArray
+	}
+	cursor++
 }
 ```
 

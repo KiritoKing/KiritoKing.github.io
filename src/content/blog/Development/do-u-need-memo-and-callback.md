@@ -42,7 +42,7 @@ pubDate: '2023-08-24 00:00:00'
 
 熟悉Vue的同学肯定立刻想到了`computed`计算属性，但不尽然如此（至少在传统选项式API中）。在React中的函数组件和JSX语法里，其实可以直接定义一个用于计算逻辑的函数，它可以作为闭包可以直接获取状态，并在每次re-render的过程中都会重新定义和运行，并不需要做特殊的“响应式优化“，如下面的代码所示：
 
-```react jsx
+```jsx
 function MemoDemo(props) {
   // ... some states definition
   const calcProduct = () => {
@@ -104,7 +104,7 @@ const memorized = useMemo(expensiveCalculation, [deps])
 - 使用`memo`声明可缓存组件，并用`useMemo`缓存传入的`props`
 - 直接使用`useMemo`来缓存组件，并把变量（ReactNode）直接传入JSX
 
-```react jsx
+```jsx
 function ComplexComponent(props) => {...}
 
 // 法1:使用memo缓存组件，useMemo缓存props
@@ -240,13 +240,13 @@ function useCallback(fn, dependencies) {
 
 下面这个简单的例子可以解释`useCallback`的工作效果：
 
-```react jsx
+```jsx
 function Demo() {
-  const [state, setState] = useState(0);
-  const log = () => {
-    console.log(state);
-  };
-  return <button onClick={() => () => setState((prev) => prev++)}>{state}</button>
+	const [state, setState] = useState(0)
+	const log = () => {
+		console.log(state)
+	}
+	return <button onClick={() => () => setState((prev) => prev++)}>{state}</button>
 }
 ```
 
@@ -254,13 +254,13 @@ function Demo() {
 
 而下面这个例子引入了`useCallback`，运行后我们可以清楚地看出区别：
 
-```react jsx
+```jsx
 function Demo() {
-  const [state, setState] = useState(0);
-  const cachedLog = useCallback(() => {
-    console.log(state);
-  }, []);
-  return <button onClick={() => () => setState((prev) => prev++)}>{state}</button>
+	const [state, setState] = useState(0)
+	const cachedLog = useCallback(() => {
+		console.log(state)
+	}, [])
+	return <button onClick={() => () => setState((prev) => prev++)}>{state}</button>
 }
 ```
 
@@ -288,7 +288,7 @@ function Demo() {
 
 很多时候我们在`useEffect`中调用的函数实际上不需要放在顶层作用域中，放在`useEffect`函数体内部作为闭包是更好的做法，这避免了`useCallback`的额外开销。（用于判断函数是否更新）
 
-```react jsx
+```jsx
 function Demo() {
   const cachedInit = useCallback(() => {
     ...
@@ -315,18 +315,18 @@ function Demo() {
 
 因此我们可以使用`useContext` + `useReducer`，用`dispatch`来代替`useCallback` 回调函数来执行操作，也可以绕过缓存来避免刷新。
 
-```react jsx
-const TodosDispatch = React.createContext(null);
+```jsx
+const TodosDispatch = React.createContext(null)
 
 function TodosApp() {
-  // Note: `dispatch` won't change between re-renders
-  const [todos, dispatch] = useReducer(todosReducer);
+	// Note: `dispatch` won't change between re-renders
+	const [todos, dispatch] = useReducer(todosReducer)
 
-  return (
-    <TodosDispatch.Provider value={dispatch}>
-      <DeepTree todos={todos} />
-    </TodosDispatch.Provider>
-  );
+	return (
+		<TodosDispatch.Provider value={dispatch}>
+			<DeepTree todos={todos} />
+		</TodosDispatch.Provider>
+	)
 }
 ```
 
