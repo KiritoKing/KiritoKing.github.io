@@ -28,7 +28,7 @@ const { Content, headings, remarkPluginFrontmatter } = await post.render()
 		<aside class='lg:flex flex-col gap-8 hidden'>
 			<Share />
 			<div class='sticky top-24 self-start hidden lg:block transition-all duration-200'>
-				{headings && headings.length > 0 && <TableOfContents {headings} />}
+				{headings && headings.length > 0 && <TableOfContents headings={headings} />}
 			</div>
 		</aside>
 

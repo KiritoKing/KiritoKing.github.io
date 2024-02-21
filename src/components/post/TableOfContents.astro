@@ -1,5 +1,5 @@
 ---
-import { cn } from '@/utils'
+import TOCItem from './TOCItem.astro'
 
 const { headings } = Astro.props
 
@@ -13,6 +13,7 @@ type TableOfContent = {
 const toc = buildToc(headings)
 function buildToc(headings: TableOfContent[]) {
 	let toc: TableOfContent[] = []
+	if (!headings || headings.length === 0) return toc
 	let parentHeadings = new Map()
 	headings.forEach((h) => {
 		let heading = { ...h, subheadings: [] }
@@ -31,26 +32,6 @@ function buildToc(headings: TableOfContent[]) {
 <nav class='max-w-xs dark:text-black'>
 	<h1 class='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
 	<ul class='[text-wrap:balance] flex flex-col gap-1'>
-		{
-			toc.map((heading) => (
-				<li class='flex flex-col'>
-					<a
-						href={'#' + heading.slug}
-						class={cn(
-							`bg-slate-200 dark:bg-slate-800 dark:hover:bg-indigo-400 hover:bg-indigo-300 hover:text-white  py-1 px-4 dark:text-white rounded-full mb-2 first-letter:uppercase w-fit line-clamp-2`
-						)}
-					>
-						{heading.text}
-					</a>
-					{heading.subheadings.length > 0 && (
-						<ul class='ml-3'>
-							{heading.subheadings.map((subheading) => (
-								<Astro.self heading={subheading} />
-							))}
-						</ul>
-					)}
-				</li>
-			))
-		}
+		{toc.map((heading) => <TOCItem heading={heading} />)}
 	</ul>
 </nav>

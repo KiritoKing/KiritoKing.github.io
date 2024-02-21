@@ -9,8 +9,8 @@
 			"@/layouts/*": ["src/layouts/*.astro"],
 			"@/utils": ["src/utils/index.ts"],
 			"@/data/*": ["src/data/*"],
-			"@/site-config": ["src/data/site.config.ts"],
-			"@/styles": ["src/styles/"]
+			"@/styles/*": ["src/styles/*"],
+			"@/site-config": ["src/data/site.config.ts"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
