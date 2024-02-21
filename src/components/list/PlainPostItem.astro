@@ -11,7 +11,7 @@ type Props = {
 }
 
 const {
-	data: { title, description, pubDate, category },
+	data: { title, pubDate, category },
 	readTime,
 	slug
 } = Astro.props
@@ -20,6 +20,7 @@ const {
 <article class='flex flex-row justify-between px-6'>
 	<div class='flex flex-col gap-y-2'>
 		<a
+			data-astro-prefetch
 			class='text-xl font-semibold tracking-wide text-ellipsis animated-link'
 			href={`/post/${slug}/`}
 		>

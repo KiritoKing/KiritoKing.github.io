@@ -12,6 +12,7 @@ const { activeCategory } = Astro.props
 			const isActive = activeCategory?.toLocaleLowerCase() === unsluglifyNameCategory
 			return (
 				<a
+					data-astro-prefetch='load'
 					href={sluglify(`/category/${unsluglifyNameCategory}`)}
 					class={cn(
 						`text-gray-600 dark:text-gray-300  pb-2.5 first-letter:uppercase font-medium hover:text-gray-800 border-b-2 border-opacity-0 dark:border-opacity-0 border-black dark:border-white dark:hover:border-white hover:border-opacity-100 transition-colors duration-150 ease-linear  `,

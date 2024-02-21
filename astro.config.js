@@ -9,6 +9,9 @@ import react from '@astrojs/react'
 export default defineConfig({
 	// Write here your website url
 	site: 'https://kiritoking.github.io/',
+	prefetch: {
+		prefetchAll: true
+	},
 	redirects: {
 		'/archive': '/archive/1',
 		'/category': `/category/development`

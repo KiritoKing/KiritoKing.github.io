@@ -1,6 +1,8 @@
 {
 	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
+		"noEmit": true,
+		"allowJs": true,
 		"strictNullChecks": true,
 		"baseUrl": ".",
 		"verbatimModuleSyntax": true,
