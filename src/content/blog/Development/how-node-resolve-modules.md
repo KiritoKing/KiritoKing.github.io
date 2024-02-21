@@ -1,5 +1,6 @@
 ---
 title: 再谈模块化：Node中ESM与CJS的解析策略
+cover: ./how-node-resolve-modules-cover.png
 tags:
   - commonjs
   - esm
