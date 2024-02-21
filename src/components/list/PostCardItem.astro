@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content'
 import FormattedDate from '@/components/FormattedDate'
 import ArrowUp from '@/components/icons/ArrowUp'
+import AnimatedCard from '../AnimatedCard.astro'
 
 type Props = {
 	data: CollectionEntry<'blog'>['data']
@@ -20,11 +21,11 @@ const {
 	class=`grid grid-rows-auto group row-auto ${title.length > 15 ? 'md:col-span-2 lg:col-span-1' : ''}`
 >
 	<div
-		class='flex justify-between flex-col py-6 gap-4 px-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-150 ease-in-out dark:shadow-none dark:border dark:border-white'
+		class='flex justify-between flex-col py-6 gap-4 px-4 shadow-md rounded-lg hover:shadow-lg hover:-translate-y-1 transition-transform duration-150 ease-in-out dark:shadow-none dark:border dark:border-gray-500'
 	>
 		<div class='flex flex-col gap-3'>
 			<div class='flex flex-col gap-2'>
-				<a class='text-2xl font-semibold tracking-wide' href={`/post/${slug}/`}>
+				<a class='text-xl font-semibold tracking-wide' href={`/post/${slug}/`}>
 					{title}
 				</a>
 				<div class='flex items-center justify-between gap-x-1'>
