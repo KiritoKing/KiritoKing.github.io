@@ -1,11 +1,9 @@
 {
-	"name": "astro-blog",
-	"type": "module",
-	"version": "1.0.0",
-	"private": true,
-	"description": "A comprehensive blog system using Astro",
-	"author": "KiritoKing <https://github.com/KiritoKing>",
 	"license": "GPL-3.0-only",
+	"private": true,
+	"type": "module",
+	"description": "A personal website template including profolios, blog system and projects.",
+	"author": "KiritoKing <https://github.com/KiritoKing>",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/KiritoKing/KiritoKing.github.io"
@@ -13,7 +11,8 @@
 	"keywords": [
 		"astro",
 		"astrojs",
-		"astro-blog"
+		"astro-blog",
+		"personal-website"
 	],
 	"scripts": {
 		"dev:tina": "tinacms dev -c \"astro dev\"",
@@ -30,20 +29,20 @@
 		"prepare": "husky install"
 	},
 	"dependencies": {
-		"@astrojs/react": "^3.0.6",
-		"@astrojs/rss": "3.0.0",
+		"@astrojs/react": "^3.0.10",
+		"@astrojs/rss": "4.0.5",
 		"@types/react": "^18.0.21",
 		"@types/react-dom": "^18.0.6",
-		"astro": "3.2.3",
+		"astro": "4.4.2",
 		"lodash": "^4.17.21",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
 		"tinacms": "^1.5.28"
 	},
 	"devDependencies": {
-		"@astrojs/mdx": "1.1.1",
-		"@astrojs/sitemap": "3.0.1",
-		"@astrojs/tailwind": "5.0.1",
+		"@astrojs/mdx": "2.1.1",
+		"@astrojs/sitemap": "3.1.1",
+		"@astrojs/tailwind": "5.1.0",
 		"@pagefind/default-ui": "^1.0.3",
 		"@tailwindcss/typography": "0.5.10",
 		"@tinacms/cli": "^1.5.39",
