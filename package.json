@@ -1,9 +1,9 @@
 {
+	"type": "module",
 	"license": "GPL-3.0-only",
 	"private": true,
 	"description": "A personal website template including profolios, blog system and projects.",
 	"author": "KiritoKing <https://github.com/KiritoKing>",
-	"license": "GPL-3.0-only",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/KiritoKing/KiritoKing.github.io"
@@ -30,12 +30,12 @@
 	"dependencies": {
 		"@astrojs/react": "^3.0.6",
 		"@astrojs/rss": "3.0.0",
-		"@types/react": "^18.0.21",
-		"@types/react-dom": "^18.0.6",
+		"@types/react": "^18.2.38",
+		"@types/react-dom": "^18.2.17",
 		"astro": "3.2.3",
 		"lodash": "^4.17.21",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
 		"tinacms": "^1.5.28"
 	},
 	"devDependencies": {
