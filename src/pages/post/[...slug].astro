@@ -2,8 +2,7 @@
 import { type CollectionEntry } from 'astro:content'
 import BlogPost from '@/layouts/BlogPost'
 import ListRelatedPosts from '@/components/list/RelatedPostList'
-import Share from '@/components/post/Share'
-import TableOfContents from '@/components/post/TableOfContents'
+import TableOfContents from '../../components/post/TOC'
 import { getPosts, getRelatedPosts } from '@/utils'
 
 type Props = CollectionEntry<'blog'>
@@ -28,7 +27,7 @@ const { Content, headings, remarkPluginFrontmatter } = await post.render()
 		<aside class='lg:flex flex-col gap-8 hidden'>
 			<!-- <Share /> -->
 			<div class='sticky top-24 self-start hidden lg:block transition-all duration-200'>
-				{headings && headings.length > 0 && <TableOfContents headings={headings} />}
+				{headings && headings.length > 0 && <TableOfContents client:load headings={headings} />}
 			</div>
 		</aside>
 

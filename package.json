@@ -1,9 +1,7 @@
 {
-	"name": "astro-blog",
-	"type": "module",
-	"version": "1.0.0",
+	"license": "GPL-3.0-only",
 	"private": true,
-	"description": "A comprehensive blog system using Astro",
+	"description": "A personal website template including profolios, blog system and projects.",
 	"author": "KiritoKing <https://github.com/KiritoKing>",
 	"license": "GPL-3.0-only",
 	"repository": {

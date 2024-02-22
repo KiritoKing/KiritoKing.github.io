@@ -30,7 +30,12 @@ function buildToc(headings: TableOfContent[]) {
 ---
 
 <nav class='max-w-xs'>
-	<h1 class='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
+	<div class='flex'>
+		<h1 class='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
+		<div>
+			<button type='button' id='scroll-top-btn'></button>
+		</div>
+	</div>
 	<ul
 		id='toc'
 		class='[text-wrap:balance] flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-16rem)]'
@@ -38,3 +43,12 @@ function buildToc(headings: TableOfContent[]) {
 		{toc.map((heading) => <TOCItem heading={heading} />)}
 	</ul>
 </nav>
+
+<script>
+	function scrollToTop() {
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	}
+	function scrollToBottom() {
+		window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+	}
+</script>

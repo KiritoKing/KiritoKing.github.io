@@ -1,15 +1,18 @@
-import { cn } from '@/utils'
 import React, { useMemo } from 'react'
+import { cn } from '@/utils'
+import UpIcon from '../icons/Up'
+import DownIcon from '../icons/Down'
+import IconButton from '../IconButton'
 
 interface TableOfContent {
 	depth: number
 	text: string
 	slug: string
-	subheadings: TableOfContent[]
+	subheadings?: TableOfContent[]
 }
 
 interface IProps {
-	headings: TableOfContent[]
+	headings?: TableOfContent[]
 }
 
 const TOCItem = ({ heading }: { heading: TableOfContent }) => {
@@ -23,7 +26,7 @@ const TOCItem = ({ heading }: { heading: TableOfContent }) => {
 			>
 				{heading.text}
 			</a>
-			{heading.subheadings.length > 0 && (
+			{heading.subheadings && heading.subheadings.length > 0 && (
 				<ul className='ml-3'>
 					{heading.subheadings.map((subheading) => (
 						<TOCItem heading={subheading} />
@@ -34,7 +37,7 @@ const TOCItem = ({ heading }: { heading: TableOfContent }) => {
 	)
 }
 
-const TableOfContents: React.FC<IProps> = ({ headings }) => {
+const TableOfContents: React.FC<IProps> = ({ headings } = {}) => {
 	const toc = useMemo(() => {
 		let toc: TableOfContent[] = []
 		if (!headings || headings.length === 0) return toc
@@ -54,8 +57,21 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 
 	return (
 		<nav className='max-w-xs dark:text-black'>
-			<h1 className='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
-			<ul className='[text-wrap:balance] flex flex-col gap-1'>
+			<div className='flex w-full justify-between'>
+				<h1 className='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
+				<div className='flex gap-2'>
+					<IconButton
+						hideTextByDefault
+						icon={<UpIcon width='1.5rem' height='1.5rem' />}
+						text='回到顶部'
+					/>
+					<button type='button'></button>
+					<button type='button'>
+						<DownIcon width='1.5rem' height='1.5rem' />
+					</button>
+				</div>
+			</div>
+			<ul id='toc' className='[text-wrap:balance] flex flex-col gap-1'>
 				{toc.map((heading) => (
 					<TOCItem heading={heading} />
 				))}
