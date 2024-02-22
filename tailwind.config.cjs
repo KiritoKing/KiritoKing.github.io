@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 module.exports = {
 	darkMode: 'class',
-	content: ['./src/**/*.{astro,html,js,md,mdx,ts}'],
+	content: ['./src/**/*.{astro,html,js,md,mdx,ts,tsx,jsx}'],
 	theme: {
 		extend: {
 			colors: {

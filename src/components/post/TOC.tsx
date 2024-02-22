@@ -52,7 +52,6 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 					<IconButton
 						animated
 						aria-label='go to top'
-						className=' rounded-[25%] shadow-lg'
 						textClass='text-sm text-gray-500'
 						icon={<UpIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
 						onClick={handleGoTop}
@@ -61,7 +60,6 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 					<IconButton
 						animated
 						aria-label='go to bottom'
-						className=' rounded-[25%] shadow-lg'
 						textClass='text-sm text-gray-500'
 						icon={<DownIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
 						onClick={handleGoBottom}
@@ -77,7 +75,7 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 				className='[text-wrap:balance] flex flex-col gap-1 scroll-smooth overflow-y-auto max-h-[calc(100vh-16rem)]'
 			>
 				{toc.map((heading) => (
-					<TOCItem heading={heading} parent={tocElement} />
+					<TOCItem key={heading.slug} heading={heading} parent={tocElement} />
 				))}
 			</ul>
 		</nav>

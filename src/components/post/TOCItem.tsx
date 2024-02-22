@@ -61,7 +61,7 @@ export const TOCItem = ({ heading, parent }: IProps) => {
 			{heading.subheadings && heading.subheadings.length > 0 && (
 				<ul className='ml-3'>
 					{heading.subheadings.map((subheading) => (
-						<TOCItem heading={subheading} parent={parent} />
+						<TOCItem key={subheading.slug} heading={subheading} parent={parent} />
 					))}
 				</ul>
 			)}

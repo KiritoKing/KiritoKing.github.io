@@ -19,17 +19,13 @@ const IconButton: React.FC<IProp> = ({
 	return (
 		<button
 			type='button'
-			className={cn(
-				'flex flex-col items-center justify-center group',
-				{
-					'transition duration-300 transform-gpu hover:-translate-y-1': animated
-				},
-				className
-			)}
+			className={cn('flex flex-col items-center justify-center group', className)}
 			{...buttonProps}
 		>
-			<span>{icon}</span>
-			<span className={cn(textClass, 'transition duration-300 group-hover:opacity-100')}>
+			<span className='transition duration-300 group-hover:-translate-y-1'>{icon}</span>
+			<span
+				className={cn(textClass, { 'transition duration-300 hidden group-hover:block': animated })}
+			>
 				{text}
 			</span>
 		</button>
