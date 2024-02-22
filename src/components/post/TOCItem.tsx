@@ -7,6 +7,9 @@ interface IProps {
 	parent?: HTMLElement
 }
 
+// 在全局声明, 所有目录组件共用一个滚动锁 (禁止点击时滚动目录)
+let isClickingIndex = false
+
 export const TOCItem = ({ heading, parent }: IProps) => {
 	const [isInView, setIsInView] = useState(false)
 	const el = useRef<HTMLAnchorElement>(null)
@@ -33,14 +36,19 @@ export const TOCItem = ({ heading, parent }: IProps) => {
 	}, [])
 
 	useEffect(() => {
-		if (!parent || !el.current) return
+		if (isClickingIndex || !parent || !el.current) return
 		// 当目录表中的高亮元素不在ViewPort时自动滚动
 		const isAnchorInView =
 			el.current.offsetTop > parent.scrollTop &&
 			el.current.offsetTop < parent.scrollTop + parent.clientHeight
 
 		if (isInView && !isAnchorInView) {
-			parent.scrollTop = el.current.offsetTop - el.current.offsetHeight
+			const targetParentScrollTop = el.current.offsetTop - parent.offsetHeight / 2
+			// 防止溢出
+			if (targetParentScrollTop <= 0) parent.scrollTop = 0
+			else if (targetParentScrollTop >= parent.scrollHeight)
+				parent.scrollTop = parent.scrollHeight - parent.clientHeight
+			else parent.scrollTop = targetParentScrollTop
 		}
 	}, [isInView])
 
@@ -48,6 +56,12 @@ export const TOCItem = ({ heading, parent }: IProps) => {
 		<li className='flex flex-col'>
 			<a
 				ref={el}
+				onClick={() => {
+					isClickingIndex = true
+					setTimeout(() => {
+						isClickingIndex = false
+					}, 500)
+				}}
 				href={`#${heading.slug}`}
 				className={cn(
 					`transition-colors duration-200 dark:hover:bg-indigo-400 hover:bg-indigo-300 hover:text-white  py-1 px-4 dark:text-white rounded-full mb-2 first-letter:uppercase w-fit line-clamp-2`,
