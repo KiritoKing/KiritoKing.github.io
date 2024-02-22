@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react'
-import { cn } from '@/utils'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import UpIcon from '../icons/Up'
 import DownIcon from '../icons/Down'
 import IconButton from '../IconButton'
+import TOCItem from './TOCItem'
 
-interface TableOfContent {
+export interface TableOfContent {
 	depth: number
 	text: string
 	slug: string
@@ -15,29 +15,9 @@ interface IProps {
 	headings?: TableOfContent[]
 }
 
-const TOCItem = ({ heading }: { heading: TableOfContent }) => {
-	return (
-		<li className='flex flex-col'>
-			<a
-				href={'#' + heading.slug}
-				className={cn(
-					`bg-slate-200 dark:bg-slate-800 dark:hover:bg-indigo-400 hover:bg-indigo-300 hover:text-white  py-1 px-4 dark:text-white rounded-full mb-2 first-letter:uppercase w-fit line-clamp-2`
-				)}
-			>
-				{heading.text}
-			</a>
-			{heading.subheadings && heading.subheadings.length > 0 && (
-				<ul className='ml-3'>
-					{heading.subheadings.map((subheading) => (
-						<TOCItem heading={subheading} />
-					))}
-				</ul>
-			)}
-		</li>
-	)
-}
+const TableOfContents: React.FC<IProps> = ({ headings }) => {
+	const [tocElement, setTocElement] = useState<HTMLElement>()
 
-const TableOfContents: React.FC<IProps> = ({ headings } = {}) => {
 	const toc = useMemo(() => {
 		let toc: TableOfContent[] = []
 		if (!headings || headings.length === 0) return toc
@@ -55,25 +35,47 @@ const TableOfContents: React.FC<IProps> = ({ headings } = {}) => {
 		return toc
 	}, [headings])
 
+	const handleGoTop = () => {
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	}
+
+	const handleGoBottom = () => {
+		window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+	}
+
 	return (
-		<nav className='max-w-xs dark:text-black'>
+		<nav className='max-w-sm dark:text-black'>
+			{/* 操作按钮 */}
 			<div className='flex w-full justify-between'>
 				<h1 className='font-bold mb-3 text-2xl dark:text-white'>文章目录</h1>
 				<div className='flex gap-2'>
 					<IconButton
-						hideTextByDefault
-						icon={<UpIcon width='1.5rem' height='1.5rem' />}
-						text='回到顶部'
+						animated
+						className=' rounded-[25%] shadow-lg'
+						textClass='text-sm text-gray-500'
+						icon={<UpIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
+						onClick={handleGoTop}
 					/>
 					<button type='button'></button>
-					<button type='button'>
-						<DownIcon width='1.5rem' height='1.5rem' />
-					</button>
+					<IconButton
+						animated
+						className=' rounded-[25%] shadow-lg'
+						textClass='text-sm text-gray-500'
+						icon={<DownIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
+						onClick={handleGoBottom}
+					/>
 				</div>
 			</div>
-			<ul id='toc' className='[text-wrap:balance] flex flex-col gap-1'>
+			{/* 目录 */}
+			<ul
+				ref={(el) => {
+					if (el) setTocElement(el)
+				}}
+				id='toc'
+				className='[text-wrap:balance] flex flex-col gap-1 scroll-smooth overflow-y-auto max-h-[calc(100vh-16rem)]'
+			>
 				{toc.map((heading) => (
-					<TOCItem heading={heading} />
+					<TOCItem heading={heading} parent={tocElement} />
 				))}
 			</ul>
 		</nav>

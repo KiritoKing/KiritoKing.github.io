@@ -81,3 +81,17 @@
 		width: 100%;
 	}
 }
+
+#toc {
+	&::-webkit-scrollbar {
+		@apply w-1;
+	}
+
+	&::-webkit-scrollbar-track {
+		@apply bg-[#e2e2e2] dark:bg-[#313131] rounded-[10px];
+	}
+
+	&::-webkit-scrollbar-thumb {
+		@apply bg-[#9a9a9a] rounded-[10px];
+	}
+}
