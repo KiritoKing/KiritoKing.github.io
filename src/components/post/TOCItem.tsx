@@ -13,7 +13,7 @@ export const TOCItem = ({ heading, parent }: IProps) => {
 
 	useEffect(() => {
 		// 这里是观察对应的标题是否进入ViewPort,因此需要获取对应Element
-		const anchor = document.querySelector(`#${heading.slug}`)
+		const anchor = document.getElementById(heading.slug)
 		if (!anchor) return
 
 		const observer = new IntersectionObserver(

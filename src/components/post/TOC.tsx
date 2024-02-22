@@ -51,6 +51,7 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 				<div className='flex gap-2'>
 					<IconButton
 						animated
+						aria-label='go to top'
 						className=' rounded-[25%] shadow-lg'
 						textClass='text-sm text-gray-500'
 						icon={<UpIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
@@ -59,6 +60,7 @@ const TableOfContents: React.FC<IProps> = ({ headings }) => {
 					<button type='button'></button>
 					<IconButton
 						animated
+						aria-label='go to bottom'
 						className=' rounded-[25%] shadow-lg'
 						textClass='text-sm text-gray-500'
 						icon={<DownIcon width='1.5rem' height='1.5rem' className='dark:text-white' />}
