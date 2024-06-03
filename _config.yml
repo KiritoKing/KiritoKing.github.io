@@ -123,7 +123,16 @@ feed:
   template:
 
 # easy-tag-correct
-easy_tags_plugin:
-  enable: true
-  tag_name_case: 1
-  sort_ignore_case: true
+# easy_tags_plugin:
+#   enable: true
+#   tag_name_case: 1
+#   sort_ignore_case: true
+
+# auto generate readme
+# readmeConfig:
+#   postsHeader: '## My posts' # headers, support markdown
+#   sort: 'desc' # posts display sort: 'desc' or 'acs'. The default option is 'desc'
+#   groupType: 'month' # 'month' or 'year' or 'none'. The default option is 'month'
+
+# minifier
+all_minifier: true

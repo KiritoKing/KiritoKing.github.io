@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "hexo": "^7.0.0",
-    "hexo-easy-tags-plugin": "^1.1.0",
+    "hexo-all-minifier": "^0.5.7",
+    "hexo-enhancer": "^1.0.10",
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-category": "^2.0.0",
     "hexo-generator-feed": "^3.0.0",
@@ -24,8 +25,10 @@
     "hexo-renderer-marked": "^6.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-theme-landscape": "^1.0.0",
     "hexo-theme-redefine": "^2.6.1"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.2.2",
+  "devDependencies": {
+    "hexo-generator-alias": "^1.0.0"
+  }
 }
