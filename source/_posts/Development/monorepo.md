@@ -2,7 +2,9 @@
 title: MonoRepo 前端项目实操
 category: Development
 date: '2023/05/26 10:55:16'
-alias: post/Development/monorepo/index.html
+alias:
+  - post/Development/monorepo/index.html
+  - post/development/monorepo/index.html
 ---
 
 **monorepo** (monolithic repository) 是一种**项目架构**（而不是软件架构或设计模式），是一种项目管理手段，简单的来说：**一个仓库内包含系统的多个开发项目（模块，包）**，把所有相关的 package 都放在一个仓库里进行管理，**每个 package 独立发布**。

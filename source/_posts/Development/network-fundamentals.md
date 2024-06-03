@@ -3,7 +3,9 @@ title: 前端面试 - 网络基础部分
 category: Development
 date: '2023/05/18 08:54:48'
 excerpt: 一些计算机网络基础知识，主要集中于传输层和应用层协议知识，包括HTTP（2.0）、HTTPS和TCP等内容
-alias: post/Development/network-fundamentals/index.html
+alias:
+  - post/Development/network-fundamentals/index.html
+  - post/development/network-fundamentals/index.html
 ---
 
 ## 常见考点

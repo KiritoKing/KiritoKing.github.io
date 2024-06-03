@@ -4,7 +4,9 @@ category: Development
 date: '2023/08/06 08:09:00'
 excerpt: >-
   本文讨论了移动端Web开发中的抓包工具的使用。与普通的响应式页面相比，移动端页面的运行环境受到系统和App的影响，需要单独适配。在真机环境下进行测试时，无法控制内置浏览器的URL，因此可以通过抓包工具进行调试。抓包工具拦截和转发网络请求包，可以实现在真机环境中访问开发页面的目的。常见的抓包工具包括whistle、Fiddler和Charles。本文还介绍了抓包工具的代理功能和反向代理的原理。在手机端安装Bifrost后，可以通过扫码连接电脑端，随后可以收到手机端的请求包信息。手机端还可以设置应用白名单，避免全局代理产生问题。
-alias: post/Development/mobile-web-dev/index.html
+alias:
+  - post/Development/mobile-web-dev/index.html
+  - post/development/mobile-web-dev/index.html
 ---
 
 之前一直做的是PC端的Web页面开发，很少触及移动端页面，最多也就是做一做响应式的适配，完全没有涉及过mobile-first页面的开发。站在初次涉及这个领域的立场上，我认为与普通的响应式页面相比主要的区别点有两点：

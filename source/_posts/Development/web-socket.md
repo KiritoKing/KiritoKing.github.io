@@ -7,7 +7,9 @@ excerpt: >-
   WebSocket 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输，客户端和服务器之间的数据交换变得更加简单。
 thumbnail: >-
   https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-electron202405200440826.png
-alias: post/Development/web-socket/index.html
+alias:
+  - post/Development/web-socket/index.html
+  - post/development/web-socket/index.html
 ---
 
 ## 了解WebSocket协议

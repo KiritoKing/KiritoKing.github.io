@@ -7,7 +7,9 @@ excerpt: >-
   23H2还提供了Dev
   Drive，这是一个基于ReFS的新存储卷，具有性能提升和数据可靠性。在基准测试中，发现ReFS在开发命令下性能更好，平均领先幅度为5秒左右，但NTFS的性能也相当不错。总的来说，Dev
   Home和Dev Drive对于Windows开发者来说是有一定帮助的。
-alias: post/Technology/win-dev-drive-hands-on/index.html
+alias:
+  - post/Technology/win-dev-drive-hands-on/index.html
+  - post/technology/win-dev-drive-hands-on/index.html
 ---
 
 随着Windows 11 23H2发布的除了大名鼎鼎的Copilot，还有Windows Dev Home。比起感觉噱头大于实用性的Coplilot，个人更关注Dev Home对Windows开发有什么改进之处。

@@ -2,7 +2,9 @@
 title: peerDependencies 版本冲突解决
 category: Development
 date: '2023/05/25 02:09:44'
-alias: post/Development/npm-peer-dependency/index.html
+alias:
+  - post/Development/npm-peer-dependency/index.html
+  - post/development/npm-peer-dependency/index.html
 ---
 
 在为公司一个老项目配置Prettier和ESLint、StyleLint兼容性设置后，我再次使用 npm install 生成 package-lock.json 时遇到了下面这个错误。

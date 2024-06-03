@@ -2,7 +2,9 @@
 title: 深入理解 React Hooks
 category: Development
 date: '2023/06/02 01:39:11'
-alias: post/Development/deep-dive-react-hooks/index.html
+alias:
+  - post/Development/deep-dive-react-hooks/index.html
+  - post/development/deep-dive-react-hooks/index.html
 ---
 
 2019年2月，React 16.8更新了一大波重磅内容，其中就包括函数式组件（function component）和Hooks，这一象征着React未来方向的技术。没想到已经四年多过去了，我仍对Hooks的理解处于一个皮毛状态，今天我就来深入研究一下React Hooks，探索Hook机制在前端声明式渲染框架中的具体应用。

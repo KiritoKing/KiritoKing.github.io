@@ -6,7 +6,7 @@
 title: ChlorineC's Blog
 subtitle: 'ChlorineC的编程小窝'
 description: 'ChlorineC随便写写东西的地方'
-keywords: ['blog', 'programming', 'dev', 'web', 'frontend', 'react', 'nodejs', 'fullstack']
+keywords: blog, programming, dev, web, frontend
 author: ChlorineC
 language: zh-CN
 timezone: 'Asia/Shanghai'
@@ -136,3 +136,7 @@ feed:
 
 # minifier
 all_minifier: true
+
+# hexo-enhancer
+# predefined tags
+tags: nodejs, react, vue, typescript, javascript, css, html, npm, webpack, electron, dotnet

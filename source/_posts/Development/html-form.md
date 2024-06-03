@@ -2,7 +2,9 @@
 title: HTML 表单（form）相关知识
 category: Development
 date: '2023/06/01 06:04:46'
-alias: post/Development/html-form/index.html
+alias:
+  - post/Development/html-form/index.html
+  - post/development/html-form/index.html
 ---
 
 自己也做了一段时间前端了，最近做项目的时候才发现自己对**表单（form）元素**一无所知，当年写登录框都是两个`<input>`直接拼在一起的（笑）。今天就专门来学习一下表单相关的知识。
