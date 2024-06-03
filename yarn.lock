@@ -1671,10 +1671,10 @@ hexo-server@^3.0.0:
     picocolors "^1.0.0"
     serve-static "^1.14.1"
 
-hexo-theme-redefine@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/hexo-theme-redefine/-/hexo-theme-redefine-2.6.1.tgz#9944314775a203a89303d83e00ab022fa44f12d6"
-  integrity sha512-Ebn3/6dr0j9Tt9MmI2jD7EOyMQuxY0wc67S9JyGp/W2pTTC363NxTUKgHU8RHXWXhYGDG/bbYFttK/Actpnnaw==
+hexo-theme-redefine@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/hexo-theme-redefine/-/hexo-theme-redefine-2.6.2.tgz#3d86b371a6cca10823c92ddf06e2751d6a296003"
+  integrity sha512-6DwfYNHzEAfQ/MICneiy2zc+Bj3NKzAt+NfUjStKaJUm1xm0MpyNNQWUXxkflkDIeP8xL+ckrFDj/8xdQrKdNA==
   dependencies:
     postcss "^8.4.28"
 
