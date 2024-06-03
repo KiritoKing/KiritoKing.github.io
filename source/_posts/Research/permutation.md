@@ -1,7 +1,8 @@
 ---
 title: 全排列问题
 category: Research
-date: 2023/04/19 08:00:00
+date: '2023/04/19 08:00:00'
+alias: post/Research/permutation/index.html
 ---
 
 **排列 (Permutation)** 是将相异对象或符号根据确定的顺序重排。每个顺序都称作一个排列。

@@ -1,8 +1,11 @@
 ---
 title: 深入JS - 1.浏览器事件循环
 category: Development
-date: 2023/04/26 08:00:00
-excerpt: 由于 JavaScript 是单线程的，且 JavaScript 主线程和渲染线程互斥，如果异步操作阻塞 JavaScript 的执行，会造成浏览器假死。而事件循环为浏览器引入了任务队列（Callback Queue），使得异步任务可以非阻塞地进行。
+date: '2023/04/26 08:00:00'
+excerpt: >-
+  由于 JavaScript 是单线程的，且 JavaScript 主线程和渲染线程互斥，如果异步操作阻塞 JavaScript
+  的执行，会造成浏览器假死。而事件循环为浏览器引入了任务队列（Callback Queue），使得异步任务可以非阻塞地进行。
+alias: post/Development/js-event-loop/index.html
 ---
 
 之前在腾讯文档前端面试的时候，考官问我经典八股之一的浏览器事件循环，编程题也是与之相关的。我直接被问瓜了，深感自己在JS基础这方面的知识薄弱，虽然以后可能不做前端了，但还是来恶补一下这方面的知识为好。

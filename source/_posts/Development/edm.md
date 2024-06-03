@@ -1,7 +1,8 @@
 ---
 title: 利用Table布局实现EDM设计
 category: Development
-date: 2023/03/20 08:00:00
+date: '2023/03/20 08:00:00'
+alias: post/Development/edm/index.html
 ---
 
 在实习的时候被安排了EDM编写，个人也是第一次接触这个领域。本来以为就是简单的HTML编写，后来发现EDM-HTML有它独特的地方，如邮件客户端奇特的渲染引擎限制，和普通HTML5网页不同的布局设计等。这里记录我在编写EDM时的一些想法。

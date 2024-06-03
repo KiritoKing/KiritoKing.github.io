@@ -1,8 +1,11 @@
 ---
 title: 抛弃React和Vue，让前端工程返璞归真
 category: Development
-date: 2024/03/31 05:24:16
-excerpt: 本文探讨了前端开发的简化方法，对比了前后端分离与全栈开发的优劣，并介绍了alpine.js、htmx等轻量级工具和Web Components技术，旨在返璞归真，减少前端工程的复杂性。
+date: '2024/03/31 05:24:16'
+excerpt: >-
+  本文探讨了前端开发的简化方法，对比了前后端分离与全栈开发的优劣，并介绍了alpine.js、htmx等轻量级工具和Web
+  Components技术，旨在返璞归真，减少前端工程的复杂性。
+alias: post/Development/front-end-without-toolchain/index.html
 ---
 
 这个标题多少有些标题党了，毕竟我作为前端在想做快速原型的时候肯定会优先考虑Next，但这两天写外包项目的途中，我突然激发了一些思考：

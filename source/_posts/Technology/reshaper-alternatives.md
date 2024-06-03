@@ -1,8 +1,9 @@
 ---
 title: 寻找 ReSharper 开源替代
 category: Technology
-date: 2023/02/14 08:00:00
+date: '2023/02/14 08:00:00'
 excerpt: 不做被JetBrains宠坏的开发者（虽然IDEA真香）
+alias: post/Technology/reshaper-alternatives/index.html
 ---
 
 众所周知 JetBrains 家的IDE都十分的智能好用，Visual Studio 的代码提示和感知相比之下就略逊一筹。

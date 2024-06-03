@@ -1,7 +1,8 @@
 ---
 title: 初探 Docker - 原理和实践
 category: Development
-date: 2023/07/12 04:27:00
+date: '2023/07/12 04:27:00'
+alias: post/Development/hands-on-docker/index.html
 ---
 
 Docker是一种Go语言编写的容器化隔离的实现，帮助我们快速地将应用打包成**容器**进行发布和部署，也可以方便地运行他人编写的应用。

@@ -1,9 +1,12 @@
 ---
 title: 再谈模块化：Node中ESM与CJS的解析策略
 category: Development
-date: 2024/02/19 01:07:06
-excerpt: 文章探讨Node.js中ESM与CJS模块解析，分析ts-node兼容性问题，提供配置tsconfig.json和package.json以避免模块解析错误的方法。
-thumbnail: https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-electron202405200443171.png
+date: '2024/02/19 01:07:06'
+excerpt: >-
+  文章探讨Node.js中ESM与CJS模块解析，分析ts-node兼容性问题，提供配置tsconfig.json和package.json以避免模块解析错误的方法。
+thumbnail: >-
+  https://picgo-1308055782.cos.ap-chengdu.myqcloud.com/picgo-electron202405200443171.png
+alias: post/Development/how-node-resolve-modules/index.html
 ---
 
 ## 前情提要：从ts-node报错发现了大坑

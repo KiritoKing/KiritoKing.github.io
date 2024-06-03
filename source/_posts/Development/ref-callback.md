@@ -1,7 +1,8 @@
 ---
 title: 【译&补】使用ref回调替代useRef吧
 category: Development
-date: 2023/09/04 09:36:00
+date: '2023/09/04 09:36:00'
+alias: post/Development/ref-callback/index.html
 ---
 
 > 原文：[_useCallback Might Be What You Meant By useRef & useEffect_](https://medium.com/welldone-software/usecallback-might-be-what-you-meant-by-useref-useeffect-773bc0278ae 'useCallback Might Be What You Meant By useRef & useEffect')

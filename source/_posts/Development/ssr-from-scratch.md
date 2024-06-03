@@ -1,7 +1,8 @@
 ---
 title: 从零开始的SSR入门之旅
 category: Development
-date: 2023/09/21 12:00:00
+date: '2023/09/21 12:00:00'
+alias: post/Development/ssr-from-scratch/index.html
 ---
 
 此前作为一个SSR一窍不通的小白，最近从目的出发研究了SSR的机制和在React中的实现。跟着这篇博客你可以理解现代SSR（同构渲染）是什么，为什么需要SSR以及SSR框架是如何实现的（非底层）。

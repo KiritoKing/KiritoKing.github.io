@@ -1,8 +1,9 @@
 ---
 title: Docker 里的 shebang 踩坑记
 category: Development
-date: 2023/07/13 12:21:42
+date: '2023/07/13 12:21:42'
 excerpt: CRLF 中的 \r 会破坏 shebang，导致无法正常找到解释器，就这个小 bug 我找了一天才修好。
+alias: post/Development/shell-shebang/index.html
 ---
 
 最近手头有一个 Node 后端项目需要用 Docker 来部署，于是火急火燎地开始学习 Docker ，但在写完 Dockerfile 后却出现了以下错误：

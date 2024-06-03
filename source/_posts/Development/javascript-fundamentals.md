@@ -1,7 +1,8 @@
 ---
 title: 深入 Javascript 基础
 category: Development
-date: 2023/05/16 08:32:22
+date: '2023/05/16 08:32:22'
+alias: post/Development/javascript-fundamentals/index.html
 ---
 
 本篇文章着重于讨论 JavaScript 语言一些原始的特性（颇有”祖宗之法不可变“的意味的一些语言设计），不过分地关注其实现细节和设计初衷。

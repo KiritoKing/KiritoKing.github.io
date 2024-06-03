@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "hexo server -s",
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
@@ -29,5 +30,8 @@
     "hexo-theme-redefine": "^2.6.1"
   },
   "devDependencies": {
+    "dayjs": "^1.11.11",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.4.3"
   }
 }

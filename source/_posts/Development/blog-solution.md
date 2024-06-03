@@ -1,8 +1,9 @@
 ---
 title: 使用 Hexo 搭建和部署个人网站
 category: Development
-date: 2023/04/23 05:36:00
+date: '2023/04/23 05:36:00'
 excerpt: 使用 Hexo+React 搭建个人静态博客系统的个人经验总结
+alias: post/Development/blog-solution/index.html
 ---
 
 ## 技术选型

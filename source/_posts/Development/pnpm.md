@@ -1,7 +1,8 @@
 ---
 title: 前端工具链之包管理器 - pnpm
 category: Development
-date: 2023/06/09 08:40:25
+date: '2023/06/09 08:40:25'
+alias: post/Development/pnpm/index.html
 ---
 
 pnpm（performant npm）是一个主打**快速和省空间**的包管理器。它使用**改进的非扁平node_modules目录**和**硬链接和符号链接**优化依赖管理过程，个人体验下来比起yarn-v2的PnP机制会遇到的兼容性问题更少，**是我现阶段最喜欢的包管理器**。

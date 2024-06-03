@@ -1,8 +1,9 @@
 ---
 title: 关于刷题环境的看法与选择
 category: Development
-date: 2023/04/12 08:00:00
+date: '2023/04/12 08:00:00'
 excerpt: 如何选择合适的刷题环境以及如何快速配置一个开箱即用的环境
+alias: post/Development/what-is-best-leetcode-lang/index.html
 ---
 
 今天在准备机试，拿起很久没刷的算法题 ~~（上次刷题还是大一刷洛谷）~~ ，除了考虑刷哪一套题单，要考虑的就是**使用什么语言、什么环境**来刷。

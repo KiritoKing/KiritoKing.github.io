@@ -1,8 +1,10 @@
 ---
 title: 你真的需要useMemo和useCallback吗
 category: Development
-date: 2023/08/24 12:00:00
-excerpt: 今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。
+date: '2023/08/24 12:00:00'
+excerpt: >-
+  今天写需求的时候被mentor敲打了，说随便用`useCallback`不好，但没有细说原因。此前在跟其他老哥交流的时候也告诉我说能不用就不用，我也很好奇为什么，这里就来好好深究一下`useCallback`和`useMemo`，以及它们到底应该在什么情况下使用。
+alias: post/Development/do-u-need-memo-and-callback/index.html
 ---
 
 ## 目录

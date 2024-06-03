@@ -1,7 +1,8 @@
 ---
 title: 协变与逆变
 category: Development
-date: 2023/01/24 08:00:00
+date: '2023/01/24 08:00:00'
+alias: post/Development/covariant-and-contravarirant/index.html
 ---
 
 协变（covariant）和逆变（contravariant）是对于类型的概念，是类型安全和类型转换中的重要概念，但可能对大多数初学者来说是一个陌生的概念。

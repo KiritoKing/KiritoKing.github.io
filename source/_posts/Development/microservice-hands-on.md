@@ -1,7 +1,8 @@
 ---
 title: 浅谈软件架构：微服务和微前端
 category: Development
-date: 2023/05/25 11:50:14
+date: '2023/05/25 11:50:14'
+alias: post/Development/microservice-hands-on/index.html
 ---
 
 之前在另一家公司实习的时候就被微服务架构等一系列词汇搞得晕乎乎的，好在最后也没涉及这方面的事情，也就不了了之了。
