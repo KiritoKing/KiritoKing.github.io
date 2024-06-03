@@ -1,6 +1,5 @@
 ---
 title: 浅谈软件架构：微服务和微前端
-category: Development
 date: '2023/05/25 11:50:14'
 alias:
   - post/Development/microservice-hands-on/index.html

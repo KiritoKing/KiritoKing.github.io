@@ -1,6 +1,5 @@
 ---
 title: 深入JS - 1.浏览器事件循环
-category: Development
 date: '2023/04/26 08:00:00'
 excerpt: >-
   由于 JavaScript 是单线程的，且 JavaScript 主线程和渲染线程互斥，如果异步操作阻塞 JavaScript

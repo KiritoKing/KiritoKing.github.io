@@ -1,6 +1,5 @@
 ---
 title: 关于刷题环境的看法与选择
-category: Development
 date: '2023/04/12 08:00:00'
 excerpt: 如何选择合适的刷题环境以及如何快速配置一个开箱即用的环境
 alias:

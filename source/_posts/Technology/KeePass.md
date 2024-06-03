@@ -1,6 +1,5 @@
 ---
 title: 我的个人密码管理方案 - KeePass
-category: Technology
 date: '2023/05/23 08:47:52'
 excerpt: 个人管理密码数据库的一些经验，以及配置全平台 KeePass 解决方案的一些心得
 alias:

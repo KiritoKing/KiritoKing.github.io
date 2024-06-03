@@ -1,6 +1,5 @@
 ---
 title: Windows Dev Drive 快速上手体验
-category: Technology
 date: '2023/11/16 01:01:33'
 excerpt: >-
   Windows 11 23H2的Windows Dev Home是一个新的开发者中心，提供了一些功能来改进Windows开发。此外，Windows 11

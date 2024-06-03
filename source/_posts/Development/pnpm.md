@@ -1,6 +1,5 @@
 ---
 title: 前端工具链之包管理器 - pnpm
-category: Development
 date: '2023/06/09 08:40:25'
 alias:
   - post/Development/pnpm/index.html

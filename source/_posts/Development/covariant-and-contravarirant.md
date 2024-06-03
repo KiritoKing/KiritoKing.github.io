@@ -1,6 +1,5 @@
 ---
 title: 协变与逆变
-category: Development
 date: '2023/01/24 08:00:00'
 alias:
   - post/Development/covariant-and-contravarirant/index.html

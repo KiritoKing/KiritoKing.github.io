@@ -1,6 +1,5 @@
 ---
 title: Bun 1.0 初体验体验：这口包子香吗？
-category: Development
 date: '2023/10/25 02:28:00'
 alias:
   - post/Development/bun-hands-on/index.html

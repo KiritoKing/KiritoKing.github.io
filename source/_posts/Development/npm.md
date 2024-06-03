@@ -1,6 +1,5 @@
 ---
 title: 前端工具链之包管理器 - 过去与未来的npm
-category: Development
 date: '2023/06/06 08:09:39'
 alias:
   - post/Development/npm/index.html

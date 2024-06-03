@@ -1,6 +1,5 @@
 ---
 title: 工欲善其事，必先利其器——打造自己趁手的终端体验
-category: Technology
 date: '2023/08/07 04:00:00'
 alias:
   - post/Technology/shell-optimize/index.html

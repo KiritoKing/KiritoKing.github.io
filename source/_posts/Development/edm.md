@@ -1,6 +1,5 @@
 ---
 title: 利用Table布局实现EDM设计
-category: Development
 date: '2023/03/20 08:00:00'
 alias:
   - post/Development/edm/index.html

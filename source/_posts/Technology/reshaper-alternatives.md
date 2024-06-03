@@ -1,6 +1,5 @@
 ---
 title: 寻找 ReSharper 开源替代
-category: Technology
 date: '2023/02/14 08:00:00'
 excerpt: 不做被JetBrains宠坏的开发者（虽然IDEA真香）
 alias:

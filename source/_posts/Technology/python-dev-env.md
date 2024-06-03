@@ -1,6 +1,5 @@
 ---
 title: Python 编程环境重新构建
-category: Technology
 date: '2023/07/09 08:00:00'
 excerpt: >-
   在新机器和旧机器上重新配置统一的Python环境和管理方案，使用一个全局最新版Python +

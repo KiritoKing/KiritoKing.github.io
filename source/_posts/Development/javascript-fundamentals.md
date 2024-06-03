@@ -1,6 +1,5 @@
 ---
 title: 深入 Javascript 基础
-category: Development
 date: '2023/05/16 08:32:22'
 alias:
   - post/Development/javascript-fundamentals/index.html

@@ -1,6 +1,5 @@
 ---
 title: 初探 Docker - 原理和实践
-category: Development
 date: '2023/07/12 04:27:00'
 alias:
   - post/Development/hands-on-docker/index.html

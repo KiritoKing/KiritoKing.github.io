@@ -1,6 +1,5 @@
 ---
 title: 全排列问题
-category: Research
 date: '2023/04/19 08:00:00'
 alias:
   - post/Research/permutation/index.html

@@ -1,6 +1,5 @@
 ---
 title: 从零开始的SSR入门之旅
-category: Development
 date: '2023/09/21 12:00:00'
 alias:
   - post/Development/ssr-from-scratch/index.html

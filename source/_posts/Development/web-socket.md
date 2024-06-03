@@ -1,6 +1,5 @@
 ---
 title: WebSocket 应用研究
-category: Development
 date: '2023/07/09 08:00:00'
 excerpt: >-
   WebSocket 是基于 TCP 的一种新的应用层网络协议。它实现了浏览器与服务器全双工通信，即允许服务器主动发送信息给客户端。因此，在

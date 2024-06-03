@@ -1,6 +1,5 @@
 ---
 title: 从设计模式看 react-redux 的工作原理
-category: Development
 date: '2023/08/14 08:48:00'
 excerpt: >-
   本文探讨了redux的发布-订阅模式的实现，以及与原生的useContext和useReducer方案的区别。redux的发布-订阅模式采用了subscription实例来订阅store的消息事件，并通过notify通知所有订阅了它的Subscription实例，从而实现了按需刷新，避免了意外组件更新。与观察者模式不同，redux的发布-订阅模式是解耦的，订阅者和发布者之间无需直接联系。此外，文章还介绍了redux的API实现和Hook

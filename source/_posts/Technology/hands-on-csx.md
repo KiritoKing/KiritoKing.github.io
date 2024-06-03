@@ -1,6 +1,5 @@
 ---
 title: 初探 C# Script
-category: Technology
 date: '2023/04/11 08:00:00'
 excerpt: >-
   C# 脚本是一款用于测试 C# 和 .NET 代码段的工具，无需创建多个单元测试或控制台项目。它提供了轻型选项，可快速在命令行上对 LINQ

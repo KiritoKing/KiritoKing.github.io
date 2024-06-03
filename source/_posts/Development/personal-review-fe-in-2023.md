@@ -1,6 +1,5 @@
 ---
 title: 2023年度总结——我为什么选择了前端
-category: Development
 date: '2024/01/30 12:25:00'
 excerpt: 简单总结我前端的入行过程和在2023年底这个节点对整个Web前端生态与未来的思考。
 alias:

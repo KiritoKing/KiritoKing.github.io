@@ -1,6 +1,5 @@
 ---
 title: HTML 表单（form）相关知识
-category: Development
 date: '2023/06/01 06:04:46'
 alias:
   - post/Development/html-form/index.html

@@ -1,6 +1,5 @@
 ---
 title: 前端工具链之包管理器 - yarn-berry与PnP
-category: Development
 date: '2023/06/09 05:12:49'
 excerpt: >-
   这篇文章简要叙述了yarn的版本变更历史，重点阐述了yarn2的PnP机制的设计思路和实际应用，并提出了一些解决相关兼容性问题的方法，方便老项目逐步升级到新版本yarn。

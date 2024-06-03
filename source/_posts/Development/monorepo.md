@@ -1,6 +1,5 @@
 ---
 title: MonoRepo 前端项目实操
-category: Development
 date: '2023/05/26 10:55:16'
 alias:
   - post/Development/monorepo/index.html
