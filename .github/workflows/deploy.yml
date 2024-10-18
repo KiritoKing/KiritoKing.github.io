@@ -56,18 +56,42 @@ jobs:
         uses: actions/deploy-pages@v4
 
   submit-to-baidu:
-    needs: build
+    needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: Download sitemap
         uses: actions/download-artifact@v3
         with:
           name: sitemap
-      - name: Extract URLs from sitemap
+      - name: Extract and prepare URLs
         run: |
-          grep -oP '(?<=<loc>).*(?=</loc>)' sitemap.xml > urls.txt
+          grep -oP '(?<=<loc>).*(?=</loc>)' sitemap.xml > all_urls.txt
+          sort all_urls.txt | uniq > unique_urls.txt
+          if [ -f last_submitted_urls.txt ]; then
+            comm -23 unique_urls.txt last_submitted_urls.txt > new_urls.txt
+          else
+            cp unique_urls.txt new_urls.txt
+          fi
+          head -n 50 new_urls.txt > urls_to_submit.txt
       - name: Submit URLs to Baidu
         run: |
-          curl -H 'Content-Type:text/plain' --data-binary @urls.txt "http://data.zz.baidu.com/urls?site=https://chlorinec.top&token=${{ secrets.BAIDU_TOKEN }}"
+          total_urls=$(wc -l < urls_to_submit.txt)
+          echo "Total URLs to submit: $total_urls"
+          
+          split -l 20 urls_to_submit.txt url_chunk_
+          
+          for chunk in url_chunk_*; do
+            echo "Submitting chunk: $chunk"
+            response=$(curl -H 'Content-Type:text/plain' --data-binary @$chunk "http://data.zz.baidu.com/urls?site=https://chlorinec.top&token=${{ secrets.BAIDU_TOKEN }}")
+            echo "Response: $response"
+            sleep 5  # 添加较长的延迟，避免请求过于频繁
+          done
+          
+          cp unique_urls.txt last_submitted_urls.txt
         env:
           BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+      - name: Upload last submitted URLs
+        uses: actions/upload-artifact@v3
+        with:
+          name: last_submitted_urls
+          path: last_submitted_urls.txt
