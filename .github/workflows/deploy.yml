@@ -49,3 +49,27 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  submit-to-baidu:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: github-pages
+          path: artifact
+      - name: Extract sitemap
+        run: |
+          unzip artifact/artifact.zip -d extracted
+          mv extracted/sitemap.xml ./sitemap.xml
+      - name: Extract URLs from sitemap
+        run: |
+          grep -oP '(?<=<loc>).*(?=</loc>)' sitemap.xml > urls.txt
+      - name: Submit URLs to Baidu
+        run: |
+          curl -H 'Content-Type:text/plain' --data-binary @urls.txt "http://data.zz.baidu.com/urls?site=https://chlorinec.top&token=${{ secrets.BAIDU_TOKEN }}"
+        env:
+          BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
