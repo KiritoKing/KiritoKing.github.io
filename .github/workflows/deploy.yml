@@ -56,7 +56,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   submit-to-baidu:
-    needs: deploy
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download sitemap
