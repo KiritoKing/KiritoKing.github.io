@@ -3,16 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "hexo server -s",
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
-    "dev": "hexo server"
-  },
-  "hexo": {
-    "version": "7.2.0"
+    "dev": "hexo server",
+    "start": "hexo server -s"
   },
   "dependencies": {
+    "dayjs": "^1.11.11",
+    "gray-matter": "^4.0.3",
     "hexo": "^7.0.0",
     "hexo-all-minifier": "^0.5.7",
     "hexo-enhancer": "^1.0.10",
@@ -22,16 +21,17 @@
     "hexo-generator-feed": "^3.0.0",
     "hexo-generator-index": "^3.0.0",
     "hexo-generator-searchdb": "^1.4.1",
+    "hexo-generator-sitemap": "^3.0.1",
     "hexo-generator-tag": "^2.0.0",
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-marked": "^6.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-theme-redefine": "^2.6.1"
-  },
-  "devDependencies": {
-    "dayjs": "^1.11.11",
-    "gray-matter": "^4.0.3",
+    "hexo-theme-redefine": "^2.6.1",
     "yaml": "^2.4.3"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "hexo": {
+    "version": "7.2.0"
   }
 }

@@ -141,3 +141,12 @@ all_minifier: true
 # hexo-enhancer
 # predefined tags
 tags: nodejs, react, vue, typescript, javascript, css, html, npm, webpack, electron, dotnet
+
+# hexo-generator-sitemap
+sitemap:
+  path: 
+    - sitemap.xml
+    - sitemap.txt
+  rel: false
+  tags: true
+  categories: true
